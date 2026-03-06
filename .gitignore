@@ -20,6 +20,7 @@ app/.packages
 app/.flutter-plugins
 app/.flutter-plugins-dependencies
 app/.metadata
+app/android/app/google-services.json
 
 # Android / iOS generated
 app/android/.gradle/
