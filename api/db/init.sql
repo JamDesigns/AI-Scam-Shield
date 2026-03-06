@@ -1,0 +1,19 @@
+CREATE TABLE IF NOT EXISTS devices (
+  id TEXT PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+  device_id TEXT PRIMARY KEY REFERENCES devices(id) ON DELETE CASCADE,
+  is_premium BOOLEAN NOT NULL DEFAULT FALSE,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS device_weekly_usage (
+  device_id TEXT NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
+  year_week TEXT NOT NULL, -- e.g. "2026-W09"
+  scans_count INT NOT NULL DEFAULT 0,
+  ai_scans_count INT NOT NULL DEFAULT 0,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (device_id, year_week)
+);

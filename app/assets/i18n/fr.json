@@ -1,0 +1,60 @@
+{
+  "app.title": "Scam Shield",
+  "scan.title": "Analyser",
+  "scan.subtitle": "Collez un lien ou un message pour vérifier s’il s’agit d’une arnaque.",
+  "scan.input.label": "Lien ou message",
+  "scan.button": "Analyser",
+  "scan.example": "Exemple : Votre compte est bloqué. Vérifiez sur https://secure-login-paypaI.com",
+  "scan.aiQuota.unlimited": "AI Pro : Illimité (Premium)",
+  "scan.aiQuota.free": "Utilisations AI Pro restantes cette semaine : {remaining}/{limit} (Illimité avec Premium)",
+
+  "result.title": "Résultat",
+  "result.riskScore": "Niveau de risque",
+  "result.category": "Catégorie",
+  "result.reasons": "Raisons",
+  "result.actions": "Que faire",
+  "result.action.block": "Bloquez l’expéditeur et ne cliquez pas sur le lien.",
+  "result.action.report": "Signalez-le à votre banque / opérateur si de l’argent est en jeu.",
+  "result.action.verify": "Vérifiez via les canaux officiels (saisissez l’URL vous-même).",
+
+  "premium.badge": "Premium",
+  "premium.locked": "Fonction Premium",
+  "premium.cta": "Passer Premium",
+  "premium.description": "Analyses illimitées et explications avancées.",
+  "premium.restore": "Restaurer",
+
+  "errors.network": "Erreur réseau. Vérifiez votre connexion.",
+  "errors.unknown": "Une erreur s’est produite.",
+  "errors.weeklyLimitExceeded": "Vous avez atteint la limite hebdomadaire gratuite. Passez Premium pour des analyses illimitées.",
+  "errors.aiLimitExceeded": "AI Pro a atteint la limite hebdomadaire gratuite. Passez Premium pour une analyse illimitée.",
+
+  "reasons.URL_TYPO": "L’URL contient une faute suspecte (possible usurpation).",
+  "reasons.SHORTENER": "Le lien utilise un raccourcisseur d’URL.",
+  "reasons.URGENCY_LANGUAGE": "Le message utilise des tactiques d’urgence ou de pression.",
+  "reasons.SENSITIVE_DATA": "Le message demande des données sensibles (mot de passe, carte, codes).",
+  "reasons.SUSPICIOUS_TLD": "Le lien utilise une extension de domaine (TLD) suspecte.",
+  "reasons.IP_URL": "Le lien utilise une adresse IP brute au lieu d'un nom de domaine.",
+  "reasons.SUSPICIOUS_PATH": "Le lien contient des mots-clés de connexion/vérification suspects.",
+  "reasons.MANY_SUBDOMAINS": "Le lien utilise de nombreux sous-domaines, ce qui est courant dans les escroqueries par usurpation d'identité.",
+
+  "categories.low_risk": "Risque faible",
+  "categories.medium_risk": "Risque moyen",
+  "categories.high_risk": "Risque élevé",
+
+  "actions.refresh": "Actualiser",
+  "premium.activated": "Premium activé",
+  "errors.paywall": "Impossible d’ouvrir l’écran de paiement.",
+
+  "actions.close": "Fermer",
+  "premium.iapNotReady": "Les achats intégrés ne sont pas encore connectés. Utilisez le basculement admin côté backend pour tester.",
+  "premium.restoreNotReady": "La restauration n’est pas encore connectée.",
+
+  "actions.clear": "Effacer",
+
+  "subscription.title": "Abonnement",
+  "subscription.subtitle": "Gérez les paramètres de votre abonnement.",
+  "subscription.manageCta": "Gérer l’abonnement",
+  "subscription.manageHint": "Vous pouvez annuler le renouvellement ou mettre à jour les informations de facturation depuis l’écran d’abonnement.",
+  "scan.weeklyQuota.free": "Analyses normales restantes cette semaine : {remaining}/{limit}",
+  "errors.weeklyAndAiLimitExceeded": "AI Pro et l’analyse normale ont atteint la limite hebdomadaire gratuite. Passez Premium pour un accès illimité."
+}

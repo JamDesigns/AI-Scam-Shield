@@ -1,0 +1,60 @@
+{
+  "app.title": "Scam Shield",
+  "scan.title": "Escanear",
+  "scan.subtitle": "Pega un enlace o mensaje para comprobar si es una estafa.",
+  "scan.input.label": "Enlace o mensaje",
+  "scan.button": "Escanear",
+  "scan.example": "Ejemplo: Tu cuenta está bloqueada. Verifica en https://secure-login-paypaI.com",
+  "scan.aiQuota.unlimited": "AI Pro: Ilimitado (Premium)",
+  "scan.aiQuota.free": "Usos de AI Pro restantes esta semana: {remaining}/{limit} (Ilimitado con Premium)",
+
+  "result.title": "Resultado",
+  "result.riskScore": "Nivel de riesgo",
+  "result.category": "Categoría",
+  "result.reasons": "Motivos",
+  "result.actions": "Qué hacer",
+  "result.action.block": "Bloquea al remitente y no hagas clic en el enlace.",
+  "result.action.report": "Repórtalo a tu banco / proveedor si implica dinero.",
+  "result.action.verify": "Verifica por canales oficiales (escribe la URL tú mismo).",
+
+  "premium.badge": "Premium",
+  "premium.locked": "Función Premium",
+  "premium.cta": "Hazte Premium",
+  "premium.description": "Escaneos ilimitados y explicaciones avanzadas.",
+  "premium.restore": "Restaurar",
+
+  "errors.network": "Error de red. Comprueba tu conexión.",
+  "errors.unknown": "Algo ha salido mal.",
+  "errors.weeklyLimitExceeded": "Has alcanzado el límite semanal gratuito de escaneos. Hazte Premium para escaneos ilimitados.",
+  "errors.aiLimitExceeded": "AI Pro ha alcanzado el límite semanal gratuito. Hazte Premium para análisis ilimitados.",
+
+  "reasons.URL_TYPO": "La URL contiene un error sospechoso (posible suplantación).",
+  "reasons.SHORTENER": "El enlace usa un acortador de URL.",
+  "reasons.URGENCY_LANGUAGE": "El mensaje usa urgencia o tácticas de presión.",
+  "reasons.SENSITIVE_DATA": "El mensaje solicita datos sensibles (contraseña, tarjeta, códigos).",
+  "reasons.SUSPICIOUS_TLD": "El enlace utiliza una extensión de dominio (TLD) sospechosa.",
+  "reasons.IP_URL": "El enlace utiliza una dirección IP sin formato en lugar de un dominio.",
+  "reasons.SUSPICIOUS_PATH": "El enlace contiene palabras clave de inicio de sesión/verificación sospechosas.",
+  "reasons.MANY_SUBDOMAINS": "El enlace utiliza muchos subdominios, lo cual es común en las estafas de suplantación de identidad.",
+
+  "categories.low_risk": "Riesgo bajo",
+  "categories.medium_risk": "Riesgo medio",
+  "categories.high_risk": "Riesgo alto",
+
+  "actions.refresh": "Actualizar",
+  "premium.activated": "Premium activado",
+  "errors.paywall": "No se pudo abrir la pantalla de pago.",
+
+  "actions.close": "Cerrar",
+  "premium.iapNotReady": "Las compras integradas aún no están conectadas. Usa el toggle de admin en backend para pruebas.",
+  "premium.restoreNotReady": "La restauración aún no está conectada.",
+
+  "actions.clear": "Limpiar",
+
+  "subscription.title": "Suscripción",
+  "subscription.subtitle": "Gestiona la configuración de tu suscripción.",
+  "subscription.manageCta": "Gestionar suscripción",
+  "subscription.manageHint": "Puedes cancelar la renovación o actualizar los datos de pago desde la pantalla de suscripción.",
+  "scan.weeklyQuota.free": "Escaneos normales restantes esta semana: {remaining}/{limit}",
+  "errors.weeklyAndAiLimitExceeded": "AI Pro y el escaneo normal han alcanzado el límite semanal gratuito. Hazte Premium para acceso ilimitado."
+}

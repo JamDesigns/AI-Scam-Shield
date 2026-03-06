@@ -1,0 +1,61 @@
+{
+  "app.title": "Scam Shield",
+  "scan.title": "Scan",
+  "scan.subtitle": "Paste a link or message to check for scams.",
+  "scan.input.label": "Link or message",
+  "scan.button": "Scan",
+  "scan.example": "Example: Your account is locked. Verify at https://secure-login-paypaI.com",
+  "scan.aiQuota.unlimited": "AI Pro: Unlimited (Premium)",
+  "scan.aiQuota.free": "AI Pro uses left this week: {remaining}/{limit} (Unlimited with Premium)",
+
+  "result.title": "Result",
+  "result.riskScore": "Risk score",
+  "result.category": "Category",
+  "result.reasons": "Reasons",
+  "result.actions": "What to do",
+  "result.action.block": "Block the sender and do not click the link.",
+  "result.action.report": "Report it to your bank / provider if it involves money.",
+  "result.action.verify": "Verify via official channels (type the URL yourself).",
+
+  "premium.badge": "Premium",
+  "premium.locked": "Premium feature",
+  "premium.cta": "Go Premium",
+  "premium.description": "Unlimited scans and advanced explanations.",
+  "premium.restore": "Restore",
+
+  "errors.network": "Network error. Check your connection.",
+  "errors.unknown": "Something went wrong.",
+  "errors.weeklyLimitExceeded": "You have reached the free weekly scan limit. Go Premium for unlimited scans.",
+  "errors.aiLimitExceeded": "AI Pro reached the free weekly limit. Go Premium for unlimited AI analysis.",
+
+  "reasons.URL_TYPO": "The URL contains a suspicious typo (possible impersonation).",
+  "reasons.SHORTENER": "The link uses a URL shortener.",
+  "reasons.URGENCY_LANGUAGE": "The message uses urgency or pressure tactics.",
+  "reasons.SENSITIVE_DATA": "The message asks for sensitive data (password, card, codes).",
+  "reasons.SUSPICIOUS_TLD": "The link uses a suspicious domain extension (TLD).",
+  "reasons.IP_URL": "The link uses a raw IP address instead of a domain.",
+  "reasons.SUSPICIOUS_PATH": "The link contains suspicious login/verification keywords.",
+  "reasons.MANY_SUBDOMAINS": "The link uses many subdomains, which is common in impersonation scams.",
+
+  "categories.low_risk": "Low risk",
+  "categories.medium_risk": "Medium risk",
+  "categories.high_risk": "High risk",
+
+  "actions.refresh": "Refresh",
+  "premium.activated": "Premium activated",
+  "errors.paywall": "Could not open the paywall.",
+
+  "actions.close": "Close",
+  "premium.iapNotReady": "IAP not wired yet. Use backend admin toggle for testing.",
+  "premium.restoreNotReady": "Restore not wired yet.",
+
+  "actions.clear": "Clear",
+
+  "subscription.title": "Subscription",
+  "subscription.subtitle": "Manage your subscription settings.",
+  "subscription.manageCta": "Manage subscription",
+  "subscription.manageHint": "You can cancel renewal or update billing details from the subscription screen.",
+
+  "scan.weeklyQuota.free": "Normal scans left this week: {remaining}/{limit}",
+  "errors.weeklyAndAiLimitExceeded": "AI Pro and normal scan reached the free weekly limit. Go Premium for unlimited access."
+}
