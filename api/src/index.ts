@@ -226,7 +226,7 @@ app.post("/scan", async (req, reply) => {
   const aiBaseUrl = env.AI_BASE_URL?.trim().length
     ? env.AI_BASE_URL.trim()
     : env.AI_MODE === "cloud"
-      ? "https://ollama.com/api"
+      ? "https://ollama.com"
       : "http://host.docker.internal:11434";
 
   const aiConfigured =
@@ -245,7 +245,6 @@ app.post("/scan", async (req, reply) => {
   if (aiConfigured) {
     if (isPremium) {
       aiAllowed = true;
-      aiUsed = true;
     } else {
       if (typeof deviceId !== "string" || deviceId.length === 0) {
         return reply.code(400).send({ error: "missing_device_id" });
@@ -256,8 +255,6 @@ app.post("/scan", async (req, reply) => {
 
       if (currentAi < FREE_WEEKLY_AI_LIMIT) {
         aiAllowed = true;
-        aiUsed = true;
-        await incrementWeeklyAiUsage(pool, deviceId, yearWeek);
       }
     }
   }
@@ -272,9 +269,23 @@ app.post("/scan", async (req, reply) => {
         model: env.AI_MODEL,
         input: body.input, // analyze original input (not translated)
       });
+
+      if (
+        ai &&
+        !isPremium &&
+        typeof deviceId === "string" &&
+        deviceId.length > 0
+      ) {
+        await incrementWeeklyAiUsage(pool, deviceId, yearWeek);
+      }
+
+      if (ai) {
+        aiUsed = true;
+      }
     } catch (e) {
       req.log.warn({ err: e }, "AI analysis failed, falling back to classic");
       ai = null;
+      aiUsed = false;
     }
   }
 
