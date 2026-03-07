@@ -10,7 +10,7 @@ class ApiClient {
 
   final String deviceId;
 
-  static const Duration _timeout = Duration(seconds: 15);
+  static const Duration _timeout = Duration(seconds: 45);
 
   Uri _u(String path) => Uri.parse('${AppConfig.apiBaseUrl}$path');
 

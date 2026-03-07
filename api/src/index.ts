@@ -42,6 +42,27 @@ function getIsoWeekKey(date: Date): { yearWeek: string; resetAt: string } {
   return { yearWeek, resetAt: end.toISOString() };
 }
 
+function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  message: string,
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(message)), ms);
+
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      },
+    );
+  });
+}
+
 const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
   DATABASE_URL: z.string(),
@@ -255,16 +276,21 @@ app.post("/scan", async (req, reply) => {
     }
   }
 
+  const AI_ANALYSIS_TIMEOUT_MS = 25000;
   let ai: AiAnalysis | null = null;
 
   if (aiAllowed) {
     try {
-      ai = await analyzeWithAI({
-        baseUrl: aiBaseUrl,
-        apiKey: env.AI_MODE === "cloud" ? env.AI_API_KEY?.trim() : undefined,
-        model: env.AI_MODEL,
-        input: body.input,
-      });
+      ai = await withTimeout(
+        analyzeWithAI({
+          baseUrl: aiBaseUrl,
+          apiKey: env.AI_MODE === "cloud" ? env.AI_API_KEY?.trim() : undefined,
+          model: env.AI_MODEL,
+          input: body.input,
+        }),
+        AI_ANALYSIS_TIMEOUT_MS,
+        `AI analysis timed out after ${AI_ANALYSIS_TIMEOUT_MS}ms`,
+      );
 
       if (
         ai &&

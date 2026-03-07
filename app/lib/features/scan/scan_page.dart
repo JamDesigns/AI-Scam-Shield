@@ -43,9 +43,15 @@ class _ScanPageState extends State<ScanPage> {
   bool get _isWeeklyScanLimitReached {
     if (_isPremium) return false;
 
-    final remaining = _lastResult?.weeklyRemaining ?? _aiQuota?.weeklyRemaining;
+    final normalRemaining =
+        _lastResult?.weeklyRemaining ?? _aiQuota?.weeklyRemaining;
+    final aiRemaining =
+        _lastResult?.aiWeeklyRemaining ?? _aiQuota?.aiWeeklyRemaining;
 
-    return remaining != null && remaining <= 0;
+    final noNormalScansLeft = normalRemaining != null && normalRemaining <= 0;
+    final noAiScansLeft = aiRemaining != null && aiRemaining <= 0;
+
+    return noNormalScansLeft && noAiScansLeft;
   }
 
   @override
@@ -138,9 +144,12 @@ class _ScanPageState extends State<ScanPage> {
         _lastResult = result;
 
         if (!_isPremium) {
-          if ((result.weeklyRemaining ?? 0) <= 0) {
+          final normalRemaining = result.weeklyRemaining ?? 0;
+          final aiRemaining = result.aiWeeklyRemaining ?? 0;
+
+          if (normalRemaining <= 0 && aiRemaining <= 0) {
             _noticeKey = 'errors.weeklyAndAiLimitExceeded';
-          } else if (!result.aiAllowed) {
+          } else if (!result.aiAllowed && aiRemaining <= 0) {
             _noticeKey = 'errors.aiLimitExceeded';
           }
         }
@@ -157,18 +166,22 @@ class _ScanPageState extends State<ScanPage> {
     } catch (e) {
       if (!mounted) return;
 
-      setState(() {
-        // Blocking: weekly scan quota exceeded (backend returns 402 + error=quota_exceeded).
-        if (e is ApiException &&
-            e.statusCode == 402 &&
-            e.errorCode == 'quota_exceeded') {
+      if (e is ApiException &&
+          e.statusCode == 402 &&
+          e.errorCode == 'quota_exceeded') {
+        await _refreshAiQuota();
+        if (!mounted) return;
+
+        setState(() {
+          _lastResult = null;
           _errorKey = 'errors.weeklyLimitExceeded';
           _errorMessage = null;
           _noticeKey = 'errors.weeklyAndAiLimitExceeded';
-          return;
-        }
+        });
+        return;
+      }
 
-        // Fallback behavior.
+      setState(() {
         _errorKey = kDebugMode ? null : 'errors.network';
         _errorMessage = kDebugMode ? e.toString() : null;
       });
