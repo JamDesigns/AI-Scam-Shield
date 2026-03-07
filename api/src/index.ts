@@ -276,7 +276,7 @@ app.post("/scan", async (req, reply) => {
     }
   }
 
-  const AI_ANALYSIS_TIMEOUT_MS = 25000;
+  const AI_ANALYSIS_TIMEOUT_MS = 90000;
   let ai: AiAnalysis | null = null;
 
   if (aiAllowed) {
