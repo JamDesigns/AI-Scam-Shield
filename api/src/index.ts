@@ -21,8 +21,8 @@ function getIsoWeekKey(date: Date): { yearWeek: string; resetAt: string } {
   const d = new Date(
     Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
   );
-  const day = d.getUTCDay() || 7; // Mon=1..Sun=7
-  d.setUTCDate(d.getUTCDate() + 4 - day); // nearest Thursday
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
 
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   const weekNo = Math.ceil(
@@ -32,7 +32,6 @@ function getIsoWeekKey(date: Date): { yearWeek: string; resetAt: string } {
 
   const yearWeek = `${year}-W${String(weekNo).padStart(2, "0")}`;
 
-  // End of ISO week (Sunday 23:59:59.999Z)
   const end = new Date(
     Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
   );
@@ -52,12 +51,10 @@ const envSchema = z.object({
   FREE_WEEKLY_LIMIT: z.coerce.number().int().min(0).default(3),
   FREE_WEEKLY_AI_LIMIT: z.coerce.number().int().min(0).default(1),
 
-  // DeepL (classic translation)
   DEEPL_AUTH_KEY: z.string().optional(),
   DEEPL_API_BASE: z.string().default("https://api-free.deepl.com"),
   DEEPL_TARGET_LANG: z.string().default("EN"),
 
-  // Ollama
   AI_PROVIDER: z.enum(["ollama"]).default("ollama"),
   AI_MODE: z.enum(["local", "cloud"]).default("local"),
   AI_BASE_URL: z.string().optional(),
@@ -96,7 +93,6 @@ await app.register(cors, {
 const pool = createPool(env.DATABASE_URL);
 
 app.addHook("preHandler", async (req) => {
-  // Most endpoints are device-based. Create the device lazily.
   const deviceId = req.headers["x-device-id"];
   if (typeof deviceId === "string" && deviceId.length > 0) {
     await ensureDevice(pool, deviceId);
@@ -144,15 +140,12 @@ app.get("/usage/week", async (req, reply) => {
 
   return {
     isPremium,
-
     weeklyLimit,
     weeklyUsed,
     weeklyRemaining,
-
     aiWeeklyLimit,
     aiWeeklyUsed,
     aiWeeklyRemaining,
-
     aiResetAt: resetAt,
     aiUnlimited: isPremium,
   };
@@ -174,7 +167,6 @@ app.post("/scan", async (req, reply) => {
     isPremium = await getPremiumStatus(pool, deviceId);
   }
 
-  // Limit for Free users (weekly)
   const FREE_WEEKLY_LIMIT = env.FREE_WEEKLY_LIMIT;
 
   if (!isPremium) {
@@ -192,15 +184,12 @@ app.post("/scan", async (req, reply) => {
         resetAt,
       });
     }
-
-    await incrementWeeklyUsage(pool, deviceId, yearWeek);
   }
 
   const rules = getDefaultRules();
 
   let textForScoring = body.input;
 
-  // Option A: classic translation to EN (so English rules can match any input language)
   if (env.DEEPL_AUTH_KEY && env.DEEPL_AUTH_KEY.trim().length > 0) {
     try {
       const tr = await translateWithDeepL({
@@ -212,7 +201,6 @@ app.post("/scan", async (req, reply) => {
 
       textForScoring = tr.text;
     } catch (e) {
-      // Keep the service resilient: if translation fails, fallback to original text.
       req.log.warn(
         { err: e },
         "DeepL translation failed, using original input",
@@ -238,7 +226,6 @@ app.post("/scan", async (req, reply) => {
     (env.AI_MODE === "local" ||
       (typeof env.AI_API_KEY === "string" && env.AI_API_KEY.trim().length > 0));
 
-  // 🔹 AI gating (Premium unlimited, Free 1/week)
   let aiAllowed = false;
   let aiUsed = false;
 
@@ -267,7 +254,7 @@ app.post("/scan", async (req, reply) => {
         baseUrl: aiBaseUrl,
         apiKey: env.AI_MODE === "cloud" ? env.AI_API_KEY?.trim() : undefined,
         model: env.AI_MODEL,
-        input: body.input, // analyze original input (not translated)
+        input: body.input,
       });
 
       if (
@@ -292,6 +279,10 @@ app.post("/scan", async (req, reply) => {
   const finalRiskScore = ai?.riskScore ?? classic.riskScore;
   const finalCategory = ai?.category ?? classic.category;
   const finalReasons = ai?.reasons ?? classic.reasons;
+
+  if (!isPremium && typeof deviceId === "string" && deviceId.length > 0) {
+    await incrementWeeklyUsage(pool, deviceId, yearWeek);
+  }
 
   const weeklyLimit = isPremium ? null : env.FREE_WEEKLY_LIMIT;
 
@@ -320,7 +311,6 @@ app.post("/scan", async (req, reply) => {
     category: finalCategory,
     reasons: finalReasons,
 
-    // keep classic for UX/debug/analytics
     classicRiskScore: classic.riskScore,
     classicCategory: classic.category,
     classicReasons: classic.reasons,
@@ -329,12 +319,10 @@ app.post("/scan", async (req, reply) => {
     weeklyUsed,
     weeklyRemaining,
 
-    // AI details
     aiAllowed,
     aiUsed,
     aiExplanation: ai?.explanation ?? null,
 
-    // AI quota info for UI
     aiWeeklyLimit,
     aiWeeklyUsed,
     aiWeeklyRemaining,
@@ -345,7 +333,6 @@ app.post("/scan", async (req, reply) => {
   };
 });
 
-// DEV-ONLY: toggle premium for a device.
 app.post("/admin/subscriptions/set", async (req, reply) => {
   const token = req.headers["x-admin-token"];
   if (token !== env.ADMIN_TOKEN) {
