@@ -191,6 +191,15 @@ app.post("/scan", async (req, reply) => {
 
   const body = bodySchema.parse(req.body);
 
+  const MAX_INPUT_LENGTH = 1500;
+
+  if (body.input.length > MAX_INPUT_LENGTH) {
+    return reply.code(400).send({
+      error: "input_too_long",
+      maxLength: MAX_INPUT_LENGTH,
+    });
+  }
+
   const { yearWeek, resetAt } = getIsoWeekKey(new Date());
 
   let isPremium = false;

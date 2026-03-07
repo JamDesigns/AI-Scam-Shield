@@ -19,6 +19,7 @@ class ScanPage extends StatefulWidget {
 }
 
 class _ScanPageState extends State<ScanPage> {
+  static const int _maxInputLength = 1500;
   final _controller = TextEditingController();
 
   String? _deviceId;
@@ -313,11 +314,23 @@ class _ScanPageState extends State<ScanPage> {
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.start,
             ),
+            const SizedBox(height: 4),
+            Text(
+              t.t(
+                'scan.maxLength',
+                params: {
+                  'max': _maxInputLength.toString(),
+                },
+              ),
+              style: Theme.of(context).textTheme.bodySmall,
+              textAlign: TextAlign.start,
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: _controller,
               minLines: 4,
               maxLines: 10,
+              maxLength: _maxInputLength,
               decoration: InputDecoration(
                 labelText: t.t('scan.input.label'),
                 hintText: t.t('scan.example'),

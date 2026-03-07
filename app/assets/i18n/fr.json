@@ -2,6 +2,7 @@
   "app.title": "Scam Shield",
   "scan.title": "Analyser",
   "scan.subtitle": "Collez un lien ou un message pour vérifier s’il s’agit d’une arnaque.",
+  "scan.maxLength": "Longueur maximale du message : {max} caractères.",
   "scan.input.label": "Lien ou message",
   "scan.button": "Analyser",
   "scan.example": "Exemple : Votre compte est bloqué. Vérifiez sur https://secure-login-paypaI.com",

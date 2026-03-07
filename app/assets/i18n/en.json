@@ -2,6 +2,7 @@
   "app.title": "Scam Shield",
   "scan.title": "Scan",
   "scan.subtitle": "Paste a link or message to check for scams.",
+  "scan.maxLength": "Maximum message length: {max} characters.",
   "scan.input.label": "Link or message",
   "scan.button": "Scan",
   "scan.example": "Example: Your account is locked. Verify at https://secure-login-paypaI.com",
