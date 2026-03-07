@@ -75,7 +75,11 @@ class _ScanPageState extends State<ScanPage> {
 
     await RevenueCatService.initialize(appUserId: deviceId);
 
-    _api = ApiClient(deviceId: deviceId);
+    _api = ApiClient(
+      deviceId: deviceId,
+      localeLanguageCode:
+          WidgetsBinding.instance.platformDispatcher.locale.languageCode,
+    );
     _scanService = ScanService(_api);
     _premiumService = PremiumService(_api);
 
@@ -495,7 +499,10 @@ class _ResultCard extends StatelessWidget {
       'UNKNOWN_SENDER',
       'SUSPICIOUS_LINK',
       'SHORTENED_URL',
+      'SHORTENER',
       'LOOKALIKE_DOMAIN',
+      'URL_TYPO',
+      'SUSPICIOUS_PATH',
       'THREAT_LANGUAGE',
       'IMPERSONATION',
       'TOO_GOOD_TO_BE_TRUE',

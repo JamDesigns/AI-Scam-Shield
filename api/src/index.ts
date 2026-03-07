@@ -186,6 +186,7 @@ app.post("/scan", async (req, reply) => {
 
   const bodySchema = z.object({
     input: z.string().min(1).max(5000),
+    outputLanguage: z.string().min(2).max(5).default("en"),
   });
 
   const body = bodySchema.parse(req.body);
@@ -287,6 +288,7 @@ app.post("/scan", async (req, reply) => {
           apiKey: env.AI_MODE === "cloud" ? env.AI_API_KEY?.trim() : undefined,
           model: env.AI_MODEL,
           input: body.input,
+          outputLanguage: body.outputLanguage,
         }),
         AI_ANALYSIS_TIMEOUT_MS,
         `AI analysis timed out after ${AI_ANALYSIS_TIMEOUT_MS}ms`,

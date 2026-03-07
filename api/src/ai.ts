@@ -1,7 +1,7 @@
 export type RiskCategory = "low_risk" | "medium_risk" | "high_risk";
 
 export type AiAnalysis = {
-  riskScore: number; // 0..100
+  riskScore: number;
   category: RiskCategory;
   reasons: string[];
   explanation: string;
@@ -12,15 +12,26 @@ type AnalyzeWithAIParams = {
   apiKey?: string;
   model: string;
   input: string;
+  outputLanguage: string;
 };
 
 type OllamaGenerateResponse = {
   response?: string;
 };
 
+function normalizeOutputLanguage(language: string): string {
+  const value = language.trim().toLowerCase();
+
+  if (value === "es") return "Spanish";
+  if (value === "fr") return "French";
+  return "English";
+}
+
 export async function analyzeWithAI(
   params: AnalyzeWithAIParams,
 ): Promise<AiAnalysis> {
+  const outputLanguage = normalizeOutputLanguage(params.outputLanguage);
+
   const system = [
     "You are an expert anti-scam analyst.",
     "Your job is to evaluate messages for fraud risk.",
@@ -28,7 +39,8 @@ export async function analyzeWithAI(
     "Do not include markdown or extra commentary.",
     "If multiple strong scam signals are present, choose high_risk.",
     "The explanation must be concise (max 3 sentences), clear, and practical.",
-    "The explanation must be written in the SAME LANGUAGE as the input text.",
+    `The explanation must be written in ${outputLanguage}.`,
+    `The reasons must also be written in ${outputLanguage}.`,
     "Avoid technical jargon.",
     "Focus on why the message is risky and what the user should do next.",
   ].join(" ");
@@ -45,6 +57,9 @@ export async function analyzeWithAI(
     "- category must align with riskScore (>=70 high_risk, >=35 medium_risk).",
     "- explanation must be short, clear and practical.",
     "- explanation must advise what the user should do.",
+    `- explanation must be written in ${outputLanguage}.`,
+    `- reasons must be written in ${outputLanguage}.`,
+    "- reasons must be short bullet-style phrases, not technical codes.",
     "",
     "Message:",
     params.input,
@@ -123,6 +138,7 @@ export async function analyzeWithAI(
             .replace(/^reasons\./i, "")
             .trim(),
         )
+        .filter((r: string) => r.length > 0)
         .slice(0, 10)
     : [];
 

@@ -6,9 +6,13 @@ import 'package:http/http.dart' as http;
 import 'app_config.dart';
 
 class ApiClient {
-  ApiClient({required this.deviceId});
+  ApiClient({
+    required this.deviceId,
+    required this.localeLanguageCode,
+  });
 
   final String deviceId;
+  final String localeLanguageCode;
 
   static const Duration _timeout = Duration(seconds: 45);
 
@@ -49,6 +53,11 @@ class ApiClient {
     Map<String, dynamic> payload,
   ) async {
     try {
+      final enrichedPayload = <String, dynamic>{
+        ...payload,
+        'outputLanguage': localeLanguageCode,
+      };
+
       final res = await http
           .post(
             _u(path),
@@ -57,7 +66,7 @@ class ApiClient {
               'accept': 'application/json',
               'x-device-id': deviceId,
             },
-            body: json.encode(payload),
+            body: json.encode(enrichedPayload),
           )
           .timeout(_timeout);
 

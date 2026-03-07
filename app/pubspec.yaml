@@ -1,7 +1,7 @@
 name: scam_shield_mvp
 description: Scam Shield MVP - AI scam scanner with backend rules + subscription gate.
 publish_to: 'none'
-version: 1.0.0+3
+version: 1.0.0+4
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
