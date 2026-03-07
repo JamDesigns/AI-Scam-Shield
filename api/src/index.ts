@@ -126,14 +126,23 @@ app.get("/usage/week", async (req, reply) => {
   const isPremium = await getPremiumStatus(pool, deviceId);
   const { yearWeek, resetAt } = getIsoWeekKey(new Date());
 
-  const weeklyLimit = isPremium ? null : env.FREE_WEEKLY_LIMIT;
-  const weeklyUsed = await getWeeklyUsage(pool, deviceId, yearWeek);
-  const weeklyRemaining = isPremium
+  const totalWeeklyUsed = await getWeeklyUsage(pool, deviceId, yearWeek);
+  const aiWeeklyUsed = await getWeeklyAiUsage(pool, deviceId, yearWeek);
+
+  const normalWeeklyLimit = Math.max(
+    0,
+    env.FREE_WEEKLY_LIMIT - env.FREE_WEEKLY_AI_LIMIT,
+  );
+  const normalWeeklyUsed = Math.max(0, totalWeeklyUsed - aiWeeklyUsed);
+  const normalWeeklyRemaining = isPremium
     ? null
-    : Math.max(0, env.FREE_WEEKLY_LIMIT - weeklyUsed);
+    : Math.max(0, normalWeeklyLimit - normalWeeklyUsed);
+
+  const weeklyLimit = isPremium ? null : normalWeeklyLimit;
+  const weeklyUsed = isPremium ? totalWeeklyUsed : normalWeeklyUsed;
+  const weeklyRemaining = normalWeeklyRemaining;
 
   const aiWeeklyLimit = isPremium ? null : env.FREE_WEEKLY_AI_LIMIT;
-  const aiWeeklyUsed = await getWeeklyAiUsage(pool, deviceId, yearWeek);
   const aiWeeklyRemaining = isPremium
     ? null
     : Math.max(0, env.FREE_WEEKLY_AI_LIMIT - aiWeeklyUsed);
@@ -284,24 +293,30 @@ app.post("/scan", async (req, reply) => {
     await incrementWeeklyUsage(pool, deviceId, yearWeek);
   }
 
-  const weeklyLimit = isPremium ? null : env.FREE_WEEKLY_LIMIT;
-
-  let weeklyUsed = 0;
+  let totalWeeklyUsed = 0;
   if (typeof deviceId === "string" && deviceId.length > 0) {
-    weeklyUsed = await getWeeklyUsage(pool, deviceId, yearWeek);
+    totalWeeklyUsed = await getWeeklyUsage(pool, deviceId, yearWeek);
   }
-
-  const weeklyRemaining = isPremium
-    ? null
-    : Math.max(0, env.FREE_WEEKLY_LIMIT - weeklyUsed);
-
-  const aiWeeklyLimit = isPremium ? null : env.FREE_WEEKLY_AI_LIMIT;
 
   let aiWeeklyUsed = 0;
   if (typeof deviceId === "string" && deviceId.length > 0) {
     aiWeeklyUsed = await getWeeklyAiUsage(pool, deviceId, yearWeek);
   }
 
+  const normalWeeklyLimit = Math.max(
+    0,
+    env.FREE_WEEKLY_LIMIT - env.FREE_WEEKLY_AI_LIMIT,
+  );
+  const normalWeeklyUsed = Math.max(0, totalWeeklyUsed - aiWeeklyUsed);
+  const normalWeeklyRemaining = isPremium
+    ? null
+    : Math.max(0, normalWeeklyLimit - normalWeeklyUsed);
+
+  const weeklyLimit = isPremium ? null : normalWeeklyLimit;
+  const weeklyUsed = isPremium ? totalWeeklyUsed : normalWeeklyUsed;
+  const weeklyRemaining = normalWeeklyRemaining;
+
+  const aiWeeklyLimit = isPremium ? null : env.FREE_WEEKLY_AI_LIMIT;
   const aiWeeklyRemaining = isPremium
     ? null
     : Math.max(0, env.FREE_WEEKLY_AI_LIMIT - aiWeeklyUsed);
