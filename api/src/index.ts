@@ -428,6 +428,52 @@ app.post("/admin/subscriptions/set", async (req, reply) => {
   return { ok: true };
 });
 
+app.post("/webhooks/revenuecat", async (req, reply) => {
+  const authorization = req.headers.authorization;
+
+  if (authorization !== env.REVENUECAT_WEBHOOK_AUTH) {
+    return reply.code(401).send({ error: "unauthorized" });
+  }
+
+  const body = req.body as {
+    event?: {
+      type?: string;
+      app_user_id?: string;
+      environment?: string;
+    };
+  };
+
+  const event = body?.event;
+  const deviceId = event?.app_user_id;
+  const eventType = event?.type;
+
+  if (
+    typeof deviceId !== "string" ||
+    deviceId.length === 0 ||
+    typeof eventType !== "string" ||
+    eventType.length === 0
+  ) {
+    return reply.code(200).send({ ok: true });
+  }
+
+  if (
+    eventType === "INITIAL_PURCHASE" ||
+    eventType === "RENEWAL" ||
+    eventType === "UNCANCELLATION" ||
+    eventType === "NON_RENEWING_PURCHASE"
+  ) {
+    await setPremiumStatus(pool, deviceId, true);
+    return reply.code(200).send({ ok: true });
+  }
+
+  if (eventType === "EXPIRATION") {
+    await setPremiumStatus(pool, deviceId, false);
+    return reply.code(200).send({ ok: true });
+  }
+
+  return reply.code(200).send({ ok: true });
+});
+
 app.setErrorHandler((err, _req, reply) => {
   app.log.error(err);
   const status = (err as any)?.statusCode ?? 500;
