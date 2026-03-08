@@ -63,6 +63,9 @@ function withTimeout<T>(
   });
 }
 
+const SCAN_RATE_LIMIT_WINDOW_MS = 3000;
+const lastScanAtByDevice = new Map<string, number>();
+
 const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
   DATABASE_URL: z.string(),
@@ -183,6 +186,25 @@ app.get("/usage/week", async (req, reply) => {
 
 app.post("/scan", async (req, reply) => {
   const deviceId = req.headers["x-device-id"];
+
+  if (typeof deviceId !== "string" || deviceId.length === 0) {
+    return reply.code(400).send({ error: "missing_device_id" });
+  }
+
+  const now = Date.now();
+  const lastScanAt = lastScanAtByDevice.get(deviceId);
+
+  if (
+    typeof lastScanAt === "number" &&
+    now - lastScanAt < SCAN_RATE_LIMIT_WINDOW_MS
+  ) {
+    return reply.code(429).send({
+      error: "rate_limited",
+      retryAfterMs: SCAN_RATE_LIMIT_WINDOW_MS - (now - lastScanAt),
+    });
+  }
+
+  lastScanAtByDevice.set(deviceId, now);
 
   const bodySchema = z.object({
     input: z.string().min(1).max(5000),

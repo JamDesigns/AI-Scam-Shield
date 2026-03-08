@@ -28,6 +28,7 @@
   "errors.unknown": "Something went wrong.",
   "errors.weeklyLimitExceeded": "You have reached the free weekly scan limit. Go Premium for unlimited scans.",
   "errors.aiLimitExceeded": "AI Pro reached the free weekly limit. Go Premium for unlimited AI analysis.",
+  "errors.rateLimited": "Please wait a few seconds before scanning again.",
 
   "reasons.URL_TYPO": "The URL contains a suspicious typo (possible impersonation).",
   "reasons.SHORTENER": "The link uses a URL shortener.",

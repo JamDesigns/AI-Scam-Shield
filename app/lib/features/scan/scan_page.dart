@@ -186,6 +186,16 @@ class _ScanPageState extends State<ScanPage> {
         return;
       }
 
+      if (e is ApiException &&
+          e.statusCode == 429 &&
+          e.errorCode == 'rate_limited') {
+        setState(() {
+          _errorKey = 'errors.rateLimited';
+          _errorMessage = null;
+        });
+        return;
+      }
+
       setState(() {
         _errorKey = kDebugMode ? null : 'errors.network';
         _errorMessage = kDebugMode ? e.toString() : null;

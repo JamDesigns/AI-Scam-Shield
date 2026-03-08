@@ -28,6 +28,7 @@
   "errors.unknown": "Une erreur s’est produite.",
   "errors.weeklyLimitExceeded": "Vous avez atteint la limite hebdomadaire gratuite. Passez Premium pour des analyses illimitées.",
   "errors.aiLimitExceeded": "AI Pro a atteint la limite hebdomadaire gratuite. Passez Premium pour une analyse illimitée.",
+  "errors.rateLimited": "Veuillez attendre quelques secondes avant de relancer une analyse.",
 
   "reasons.URL_TYPO": "L’URL contient une faute suspecte (possible usurpation).",
   "reasons.SHORTENER": "Le lien utilise un raccourcisseur d’URL.",
