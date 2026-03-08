@@ -75,6 +75,8 @@ const envSchema = z.object({
   FREE_WEEKLY_LIMIT: z.coerce.number().int().min(0).default(3),
   FREE_WEEKLY_AI_LIMIT: z.coerce.number().int().min(0).default(1),
 
+  REVENUECAT_WEBHOOK_AUTH: z.string().min(8),
+
   DEEPL_AUTH_KEY: z.string().optional(),
   DEEPL_API_BASE: z.string().default("https://api-free.deepl.com"),
   DEEPL_TARGET_LANG: z.string().default("EN"),
@@ -94,6 +96,8 @@ const env = envSchema.parse({
 
   FREE_WEEKLY_LIMIT: process.env.FREE_WEEKLY_LIMIT,
   FREE_WEEKLY_AI_LIMIT: process.env.FREE_WEEKLY_AI_LIMIT,
+
+  REVENUECAT_WEBHOOK_AUTH: process.env.REVENUECAT_WEBHOOK_AUTH,
 
   DEEPL_AUTH_KEY: process.env.DEEPL_AUTH_KEY,
   DEEPL_API_BASE: process.env.DEEPL_API_BASE,
