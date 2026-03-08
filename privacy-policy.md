@@ -12,7 +12,7 @@ The application may process the following information:
 - Anonymous device identifier used to manage usage limits and subscriptions
 - Subscription status (premium or free)
 
-We do **not collect personal identity information** such as name, email, or contacts.
+We do **not collect personal identity information** such as name, email, contacts, or location.
 
 ## How Information Is Used
 
@@ -23,30 +23,31 @@ The collected information is used exclusively to:
 - Manage premium subscriptions
 - Improve scam detection accuracy
 
-User text may be processed by third-party AI services for analysis.
+User-submitted text is sent to an external AI analysis service to generate a scam risk assessment.  
+The text is processed only for analysis and is not permanently stored by AI Scam Shield.
 
 ## Third-Party Services
 
 AI Scam Shield may use third-party services including:
 
-- AI providers for scam detection
+- AI analysis services used to detect potential scam messages
 - RevenueCat for subscription management
 
 These services may process limited data necessary to provide their functionality.
 
 ## Data Storage
 
-Anonymous device identifiers and usage counters may be stored securely on our servers.
+Anonymous device identifiers and usage counters may be stored securely on our servers for the time necessary to operate the service.
 
-We do not sell or share user data for advertising purposes.
+We do not sell, rent, or share user data for advertising purposes.
 
 ## Security
 
-We implement reasonable technical measures to protect the information processed by the application.
+We implement reasonable technical and organizational measures to protect the information processed by the application.
 
 ## Children’s Privacy
 
-AI Scam Shield is not directed to children under 13 years old.
+AI Scam Shield is not directed to children under the age of 13.
 
 ## Contact
 
