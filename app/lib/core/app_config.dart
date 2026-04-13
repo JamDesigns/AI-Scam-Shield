@@ -1,8 +1,12 @@
+import 'package:flutter/foundation.dart';
+
 class AppConfig {
-  static const String apiBaseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'https://ai-scam-shield.onrender.com',
-  );
+  static const String _devApiBaseUrl = 'http://10.0.2.2:3000';
+  static const String _prodApiBaseUrl = 'https://ai-scam-shield.onrender.com';
+
+  static String get apiBaseUrl {
+    return kReleaseMode ? _prodApiBaseUrl : _devApiBaseUrl;
+  }
 
   // RevenueCat public SDK key.
   // Use a test key for debug builds and a production key for release builds.
