@@ -14,7 +14,7 @@ class ApiClient {
   final String deviceId;
   final String localeLanguageCode;
 
-  static const Duration _timeout = Duration(seconds: 45);
+  static const Duration _timeout = Duration(seconds: 100);
 
   Uri _u(String path) => Uri.parse('${AppConfig.apiBaseUrl}$path');
 

@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/analytics_service.dart';
 import '../../core/api_client.dart';
@@ -20,19 +24,28 @@ class ScanPage extends StatefulWidget {
 
 class _ScanPageState extends State<ScanPage> {
   static const int _maxInputLength = 1500;
+  static const MethodChannel _shareIntentChannel = MethodChannel(
+    'com.jamdesigns.scamshield/share_intent',
+  );
+  static const String _lastScannedInputKey = 'last_scanned_input';
+  static const String _lastScanResultKey = 'last_scan_result';
+  static const String _lastScannedFingerprintKey = 'last_scanned_fingerprint';
+
   final _controller = TextEditingController();
+
+  late final Future<void> _bootstrapFuture;
 
   String? _deviceId;
   bool _loading = false;
   bool _isPremium = false;
   bool _hasInput = false;
   ScanResult? _lastResult;
+  ScanResult? _restoredLastResult;
+  String? _lastScannedInput;
+  String? _lastScannedFingerprint;
 
-  // Blocking error (red)
   String? _errorKey;
   String? _errorMessage;
-
-  // Non-blocking notice (yellow)
   String? _noticeKey;
 
   AiQuotaStatus? _aiQuota;
@@ -55,10 +68,42 @@ class _ScanPageState extends State<ScanPage> {
     return noNormalScansLeft && noAiScansLeft;
   }
 
+  String _normalizeInput(String value) {
+    return value.trim();
+  }
+
+  String _buildInputFingerprint(String value) {
+    final normalized = _normalizeInput(value);
+
+    final uri = Uri.tryParse(normalized);
+    if (uri == null || !uri.hasScheme || uri.host.isEmpty) {
+      return normalized.replaceAll(RegExp(r'\s+'), ' ');
+    }
+
+    final normalizedPath = uri.path != '/' && uri.path.endsWith('/')
+        ? uri.path.substring(0, uri.path.length - 1)
+        : uri.path;
+
+    final normalizedUri = uri.replace(
+      scheme: uri.scheme.toLowerCase(),
+      host: uri.host.toLowerCase(),
+      path: normalizedPath,
+      fragment: null,
+    );
+
+    return normalizedUri.toString();
+  }
+
+  bool get _isCurrentInputAlreadyScanned {
+    final input = _normalizeInput(_controller.text);
+    return input.isNotEmpty && input == _lastScannedInput;
+  }
+
   @override
   void initState() {
     super.initState();
-    _bootstrap();
+    _bootstrapFuture = _bootstrap();
+    _setupShareIntent();
 
     _controller.addListener(() {
       final hasInput = _controller.text.trim().isNotEmpty;
@@ -84,6 +129,8 @@ class _ScanPageState extends State<ScanPage> {
     _scanService = ScanService(_api);
     _premiumService = PremiumService(_api);
 
+    await _restoreLastSuccessfulScan();
+
     if (!mounted) return;
     setState(() {
       _deviceId = deviceId;
@@ -91,6 +138,129 @@ class _ScanPageState extends State<ScanPage> {
 
     await _refreshPremium();
     await _refreshAiQuota();
+  }
+
+  Future<void> _restoreLastSuccessfulScan() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final storedInput = prefs.getString(_lastScannedInputKey);
+    final storedFingerprint = prefs.getString(_lastScannedFingerprintKey);
+    final storedResultRaw = prefs.getString(_lastScanResultKey);
+
+    ScanResult? storedResult;
+
+    if (storedResultRaw != null && storedResultRaw.isNotEmpty) {
+      try {
+        final decoded = json.decode(storedResultRaw) as Map<String, dynamic>;
+        storedResult = ScanResult.fromJson(decoded);
+      } catch (_) {
+        storedResult = null;
+      }
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _lastScannedInput = storedInput;
+      _lastScannedFingerprint = storedFingerprint;
+      _restoredLastResult = storedResult;
+      _lastResult = null;
+    });
+  }
+
+  Future<void> _persistLastSuccessfulScan(
+    String input,
+    ScanResult result,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final fingerprint = _buildInputFingerprint(input);
+
+    await prefs.setString(_lastScannedInputKey, input);
+    await prefs.setString(_lastScannedFingerprintKey, fingerprint);
+    await prefs.setString(
+      _lastScanResultKey,
+      json.encode(_scanResultToJson(result)),
+    );
+  }
+
+  Map<String, dynamic> _scanResultToJson(ScanResult result) {
+    return {
+      'riskScore': result.riskScore,
+      'category': result.category,
+      'reasons': result.reasons,
+      'isPremium': result.isPremium,
+      'weeklyLimit': result.weeklyLimit,
+      'weeklyUsed': result.weeklyUsed,
+      'weeklyRemaining': result.weeklyRemaining,
+      'aiAllowed': result.aiAllowed,
+      'aiUsed': result.aiUsed,
+      'aiWeeklyLimit': result.aiWeeklyLimit,
+      'aiWeeklyUsed': result.aiWeeklyUsed,
+      'aiWeeklyRemaining': result.aiWeeklyRemaining,
+      'aiUnlimited': result.aiUnlimited,
+      'aiResetAt': result.aiResetAt,
+    };
+  }
+
+  Future<void> _setupShareIntent() async {
+    _shareIntentChannel.setMethodCallHandler((call) async {
+      if (call.method != 'onSharedText') {
+        return;
+      }
+
+      final sharedText = call.arguments as String?;
+      await _applySharedTextAndScan(sharedText);
+    });
+
+    final initialSharedText = await _shareIntentChannel.invokeMethod<String>(
+      'getInitialSharedText',
+    );
+
+    await _applySharedTextAndScan(initialSharedText);
+
+    await _shareIntentChannel.invokeMethod<void>('clearInitialSharedText');
+  }
+
+  Future<void> _applySharedTextAndScan(String? sharedText) async {
+    final input = sharedText == null ? null : _normalizeInput(sharedText);
+    if (input == null || input.isEmpty) {
+      return;
+    }
+
+    final normalizedInput = input.length > _maxInputLength
+        ? input.substring(0, _maxInputLength)
+        : input;
+
+    _controller.value = TextEditingValue(
+      text: normalizedInput,
+      selection: TextSelection.collapsed(offset: normalizedInput.length),
+    );
+
+    if (!mounted) return;
+
+    await _bootstrapFuture;
+    if (!mounted) return;
+
+    final fingerprint = _buildInputFingerprint(normalizedInput);
+    final reusableResult = _lastResult ?? _restoredLastResult;
+    final isSameInput =
+        _lastScannedFingerprint == fingerprint && reusableResult != null;
+
+    setState(() {
+      _errorKey = null;
+      _errorMessage = null;
+      _noticeKey = null;
+      _lastResult = isSameInput ? reusableResult : null;
+    });
+
+    if (isSameInput) {
+      return;
+    }
+
+    if (_loading) return;
+    if (_isWeeklyScanLimitReached) return;
+
+    await _scan();
   }
 
   void _clear() {
@@ -102,6 +272,23 @@ class _ScanPageState extends State<ScanPage> {
       _errorMessage = null;
       _noticeKey = null;
     });
+  }
+
+  Future<void> _refreshScreenState() async {
+    _controller.clear();
+
+    if (!mounted) return;
+
+    setState(() {
+      _hasInput = false;
+      _lastResult = null;
+      _errorKey = null;
+      _errorMessage = null;
+      _noticeKey = null;
+    });
+
+    await _refreshPremium();
+    await _refreshAiQuota();
   }
 
   Future<void> _refreshPremium() async {
@@ -129,8 +316,13 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   Future<void> _scan() async {
-    final input = _controller.text.trim();
+    final input = _normalizeInput(_controller.text);
     if (input.isEmpty) return;
+    if (_loading) return;
+    if (_lastScannedFingerprint == _buildInputFingerprint(input) &&
+        _lastResult != null) {
+      return;
+    }
 
     setState(() {
       _loading = true;
@@ -147,6 +339,9 @@ class _ScanPageState extends State<ScanPage> {
 
       setState(() {
         _lastResult = result;
+        _lastScannedInput = input;
+        _lastScannedFingerprint = _buildInputFingerprint(input);
+        _restoredLastResult = result;
 
         if (!_isPremium) {
           final normalRemaining = result.weeklyRemaining ?? 0;
@@ -160,6 +355,7 @@ class _ScanPageState extends State<ScanPage> {
         }
       });
 
+      await _persistLastSuccessfulScan(input, result);
       await _refreshAiQuota();
 
       await AnalyticsService.scanResult(
@@ -191,6 +387,17 @@ class _ScanPageState extends State<ScanPage> {
           e.errorCode == 'rate_limited') {
         setState(() {
           _errorKey = 'errors.rateLimited';
+          _errorMessage = null;
+        });
+        return;
+      }
+
+      if (e is ApiException &&
+          e.statusCode == 503 &&
+          e.errorCode == 'ai_unavailable') {
+        setState(() {
+          _lastResult = null;
+          _errorKey = 'errors.network';
           _errorMessage = null;
         });
         return;
@@ -256,6 +463,7 @@ class _ScanPageState extends State<ScanPage> {
 
   @override
   void dispose() {
+    _shareIntentChannel.setMethodCallHandler(null);
     _controller.dispose();
     super.dispose();
   }
@@ -269,10 +477,11 @@ class _ScanPageState extends State<ScanPage> {
         title: Text(t.t('app.title')),
         actions: [
           IconButton(
-            onPressed: () async {
-              await _refreshPremium();
-              await _refreshAiQuota();
-            },
+            onPressed: _loading
+                ? null
+                : () async {
+                    await _refreshScreenState();
+                  },
             icon: const Icon(Icons.refresh),
             tooltip: t.t('actions.refresh'),
           ),
@@ -353,8 +562,11 @@ class _ScanPageState extends State<ScanPage> {
               children: [
                 Expanded(
                   child: FilledButton(
-                    onPressed:
-                        (_loading || _isWeeklyScanLimitReached) ? null : _scan,
+                    onPressed: (_loading ||
+                            _isWeeklyScanLimitReached ||
+                            _isCurrentInputAlreadyScanned)
+                        ? null
+                        : _scan,
                     child: _loading
                         ? const SizedBox(
                             height: 18,
@@ -386,8 +598,6 @@ class _ScanPageState extends State<ScanPage> {
               quota: _aiQuota,
             ),
             const SizedBox(height: 6),
-
-            // Non-blocking notice (AI limit / weekly limit)
             if (_noticeKey != null)
               Container(
                 padding: const EdgeInsetsDirectional.fromSTEB(12, 10, 12, 10),
@@ -404,10 +614,7 @@ class _ScanPageState extends State<ScanPage> {
                   textAlign: TextAlign.start,
                 ),
               ),
-
             if (_noticeKey != null) const SizedBox(height: 10),
-
-            // Blocking error
             if (_errorKey != null)
               Text(
                 t.t(_errorKey!),

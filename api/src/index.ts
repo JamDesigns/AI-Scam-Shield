@@ -329,22 +329,14 @@ app.post("/scan", async (req, reply) => {
         `AI analysis timed out after ${AI_ANALYSIS_TIMEOUT_MS}ms`,
       );
 
-      if (
-        ai &&
-        !isPremium &&
-        typeof deviceId === "string" &&
-        deviceId.length > 0
-      ) {
-        await incrementWeeklyAiUsage(pool, deviceId, yearWeek);
-      }
-
-      if (ai) {
-        aiUsed = true;
-      }
+      aiUsed = true;
     } catch (e) {
-      req.log.warn({ err: e }, "AI analysis failed, falling back to classic");
-      ai = null;
-      aiUsed = false;
+      req.log.warn({ err: e }, "AI analysis failed");
+
+      return reply.code(503).send({
+        error: "ai_unavailable",
+        message: "AI analysis failed",
+      });
     }
   }
 
@@ -354,6 +346,10 @@ app.post("/scan", async (req, reply) => {
 
   if (!isPremium && typeof deviceId === "string" && deviceId.length > 0) {
     await incrementWeeklyUsage(pool, deviceId, yearWeek);
+
+    if (aiUsed) {
+      await incrementWeeklyAiUsage(pool, deviceId, yearWeek);
+    }
   }
 
   let totalWeeklyUsed = 0;
