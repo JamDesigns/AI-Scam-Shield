@@ -1,5 +1,12 @@
 {
   "app.title": "Scam Shield",
+
+  "nav.scan": "Scan",
+  "nav.stats": "Stats",
+  "nav.about": "About",
+  "stats.title": "Stats",
+  "about.title": "About",
+
   "scan.title": "Scan",
   "scan.subtitle": "Paste a link or message to check for scams.",
   "scan.maxLength": "Maximum message length: {max} characters.",
@@ -8,6 +15,30 @@
   "scan.example": "Example: Your account is locked. Verify at https://secure-login-paypaI.com",
   "scan.aiQuota.unlimited": "AI Pro: Unlimited (Premium)",
   "scan.aiQuota.free": "AI Pro uses left this week: {remaining}/{limit} (Unlimited with Premium)",
+
+  "stats.scansToday": "Today",
+  "stats.scansWeek": "This week",
+  "stats.scansMonth": "This month",
+  "stats.threats": "Threats detected",
+  "stats.activity": "Activity",
+  "stats.history": "Recent scans",
+  "stats.chart.day": "Today",
+  "stats.chart.week": "Week",
+  "stats.chart.month": "Month",
+  "stats.chart.dayShort": "D",
+  "stats.chart.weekShort": "W",
+  "stats.chart.monthShort": "M",
+  "stats.chart.threats": "Threats",
+  "stats.chart.threatsShort": "T",
+  "stats.empty": "No scans yet",
+
+  "about.description": "AI scam scanner that helps detect suspicious links and messages.",
+  "about.version": "Version",
+  "about.privacyTitle": "Privacy policy",
+  "about.privacyDescription": "Review the current privacy policy inside the app.",
+  "about.openPrivacyPolicy": "Open privacy policy",
+  "about.unknownVersion": "Unknown",
+  "about.emailCopied": "Email copied to clipboard",
 
   "result.title": "Result",
   "result.riskScore": "Risk score",

@@ -1,12 +1,16 @@
 name: scam_shield_mvp
 description: Scam Shield MVP - AI scam scanner with backend rules + subscription gate.
 publish_to: 'none'
-version: 1.0.0+7
+version: 3.1.0+8
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
+  package_info_plus: ^9.0.1
+  flutter_markdown: ^0.7.0
+  url_launcher: ^6.3.1
+
   firebase_analytics: ^12.1.2
   firebase_core: ^4.4.0
   flutter:
@@ -36,3 +40,4 @@ flutter:
   assets:
     - assets/brand/
     - assets/i18n/
+    - assets/legal/privacy-policy.md

@@ -58,4 +58,4 @@ If you believe that any sensitive data has been provided unintentionally, please
 If you have any questions about this Privacy Policy, you can contact:
 
 JamDesigns  
-joseangel.mosquera@gmail.com
+[joseangel.mosquera@gmail.com](mailto:joseangel.mosquera@gmail.com)

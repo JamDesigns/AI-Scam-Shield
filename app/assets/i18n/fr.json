@@ -1,5 +1,12 @@
 {
   "app.title": "Scam Shield",
+
+  "nav.scan": "Analyser",
+  "nav.stats": "Statistiques",
+  "nav.about": "À propos",
+  "stats.title": "Statistiques",
+  "about.title": "À propos",
+
   "scan.title": "Analyser",
   "scan.subtitle": "Collez un lien ou un message pour vérifier s’il s’agit d’une arnaque.",
   "scan.maxLength": "Longueur maximale du message : {max} caractères.",
@@ -8,6 +15,30 @@
   "scan.example": "Exemple : Votre compte est bloqué. Vérifiez sur https://secure-login-paypaI.com",
   "scan.aiQuota.unlimited": "AI Pro : Illimité (Premium)",
   "scan.aiQuota.free": "Utilisations AI Pro restantes cette semaine : {remaining}/{limit} (Illimité avec Premium)",
+
+  "stats.scansToday": "Aujourd'hui",
+  "stats.scansWeek": "Cette semaine",
+  "stats.scansMonth": "Ce mois",
+  "stats.threats": "Menaces détectées",
+  "stats.activity": "Activité",
+  "stats.history": "Analyses récentes",
+  "stats.chart.day": "Aujourd'hui",
+  "stats.chart.week": "Semaine",
+  "stats.chart.month": "Mois",
+  "stats.chart.dayShort": "J",
+  "stats.chart.weekShort": "S",
+  "stats.chart.monthShort": "M",
+  "stats.chart.threats": "Menaces",
+  "stats.chart.threatsShort": "T",
+  "stats.empty": "Aucune analyse",
+
+  "about.description": "Analyseur anti-arnaques par IA qui aide à détecter les liens et messages suspects.",
+  "about.version": "Version",
+  "about.privacyTitle": "Politique de confidentialité",
+  "about.privacyDescription": "Consultez la politique de confidentialité actuelle dans l'application.",
+  "about.openPrivacyPolicy": "Ouvrir la politique de confidentialité",
+  "about.unknownVersion": "Inconnue",
+  "about.emailCopied": "E-mail copié dans le presse-papiers",
 
   "result.title": "Résultat",
   "result.riskScore": "Niveau de risque",

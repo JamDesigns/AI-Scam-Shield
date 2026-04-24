@@ -12,6 +12,9 @@ import {
   incrementWeeklyUsage,
   getWeeklyAiUsage,
   incrementWeeklyAiUsage,
+  insertScanEvent,
+  getScanStats,
+  getScanActivity,
 } from "./db.js";
 import { getDefaultRules, scoreInput } from "./rules.js";
 import { translateWithDeepL } from "./translate.js";
@@ -61,6 +64,14 @@ function withTimeout<T>(
       },
     );
   });
+}
+
+function createEventId(): string {
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 14)}`;
+}
+
+function buildInputPreview(input: string): string {
+  return input.replace(/\s+/g, " ").trim().slice(0, 160);
 }
 
 const SCAN_RATE_LIMIT_WINDOW_MS = 3000;
@@ -185,6 +196,70 @@ app.get("/usage/week", async (req, reply) => {
     aiWeeklyRemaining,
     aiResetAt: resetAt,
     aiUnlimited: isPremium,
+  };
+});
+
+app.get("/stats", async (req, reply) => {
+  const deviceId = req.headers["x-device-id"];
+
+  if (typeof deviceId !== "string" || deviceId.length === 0) {
+    return reply.code(400).send({ error: "missing_device_id" });
+  }
+
+  const stats = await getScanStats(pool, deviceId);
+
+  const isPremium = await getPremiumStatus(pool, deviceId);
+  const { yearWeek } = getIsoWeekKey(new Date());
+
+  const totalWeeklyUsed = await getWeeklyUsage(pool, deviceId, yearWeek);
+  const aiWeeklyUsed = await getWeeklyAiUsage(pool, deviceId, yearWeek);
+
+  const normalWeeklyLimit = Math.max(
+    0,
+    env.FREE_WEEKLY_LIMIT - env.FREE_WEEKLY_AI_LIMIT,
+  );
+
+  const normalWeeklyUsed = Math.max(0, totalWeeklyUsed - aiWeeklyUsed);
+
+  const weeklyRemaining = isPremium
+    ? null
+    : Math.max(0, normalWeeklyLimit - normalWeeklyUsed);
+
+  const aiWeeklyRemaining = isPremium
+    ? null
+    : Math.max(0, env.FREE_WEEKLY_AI_LIMIT - aiWeeklyUsed);
+
+  return {
+    scansToday: stats.scansToday,
+    scansWeek: stats.scansWeek,
+    scansMonth: stats.scansMonth,
+    threatsDetected: stats.threatsDetected,
+
+    isPremium,
+    weeklyRemaining,
+    aiWeeklyRemaining,
+  };
+});
+
+app.get("/activity", async (req, reply) => {
+  const deviceId = req.headers["x-device-id"];
+
+  if (typeof deviceId !== "string" || deviceId.length === 0) {
+    return reply.code(400).send({ error: "missing_device_id" });
+  }
+
+  const querySchema = z.object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+  });
+
+  const query = querySchema.parse(req.query);
+  const items = await getScanActivity(pool, deviceId, query.page, query.limit);
+
+  return {
+    page: query.page,
+    limit: query.limit,
+    items,
   };
 });
 
@@ -343,6 +418,8 @@ app.post("/scan", async (req, reply) => {
   const finalRiskScore = ai?.riskScore ?? classic.riskScore;
   const finalCategory = ai?.category ?? classic.category;
   const finalReasons = ai?.reasons ?? classic.reasons;
+  const isThreat = finalCategory !== "low_risk";
+  const inputPreview = buildInputPreview(body.input);
 
   if (!isPremium && typeof deviceId === "string" && deviceId.length > 0) {
     await incrementWeeklyUsage(pool, deviceId, yearWeek);
@@ -379,6 +456,18 @@ app.post("/scan", async (req, reply) => {
   const aiWeeklyRemaining = isPremium
     ? null
     : Math.max(0, env.FREE_WEEKLY_AI_LIMIT - aiWeeklyUsed);
+
+  await insertScanEvent(pool, {
+    id: createEventId(),
+    deviceId,
+    inputPreview,
+    finalCategory,
+    finalRiskScore,
+    classicCategory: classic.category,
+    classicRiskScore: classic.riskScore,
+    aiUsed,
+    isThreat,
+  });
 
   return {
     riskScore: finalRiskScore,

@@ -12,6 +12,7 @@ import '../../core/revenuecat_service.dart';
 import '../../i18n/app_localizations.dart';
 import '../premium/premium_service.dart';
 import '../premium/subscription_page.dart';
+import '../navigation/home_page.dart';
 import 'scan_models.dart';
 import 'scan_service.dart';
 
@@ -226,6 +227,8 @@ class _ScanPageState extends State<ScanPage> {
     if (input == null || input.isEmpty) {
       return;
     }
+
+    HomePage.globalKey.currentState?.openScanTab();
 
     final normalizedInput = input.length > _maxInputLength
         ? input.substring(0, _maxInputLength)
