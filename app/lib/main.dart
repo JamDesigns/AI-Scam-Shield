@@ -1,10 +1,10 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 
+import 'features/navigation/home_page.dart';
 import 'i18n/app_localizations.dart';
-import 'features/scan/scan_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,11 +45,11 @@ class ScamShieldApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1053BB), // Brand primary
+          seedColor: const Color(0xFF1053BB),
         ),
         scaffoldBackgroundColor: const Color(0xFFF7F8FC),
       ),
-      home: const ScanPage(),
+      home: HomePage(key: HomePage.globalKey),
     );
   }
 }

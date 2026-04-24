@@ -1,5 +1,12 @@
 {
   "app.title": "Scam Shield",
+
+  "nav.scan": "Escanear",
+  "nav.stats": "Estadísticas",
+  "nav.about": "Acerca de",
+  "stats.title": "Estadísticas",
+  "about.title": "Acerca de",
+
   "scan.title": "Escanear",
   "scan.subtitle": "Pega un enlace o mensaje para comprobar si es una estafa.",
   "scan.maxLength": "Longitud máxima del mensaje: {max} caracteres.",
@@ -8,6 +15,30 @@
   "scan.example": "Ejemplo: Tu cuenta está bloqueada. Verifica en https://secure-login-paypaI.com",
   "scan.aiQuota.unlimited": "AI Pro: Ilimitado (Premium)",
   "scan.aiQuota.free": "Usos de AI Pro restantes esta semana: {remaining}/{limit} (Ilimitado con Premium)",
+
+  "stats.scansToday": "Hoy",
+  "stats.scansWeek": "Esta semana",
+  "stats.scansMonth": "Este mes",
+  "stats.threats": "Amenazas detectadas",
+  "stats.activity": "Actividad",
+  "stats.history": "Escaneos recientes",
+  "stats.chart.day": "Hoy",
+  "stats.chart.week": "Semana",
+  "stats.chart.month": "Mes",
+  "stats.chart.dayShort": "D",
+  "stats.chart.weekShort": "S",
+  "stats.chart.monthShort": "M",
+  "stats.chart.threats": "Amenazas",
+  "stats.chart.threatsShort": "A",
+  "stats.empty": "Sin escaneos aún",
+
+  "about.description": "Escáner antiestafas con IA que ayuda a detectar enlaces y mensajes sospechosos.",
+  "about.version": "Versión",
+  "about.privacyTitle": "Política de privacidad",
+  "about.privacyDescription": "Consulta la política de privacidad actual dentro de la app.",
+  "about.openPrivacyPolicy": "Abrir política de privacidad",
+  "about.unknownVersion": "Desconocida",
+  "about.emailCopied": "Correo copiado al portapapeles",
 
   "result.title": "Resultado",
   "result.riskScore": "Nivel de riesgo",
