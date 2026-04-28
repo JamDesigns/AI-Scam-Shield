@@ -17,4 +17,17 @@ class ScanService {
     final json = await _api.getJson('/usage/week');
     return AiQuotaStatus.fromJson(json);
   }
+
+  Future<ScanStats> fetchStats() async {
+    final json = await _api.getJson('/stats');
+    return ScanStats.fromJson(json);
+  }
+
+  Future<ScanActivityResponse> fetchActivity({
+    int page = 1,
+    int limit = 10,
+  }) async {
+    final json = await _api.getJson('/activity?page=$page&limit=$limit');
+    return ScanActivityResponse.fromJson(json);
+  }
 }

@@ -116,3 +116,137 @@ export async function incrementWeeklyAiUsage(
 
   return Number(res.rows[0].ai_scans_count ?? 0);
 }
+
+export type InsertScanEventParams = {
+  id: string;
+  deviceId: string;
+  inputPreview: string;
+  finalCategory: string;
+  finalRiskScore: number;
+  classicCategory: string;
+  classicRiskScore: number;
+  aiUsed: boolean;
+  isThreat: boolean;
+};
+
+export type ScanStats = {
+  scansToday: number;
+  scansWeek: number;
+  scansMonth: number;
+  threatsDetected: number;
+};
+
+export type ScanActivityItem = {
+  id: string;
+  createdAt: string;
+  inputPreview: string;
+  finalCategory: string;
+  finalRiskScore: number;
+  aiUsed: boolean;
+  isThreat: boolean;
+};
+
+export async function insertScanEvent(
+  pool: pg.Pool,
+  params: InsertScanEventParams,
+): Promise<void> {
+  await pool.query(
+    `
+    INSERT INTO scan_events(
+      id,
+      device_id,
+      input_preview,
+      final_category,
+      final_risk_score,
+      classic_category,
+      classic_risk_score,
+      ai_used,
+      is_threat
+    )
+    VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `,
+    [
+      params.id,
+      params.deviceId,
+      params.inputPreview,
+      params.finalCategory,
+      params.finalRiskScore,
+      params.classicCategory,
+      params.classicRiskScore,
+      params.aiUsed,
+      params.isThreat,
+    ],
+  );
+}
+
+export async function getScanStats(
+  pool: pg.Pool,
+  deviceId: string,
+): Promise<ScanStats> {
+  const res = await pool.query(
+    `
+    SELECT
+      COUNT(*) FILTER (
+        WHERE created_at >= date_trunc('day', NOW())
+      )::int AS scans_today,
+      COUNT(*) FILTER (
+        WHERE created_at >= date_trunc('week', NOW())
+      )::int AS scans_week,
+      COUNT(*) FILTER (
+        WHERE created_at >= date_trunc('month', NOW())
+      )::int AS scans_month,
+      COUNT(*) FILTER (
+        WHERE is_threat = TRUE
+      )::int AS threats_detected
+    FROM scan_events
+    WHERE device_id = $1
+    `,
+    [deviceId],
+  );
+
+  const row = res.rows[0] ?? {};
+
+  return {
+    scansToday: Number(row.scans_today ?? 0),
+    scansWeek: Number(row.scans_week ?? 0),
+    scansMonth: Number(row.scans_month ?? 0),
+    threatsDetected: Number(row.threats_detected ?? 0),
+  };
+}
+
+export async function getScanActivity(
+  pool: pg.Pool,
+  deviceId: string,
+  page: number,
+  limit: number,
+): Promise<ScanActivityItem[]> {
+  const offset = (page - 1) * limit;
+
+  const res = await pool.query(
+    `
+    SELECT
+      id,
+      created_at,
+      input_preview,
+      final_category,
+      final_risk_score,
+      ai_used,
+      is_threat
+    FROM scan_events
+    WHERE device_id = $1
+    ORDER BY created_at DESC
+    LIMIT $2 OFFSET $3
+    `,
+    [deviceId, limit, offset],
+  );
+
+  return res.rows.map((row) => ({
+    id: String(row.id),
+    createdAt: new Date(row.created_at).toISOString(),
+    inputPreview: String(row.input_preview),
+    finalCategory: String(row.final_category),
+    finalRiskScore: Number(row.final_risk_score),
+    aiUsed: Boolean(row.ai_used),
+    isThreat: Boolean(row.is_threat),
+  }));
+}
