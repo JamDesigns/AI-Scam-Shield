@@ -188,6 +188,7 @@ class _ScanPageState extends State<ScanPage> {
     return {
       'riskScore': result.riskScore,
       'category': result.category,
+      'threatType': result.threatType,
       'reasons': result.reasons,
       'isPremium': result.isPremium,
       'weeklyLimit': result.weeklyLimit,
@@ -550,8 +551,8 @@ class _ScanPageState extends State<ScanPage> {
             const SizedBox(height: 16),
             TextField(
               controller: _controller,
-              minLines: 4,
-              maxLines: 10,
+              minLines: 3,
+              maxLines: 3,
               maxLength: _maxInputLength,
               decoration: InputDecoration(
                 labelText: t.t('scan.input.label'),
@@ -679,6 +680,13 @@ class _ResultCard extends StatelessWidget {
               context,
               t.t('result.category'),
               t.t('categories.${result.category}'),
+              result.category,
+            ),
+            const SizedBox(height: 4),
+            _categoryRow(
+              context,
+              t.t('result.threatType'),
+              t.t('threatTypes.${result.threatType}'),
               result.category,
             ),
             const SizedBox(height: 10),

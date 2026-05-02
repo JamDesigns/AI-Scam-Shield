@@ -122,6 +122,7 @@ export type InsertScanEventParams = {
   deviceId: string;
   inputPreview: string;
   finalCategory: string;
+  threatType: string;
   finalRiskScore: number;
   classicCategory: string;
   classicRiskScore: number;
@@ -141,6 +142,7 @@ export type ScanActivityItem = {
   createdAt: string;
   inputPreview: string;
   finalCategory: string;
+  threatType: string;
   finalRiskScore: number;
   aiUsed: boolean;
   isThreat: boolean;
@@ -157,19 +159,21 @@ export async function insertScanEvent(
       device_id,
       input_preview,
       final_category,
+      threat_type,
       final_risk_score,
       classic_category,
       classic_risk_score,
       ai_used,
       is_threat
     )
-    VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     `,
     [
       params.id,
       params.deviceId,
       params.inputPreview,
       params.finalCategory,
+      params.threatType,
       params.finalRiskScore,
       params.classicCategory,
       params.classicRiskScore,
@@ -229,6 +233,7 @@ export async function getScanActivity(
       created_at,
       input_preview,
       final_category,
+      threat_type,
       final_risk_score,
       ai_used,
       is_threat
@@ -245,6 +250,7 @@ export async function getScanActivity(
     createdAt: new Date(row.created_at).toISOString(),
     inputPreview: String(row.input_preview),
     finalCategory: String(row.final_category),
+    threatType: String(row.threat_type ?? "none"),
     finalRiskScore: Number(row.final_risk_score),
     aiUsed: Boolean(row.ai_used),
     isThreat: Boolean(row.is_threat),

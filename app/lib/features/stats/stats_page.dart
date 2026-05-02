@@ -129,20 +129,36 @@ class StatsPageState extends State<StatsPage> {
       physics: const NeverScrollableScrollPhysics(),
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
-      childAspectRatio: 1.8,
+      childAspectRatio: 2.4,
       children: [
-        _kpiCard(t.t('stats.scansToday'), stats.scansToday),
-        _kpiCard(t.t('stats.scansWeek'), stats.scansWeek),
-        _kpiCard(t.t('stats.scansMonth'), stats.scansMonth),
-        _kpiCard(t.t('stats.threats'), stats.threatsDetected),
+        _kpiCard(
+          t.t('stats.scansToday'),
+          stats.scansToday,
+          t.t('stats.chart.dayShort'),
+        ),
+        _kpiCard(
+          t.t('stats.scansWeek'),
+          stats.scansWeek,
+          t.t('stats.chart.weekShort'),
+        ),
+        _kpiCard(
+          t.t('stats.scansMonth'),
+          stats.scansMonth,
+          t.t('stats.chart.monthShort'),
+        ),
+        _kpiCard(
+          t.t('stats.threats'),
+          stats.threatsDetected,
+          t.t('stats.chart.threatsShort'),
+        ),
       ],
     );
   }
 
-  Widget _kpiCard(String label, int value) {
+  Widget _kpiCard(String label, int value, String shortLabel) {
     return Container(
-      constraints: const BoxConstraints(minHeight: 78),
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      constraints: const BoxConstraints(minHeight: 58),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: Theme.of(context).colorScheme.surface,
@@ -157,17 +173,31 @@ class StatsPageState extends State<StatsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 14),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                shortLabel,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+            ],
           ),
           const Spacer(),
           Text(
             value.toString(),
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -329,7 +359,7 @@ class StatsPageState extends State<StatsPage> {
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: _activityItem(context, item),
+                  child: _activityItem(context, t, item),
                 );
               },
             ),
@@ -339,7 +369,11 @@ class StatsPageState extends State<StatsPage> {
     );
   }
 
-  Widget _activityItem(BuildContext context, ScanActivityItem item) {
+  Widget _activityItem(
+    BuildContext context,
+    AppLocalizations t,
+    ScanActivityItem item,
+  ) {
     final theme = Theme.of(context);
 
     Color color;
@@ -392,7 +426,9 @@ class StatsPageState extends State<StatsPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  item.finalCategory,
+                  '${t.t('categories.${item.finalCategory}')} · ${t.t('threatTypes.${item.threatType}')}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: color,
                     fontSize: 12,
