@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/analytics_service.dart';
 import '../../core/api_client.dart';
@@ -15,6 +16,7 @@ import '../premium/subscription_page.dart';
 import '../navigation/home_page.dart';
 import 'scan_models.dart';
 import 'scan_service.dart';
+import 'scan_action_advice.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
@@ -720,13 +722,128 @@ class _ResultCard extends StatelessWidget {
               textAlign: TextAlign.start,
             ),
             const SizedBox(height: 4),
-            _bullet(t.t('result.action.block')),
-            _bullet(t.t('result.action.verify')),
-            _bullet(t.t('result.action.report')),
+            ..._buildActionBullets(t),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    await Clipboard.setData(
+                      ClipboardData(text: _buildSafetyAdvice(t)),
+                    );
+
+                    if (!context.mounted) return;
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(t.t('result.copyAdvice.copied'))),
+                    );
+                  },
+                  icon: const Icon(Icons.copy),
+                  label: Text(t.t('result.copyAdvice.button')),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    await SharePlus.instance.share(
+                      ShareParams(text: _buildSafetyAdvice(t)),
+                    );
+                  },
+                  icon: const Icon(Icons.ios_share),
+                  label: Text(t.t('result.shareAdvice.button')),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    _showVerificationChecklist(context, t);
+                  },
+                  icon: const Icon(Icons.checklist),
+                  label: Text(t.t('result.checklist.button')),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
+  }
+
+  void _showVerificationChecklist(
+    BuildContext context,
+    AppLocalizations t,
+  ) {
+    final checklistItems = result.category == 'low_risk'
+        ? [
+            t.t('result.checklist.low.sender'),
+            t.t('result.checklist.low.links'),
+            t.t('result.checklist.low.requests'),
+          ]
+        : [
+            t.t('result.checklist.risky.doNotClick'),
+            t.t('result.checklist.risky.officialWebsite'),
+            t.t('result.checklist.risky.contactProvider'),
+            t.t('result.checklist.risky.neverShareCodes'),
+            t.t('result.checklist.risky.report'),
+          ];
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(t.t('result.checklist.title')),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: checklistItems
+                .map(
+                  (item) => Padding(
+                    padding: const EdgeInsetsDirectional.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.check_circle_outline, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            item,
+                            textAlign: TextAlign.start,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+              child: Text(t.t('actions.close')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  List<String> _buildActionTexts(AppLocalizations t) {
+    return buildScanActionAdviceContent(
+      result: result,
+      translate: (key) => t.t(key),
+      formatReason: (reason) => _formatReason(t, reason),
+    ).actions;
+  }
+
+  List<Widget> _buildActionBullets(AppLocalizations t) {
+    return _buildActionTexts(t).map(_bullet).toList();
+  }
+
+  String _buildSafetyAdvice(AppLocalizations t) {
+    return buildScanActionAdviceContent(
+      result: result,
+      translate: (key) => t.t(key),
+      formatReason: (reason) => _formatReason(t, reason),
+    ).safetyAdvice;
   }
 
   String _formatReason(AppLocalizations t, String reason) {
@@ -749,6 +866,9 @@ class _ResultCard extends StatelessWidget {
       'TOO_GOOD_TO_BE_TRUE',
       'SENSITIVE_DATA',
       'URGENCY_LANGUAGE',
+      'SUSPICIOUS_TLD',
+      'IP_URL',
+      'MANY_SUBDOMAINS',
     };
 
     if (heuristicReasons.contains(reason)) {
