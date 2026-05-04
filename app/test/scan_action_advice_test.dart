@@ -39,7 +39,15 @@ void main() {
     );
     expect(
       content.safetyAdvice,
-      isNot(contains('- Block the sender and do not click the link.')),
+      isNot(contains('- Do not reply to the message.')),
+    );
+    expect(
+      content.safetyAdvice,
+      isNot(contains('- Block the sender and do not click any links.')),
+    );
+    expect(
+      content.safetyAdvice,
+      isNot(contains('- Delete the message after reporting it if needed.')),
     );
   });
 
@@ -61,9 +69,10 @@ void main() {
     );
 
     expect(content.actions, [
-      'Block the sender and do not click the link.',
+      'Do not reply to the message.',
+      'Block the sender and do not click any links.',
+      'Delete the message after reporting it if needed.',
       'Verify via official channels.',
-      'Report it to your provider if it involves money.',
     ]);
 
     expect(content.safetyAdvice, contains('Risk score: 100/100'));
@@ -79,7 +88,15 @@ void main() {
     );
     expect(
       content.safetyAdvice,
-      contains('- Block the sender and do not click the link.'),
+      contains('- Do not reply to the message.'),
+    );
+    expect(
+      content.safetyAdvice,
+      contains('- Block the sender and do not click any links.'),
+    );
+    expect(
+      content.safetyAdvice,
+      contains('- Delete the message after reporting it if needed.'),
     );
     expect(
       content.safetyAdvice,
@@ -131,7 +148,9 @@ String _translate(String key) {
         'Stay cautious if the sender later asks for sensitive data.',
     'result.action.low.verifyIfUnusual':
         'Verify via official channels if anything feels unusual.',
-    'result.action.block': 'Block the sender and do not click the link.',
+    'result.action.noReply': 'Do not reply to the message.',
+    'result.action.block': 'Block the sender and do not click any links.',
+    'result.action.delete': 'Delete the message after reporting it if needed.',
     'result.action.verify': 'Verify via official channels.',
     'result.action.report': 'Report it to your provider if it involves money.',
   };
