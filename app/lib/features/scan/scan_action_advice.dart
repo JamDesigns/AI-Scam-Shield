@@ -55,8 +55,9 @@ List<String> _buildActionTexts(
   }
 
   return [
+    translate('result.action.noReply'),
     translate('result.action.block'),
+    translate('result.action.delete'),
     translate('result.action.verify'),
-    translate('result.action.report'),
   ];
 }
