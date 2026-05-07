@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -17,6 +19,7 @@ import '../navigation/home_page.dart';
 import 'scan_models.dart';
 import 'scan_service.dart';
 import 'scan_action_advice.dart';
+import 'image_scan_text.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
@@ -35,11 +38,14 @@ class _ScanPageState extends State<ScanPage> {
   static const String _lastScannedFingerprintKey = 'last_scanned_fingerprint';
 
   final _controller = TextEditingController();
+  final _imagePicker = ImagePicker();
+  final _textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
   late final Future<void> _bootstrapFuture;
 
   String? _deviceId;
   bool _loading = false;
+  bool _imageScanLoading = false;
   bool _isPremium = false;
   bool _hasInput = false;
   ScanResult? _lastResult;
@@ -56,6 +62,8 @@ class _ScanPageState extends State<ScanPage> {
   late ApiClient _api;
   late ScanService _scanService;
   late PremiumService _premiumService;
+
+  bool get _isBusy => _loading || _imageScanLoading;
 
   bool get _isWeeklyScanLimitReached {
     if (_isPremium) return false;
@@ -263,7 +271,7 @@ class _ScanPageState extends State<ScanPage> {
       return;
     }
 
-    if (_loading) return;
+    if (_isBusy) return;
     if (_isWeeklyScanLimitReached) return;
 
     await _scan();
@@ -318,6 +326,75 @@ class _ScanPageState extends State<ScanPage> {
       });
     } catch (_) {
       // Keep silent for MVP.
+    }
+  }
+
+  Future<void> _scanImage() async {
+    if (_isBusy) return;
+    if (_isWeeklyScanLimitReached) return;
+
+    setState(() {
+      _imageScanLoading = true;
+      _errorKey = null;
+      _errorMessage = null;
+      _noticeKey = null;
+    });
+
+    try {
+      final image = await _imagePicker.pickImage(source: ImageSource.gallery);
+
+      if (image == null) {
+        return;
+      }
+
+      final inputImage = InputImage.fromFilePath(image.path);
+      final recognizedText = await _textRecognizer.processImage(inputImage);
+      final extractedText = prepareImageScanText(
+        recognizedText.text,
+        maxLength: _maxInputLength,
+      );
+
+      if (!mounted) return;
+
+      if (extractedText.isEmpty) {
+        setState(() {
+          _lastResult = null;
+          _errorKey = 'errors.imageScanNoText';
+          _errorMessage = null;
+        });
+        return;
+      }
+
+      _controller.value = TextEditingValue(
+        text: extractedText,
+        selection: TextSelection.collapsed(offset: extractedText.length),
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _hasInput = true;
+        _lastResult = null;
+        _errorKey = null;
+        _errorMessage = null;
+        _noticeKey = null;
+      });
+
+      await _scan();
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _lastResult = null;
+        _errorKey = kDebugMode ? null : 'errors.imageScanFailed';
+        _errorMessage = kDebugMode ? e.toString() : null;
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _imageScanLoading = false;
+        });
+      }
     }
   }
 
@@ -471,6 +548,7 @@ class _ScanPageState extends State<ScanPage> {
   void dispose() {
     _shareIntentChannel.setMethodCallHandler(null);
     _controller.dispose();
+    _textRecognizer.close();
     super.dispose();
   }
 
@@ -500,7 +578,7 @@ class _ScanPageState extends State<ScanPage> {
               children: [
                 const Spacer(),
                 FilledButton(
-                  onPressed: _loading ? null : _onPremiumPressed,
+                  onPressed: _isBusy ? null : _onPremiumPressed,
                   child: Text(
                     _isPremium ? t.t('subscription.title') : t.t('premium.cta'),
                   ),
@@ -564,11 +642,28 @@ class _ScanPageState extends State<ScanPage> {
               textAlign: TextAlign.start,
             ),
             const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed:
+                  (_isBusy || _isWeeklyScanLimitReached) ? null : _scanImage,
+              icon: _imageScanLoading
+                  ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.image_search),
+              label: Text(
+                _imageScanLoading
+                    ? t.t('scan.image.extracting')
+                    : t.t('scan.image.button'),
+              ),
+            ),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: FilledButton(
-                    onPressed: (_loading ||
+                    onPressed: (_isBusy ||
                             _isWeeklyScanLimitReached ||
                             _isCurrentInputAlreadyScanned)
                         ? null
@@ -585,7 +680,7 @@ class _ScanPageState extends State<ScanPage> {
                 const SizedBox(width: 12),
                 if (_hasInput)
                   OutlinedButton.icon(
-                    onPressed: _loading ? null : _clear,
+                    onPressed: _isBusy ? null : _clear,
                     icon: const Icon(Icons.delete_outline),
                     label: Text(t.t('actions.clear')),
                   ),
