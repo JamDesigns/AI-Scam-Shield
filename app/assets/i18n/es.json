@@ -8,10 +8,12 @@
   "about.title": "Acerca de",
 
   "scan.title": "Escanear",
-  "scan.subtitle": "Pega un enlace o mensaje para comprobar si es una estafa.",
+  "scan.subtitle": "Pega un enlace, mensaje o escanea una captura para comprobar si es una estafa.",
   "scan.maxLength": "Longitud máxima del mensaje: {max} caracteres.",
   "scan.input.label": "Enlace o mensaje",
   "scan.button": "Escanear",
+  "scan.image.button": "Escanear imagen",
+  "scan.image.extracting": "Extrayendo texto...",
   "scan.example": "Ejemplo: Tu cuenta está bloqueada. Verifica en https://secure-login-paypaI.com",
   "scan.aiQuota.unlimited": "AI Pro: Ilimitado (Premium)",
   "scan.aiQuota.free": "Usos de AI Pro restantes esta semana: {remaining}/{limit} (Ilimitado con Premium)",
@@ -81,6 +83,8 @@
   "errors.weeklyLimitExceeded": "Has alcanzado el límite semanal gratuito de escaneos. Hazte Premium para escaneos ilimitados.",
   "errors.aiLimitExceeded": "AI Pro ha alcanzado el límite semanal gratuito. Hazte Premium para análisis ilimitados.",
   "errors.rateLimited": "Espera unos segundos antes de volver a escanear.",
+  "errors.imageScanNoText": "No se ha detectado texto legible en la imagen.",
+  "errors.imageScanFailed": "No se pudo leer la imagen. Prueba con otra captura.",
 
   "reasons.URL_TYPO": "La URL contiene un error sospechoso (posible suplantación).",
   "reasons.SHORTENER": "El enlace usa un acortador de URL.",

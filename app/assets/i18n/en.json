@@ -8,10 +8,12 @@
   "about.title": "About",
 
   "scan.title": "Scan",
-  "scan.subtitle": "Paste a link or message to check for scams.",
+  "scan.subtitle": "Paste a link, message, or scan a screenshot to check for scams.",
   "scan.maxLength": "Maximum message length: {max} characters.",
   "scan.input.label": "Link or message",
   "scan.button": "Scan",
+  "scan.image.button": "Scan image",
+  "scan.image.extracting": "Extracting text...",
   "scan.example": "Example: Your account is locked. Verify at https://secure-login-paypaI.com",
   "scan.aiQuota.unlimited": "AI Pro: Unlimited (Premium)",
   "scan.aiQuota.free": "AI Pro uses left this week: {remaining}/{limit} (Unlimited with Premium)",
@@ -81,6 +83,8 @@
   "errors.weeklyLimitExceeded": "You have reached the free weekly scan limit. Go Premium for unlimited scans.",
   "errors.aiLimitExceeded": "AI Pro reached the free weekly limit. Go Premium for unlimited AI analysis.",
   "errors.rateLimited": "Please wait a few seconds before scanning again.",
+  "errors.imageScanNoText": "No readable text was detected in the image.",
+  "errors.imageScanFailed": "Could not read the image. Try another screenshot.",
 
   "reasons.URL_TYPO": "The URL contains a suspicious typo (possible impersonation).",
   "reasons.SHORTENER": "The link uses a URL shortener.",

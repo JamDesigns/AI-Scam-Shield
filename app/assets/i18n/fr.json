@@ -8,10 +8,12 @@
   "about.title": "À propos",
 
   "scan.title": "Analyser",
-  "scan.subtitle": "Collez un lien ou un message pour vérifier s’il s’agit d’une arnaque.",
+  "scan.subtitle": "Collez un lien, un message ou analysez une capture d’écran pour vérifier s’il s’agit d’une arnaque.",
   "scan.maxLength": "Longueur maximale du message : {max} caractères.",
   "scan.input.label": "Lien ou message",
   "scan.button": "Analyser",
+  "scan.image.button": "Analyser une image",
+  "scan.image.extracting": "Extraction du texte...",
   "scan.example": "Exemple : Votre compte est bloqué. Vérifiez sur https://secure-login-paypaI.com",
   "scan.aiQuota.unlimited": "AI Pro : Illimité (Premium)",
   "scan.aiQuota.free": "Utilisations AI Pro restantes cette semaine : {remaining}/{limit} (Illimité avec Premium)",
@@ -81,6 +83,8 @@
   "errors.weeklyLimitExceeded": "Vous avez atteint la limite hebdomadaire gratuite. Passez Premium pour des analyses illimitées.",
   "errors.aiLimitExceeded": "AI Pro a atteint la limite hebdomadaire gratuite. Passez Premium pour une analyse illimitée.",
   "errors.rateLimited": "Veuillez attendre quelques secondes avant de relancer une analyse.",
+  "errors.imageScanNoText": "Aucun texte lisible n’a été détecté dans l’image.",
+  "errors.imageScanFailed": "Impossible de lire l’image. Essayez une autre capture.",
 
   "reasons.URL_TYPO": "L’URL contient une faute suspecte (possible usurpation).",
   "reasons.SHORTENER": "Le lien utilise un raccourcisseur d’URL.",
