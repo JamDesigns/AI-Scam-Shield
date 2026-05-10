@@ -847,44 +847,48 @@ class _ResultCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             ..._buildActionBullets(t),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                OutlinedButton.icon(
-                  onPressed: () async {
-                    await Clipboard.setData(
-                      ClipboardData(text: _buildSafetyAdvice(t)),
-                    );
+            if (result.category != 'low_risk') ...[
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      await Clipboard.setData(
+                        ClipboardData(text: _buildSafetyAdvice(t)),
+                      );
 
-                    if (!context.mounted) return;
+                      if (!context.mounted) return;
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(t.t('result.copyAdvice.copied'))),
-                    );
-                  },
-                  icon: const Icon(Icons.copy),
-                  label: Text(t.t('result.copyAdvice.button')),
-                ),
-                OutlinedButton.icon(
-                  onPressed: () async {
-                    await SharePlus.instance.share(
-                      ShareParams(text: _buildSafetyAdvice(t)),
-                    );
-                  },
-                  icon: const Icon(Icons.ios_share),
-                  label: Text(t.t('result.shareAdvice.button')),
-                ),
-                OutlinedButton.icon(
-                  onPressed: () {
-                    _showVerificationChecklist(context, t);
-                  },
-                  icon: const Icon(Icons.checklist),
-                  label: Text(t.t('result.checklist.button')),
-                ),
-              ],
-            ),
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(t.t('result.copyAdvice.copied')),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.copy),
+                    label: Text(t.t('result.copyAdvice.button')),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      await SharePlus.instance.share(
+                        ShareParams(text: _buildSafetyAdvice(t)),
+                      );
+                    },
+                    icon: const Icon(Icons.ios_share),
+                    label: Text(t.t('result.shareAdvice.button')),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      _showVerificationChecklist(context, t);
+                    },
+                    icon: const Icon(Icons.checklist),
+                    label: Text(t.t('result.checklist.button')),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
