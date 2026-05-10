@@ -216,12 +216,16 @@ class _ScanPageState extends State<ScanPage> {
 
   Future<void> _setupShareIntent() async {
     _shareIntentChannel.setMethodCallHandler((call) async {
-      if (call.method != 'onSharedText') {
+      if (call.method == 'onSharedText') {
+        final sharedText = call.arguments as String?;
+        await _applySharedTextAndScan(sharedText);
         return;
       }
 
-      final sharedText = call.arguments as String?;
-      await _applySharedTextAndScan(sharedText);
+      if (call.method == 'onSharedImage') {
+        final sharedImagePath = call.arguments as String?;
+        await _applySharedImageAndScan(sharedImagePath);
+      }
     });
 
     final initialSharedText = await _shareIntentChannel.invokeMethod<String>(
@@ -230,7 +234,15 @@ class _ScanPageState extends State<ScanPage> {
 
     await _applySharedTextAndScan(initialSharedText);
 
+    final initialSharedImagePath =
+        await _shareIntentChannel.invokeMethod<String>(
+      'getInitialSharedImagePath',
+    );
+
+    await _applySharedImageAndScan(initialSharedImagePath);
+
     await _shareIntentChannel.invokeMethod<void>('clearInitialSharedText');
+    await _shareIntentChannel.invokeMethod<void>('clearInitialSharedImagePath');
   }
 
   Future<void> _applySharedTextAndScan(String? sharedText) async {
@@ -333,6 +345,29 @@ class _ScanPageState extends State<ScanPage> {
     if (_isBusy) return;
     if (_isWeeklyScanLimitReached) return;
 
+    final image = await _imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (image == null) {
+      return;
+    }
+
+    await _applySharedImageAndScan(image.path);
+  }
+
+  Future<void> _applySharedImageAndScan(String? imagePath) async {
+    final path = imagePath?.trim();
+    if (path == null || path.isEmpty) {
+      return;
+    }
+
+    HomePage.globalKey.currentState?.openScanTab();
+
+    await _bootstrapFuture;
+    if (!mounted) return;
+
+    if (_isBusy) return;
+    if (_isWeeklyScanLimitReached) return;
+
     setState(() {
       _imageScanLoading = true;
       _errorKey = null;
@@ -341,13 +376,7 @@ class _ScanPageState extends State<ScanPage> {
     });
 
     try {
-      final image = await _imagePicker.pickImage(source: ImageSource.gallery);
-
-      if (image == null) {
-        return;
-      }
-
-      final inputImage = InputImage.fromFilePath(image.path);
+      final inputImage = InputImage.fromFilePath(path);
       final recognizedText = await _textRecognizer.processImage(inputImage);
       final extractedText = prepareImageScanText(
         recognizedText.text,
