@@ -129,7 +129,7 @@ class StatsPageState extends State<StatsPage> {
       physics: const NeverScrollableScrollPhysics(),
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
-      childAspectRatio: 2.4,
+      childAspectRatio: 1.8,
       children: [
         _kpiCard(
           t.t('stats.scansToday'),
