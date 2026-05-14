@@ -51,6 +51,38 @@ void main() {
     );
   });
 
+  test('buildScanActionAdviceContent uses strong actions for medium risk', () {
+    final result = _scanResult(
+      riskScore: 55,
+      category: 'medium_risk',
+      threatType: 'unknown_suspicious',
+      reasons: const [
+        'URGENCY_LANGUAGE',
+      ],
+    );
+
+    final content = buildScanActionAdviceContent(
+      result: result,
+      translate: _translate,
+      formatReason: _formatReason,
+    );
+
+    expect(content.actions, [
+      'Do not reply to the message.',
+      'Block the sender and do not click any links.',
+      'Delete the message after reporting it if needed.',
+      'Verify via official channels.',
+    ]);
+
+    expect(content.safetyAdvice, contains('Risk score: 55/100'));
+    expect(content.safetyAdvice, contains('Category: Medium risk'));
+    expect(content.safetyAdvice, contains('Threat type: Unknown suspicious'));
+    expect(
+      content.safetyAdvice,
+      contains('- The message uses urgency or pressure tactics.'),
+    );
+  });
+
   test('buildScanActionAdviceContent uses strong actions for high risk', () {
     final result = _scanResult(
       riskScore: 100,
@@ -140,8 +172,10 @@ String _translate(String key) {
     'result.actions': 'What to do',
     'result.copyAdvice.noReasons': 'No specific reasons detected.',
     'categories.low_risk': 'Low risk',
+    'categories.medium_risk': 'Medium risk',
     'categories.high_risk': 'High risk',
     'threatTypes.none': 'No specific threat detected',
+    'threatTypes.unknown_suspicious': 'Unknown suspicious',
     'threatTypes.bank_phishing': 'Bank phishing',
     'result.action.low.noImmediateAction': 'No immediate action is needed.',
     'result.action.low.stayCautious':
@@ -162,6 +196,7 @@ String _formatReason(String reason) {
   const reasons = {
     'SUSPICIOUS_TLD': 'The link uses a suspicious domain extension.',
     'URL_TYPO': 'The URL contains a suspicious typo.',
+    'URGENCY_LANGUAGE': 'The message uses urgency or pressure tactics.',
   };
 
   return reasons[reason] ?? reason;
