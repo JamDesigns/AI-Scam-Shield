@@ -1,8 +1,5 @@
-name: api_scam_shield
-
 services:
   postgres:
-    container_name: api_scam_shield_postgres
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: scam
@@ -15,7 +12,6 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
   api:
-    container_name: api_scam_shield_api
     build: .
     env_file:
       - .env
@@ -28,4 +24,4 @@ services:
 
 volumes:
   pgdata:
-    name: api_scam_shield_pgdata
+  

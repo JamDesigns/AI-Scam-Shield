@@ -2,7 +2,6 @@ class ScanResult {
   ScanResult({
     required this.riskScore,
     required this.category,
-    required this.threatType,
     required this.reasons,
     required this.isPremium,
     required this.weeklyLimit,
@@ -19,7 +18,6 @@ class ScanResult {
 
   final int riskScore;
   final String category;
-  final String threatType;
   final List<String> reasons;
   final bool isPremium;
 
@@ -39,9 +37,8 @@ class ScanResult {
   factory ScanResult.fromJson(Map<String, dynamic> json) {
     return ScanResult(
       riskScore: (json['riskScore'] as num).toInt(),
-      category: json['category'] as String? ?? 'low_risk',
-      threatType: json['threatType'] as String? ?? 'none',
-      reasons: (json['reasons'] as List<dynamic>? ?? const []).cast<String>(),
+      category: json['category'] as String,
+      reasons: (json['reasons'] as List<dynamic>).cast<String>(),
       isPremium: json['isPremium'] as bool? ?? false,
       weeklyLimit: (json['weeklyLimit'] as num?)?.toInt(),
       weeklyUsed: (json['weeklyUsed'] as num?)?.toInt() ?? 0,
@@ -158,7 +155,6 @@ class ScanActivityItem {
     required this.createdAt,
     required this.inputPreview,
     required this.finalCategory,
-    required this.threatType,
     required this.finalRiskScore,
     required this.aiUsed,
     required this.isThreat,
@@ -168,7 +164,6 @@ class ScanActivityItem {
   final String createdAt;
   final String inputPreview;
   final String finalCategory;
-  final String threatType;
   final int finalRiskScore;
   final bool aiUsed;
   final bool isThreat;
@@ -183,7 +178,6 @@ class ScanActivityItem {
       createdAt: json['createdAt'] as String? ?? '',
       inputPreview: json['inputPreview'] as String? ?? '',
       finalCategory: json['finalCategory'] as String? ?? 'low_risk',
-      threatType: json['threatType'] as String? ?? 'none',
       finalRiskScore: (json['finalRiskScore'] as num?)?.toInt() ?? 0,
       aiUsed: json['aiUsed'] as bool? ?? false,
       isThreat: json['isThreat'] as bool? ?? false,
