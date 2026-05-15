@@ -26,12 +26,15 @@ class PremiumService {
   }
 
   /// Presents the RevenueCat paywall if the entitlement is not active yet.
-  /// Returns true if the user purchased or restored successfully.
+  /// Returns true only when the entitlement is active after purchase or restore.
   Future<bool> presentPaywallIfNeeded() async {
     final result = await RevenueCatUI.presentPaywallIfNeeded(entitlementId);
 
-    return result == PaywallResult.purchased ||
-        result == PaywallResult.restored;
+    if (result != PaywallResult.purchased && result != PaywallResult.restored) {
+      return false;
+    }
+
+    return isPremium();
   }
 
   /// Optional: backend mirror status (do NOT use as gating source of truth).

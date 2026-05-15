@@ -24,12 +24,16 @@ CREATE TABLE IF NOT EXISTS scan_events (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   input_preview TEXT NOT NULL,
   final_category TEXT NOT NULL,
+  threat_type TEXT NOT NULL DEFAULT 'none',
   final_risk_score INT NOT NULL,
   classic_category TEXT NOT NULL,
   classic_risk_score INT NOT NULL,
   ai_used BOOLEAN NOT NULL DEFAULT FALSE,
   is_threat BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+ALTER TABLE scan_events
+  ADD COLUMN IF NOT EXISTS threat_type TEXT NOT NULL DEFAULT 'none';
 
 CREATE INDEX IF NOT EXISTS idx_scan_events_device_created_at
   ON scan_events (device_id, created_at DESC);

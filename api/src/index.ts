@@ -2,6 +2,7 @@ import "dotenv/config";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { z } from "zod";
+import { inferClassicThreatType } from "./threat-type.js";
 
 import {
   createPool,
@@ -18,7 +19,7 @@ import {
 } from "./db.js";
 import { getDefaultRules, scoreInput } from "./rules.js";
 import { translateWithDeepL } from "./translate.js";
-import { analyzeWithAI, type AiAnalysis } from "./ai.js";
+import { analyzeWithAI, type AiAnalysis, type ThreatType } from "./ai.js";
 
 function getIsoWeekKey(date: Date): { yearWeek: string; resetAt: string } {
   const d = new Date(
@@ -417,6 +418,8 @@ app.post("/scan", async (req, reply) => {
 
   const finalRiskScore = ai?.riskScore ?? classic.riskScore;
   const finalCategory = ai?.category ?? classic.category;
+  const finalThreatType: ThreatType =
+    ai?.threatType ?? inferClassicThreatType(textForScoring, finalCategory);
   const finalReasons = ai?.reasons ?? classic.reasons;
   const isThreat = finalCategory !== "low_risk";
   const inputPreview = buildInputPreview(body.input);
@@ -462,6 +465,7 @@ app.post("/scan", async (req, reply) => {
     deviceId,
     inputPreview,
     finalCategory,
+    threatType: finalThreatType,
     finalRiskScore,
     classicCategory: classic.category,
     classicRiskScore: classic.riskScore,
@@ -472,6 +476,7 @@ app.post("/scan", async (req, reply) => {
   return {
     riskScore: finalRiskScore,
     category: finalCategory,
+    threatType: finalThreatType,
     reasons: finalReasons,
 
     classicRiskScore: classic.riskScore,
