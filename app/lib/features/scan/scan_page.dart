@@ -3,10 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../core/analytics_service.dart';
 import '../../core/api_client.dart';
@@ -18,8 +15,6 @@ import '../premium/subscription_page.dart';
 import '../navigation/home_page.dart';
 import 'scan_models.dart';
 import 'scan_service.dart';
-import 'scan_action_advice.dart';
-import 'image_scan_text.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
@@ -38,14 +33,11 @@ class _ScanPageState extends State<ScanPage> {
   static const String _lastScannedFingerprintKey = 'last_scanned_fingerprint';
 
   final _controller = TextEditingController();
-  final _imagePicker = ImagePicker();
-  final _textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
   late final Future<void> _bootstrapFuture;
 
   String? _deviceId;
   bool _loading = false;
-  bool _imageScanLoading = false;
   bool _isPremium = false;
   bool _hasInput = false;
   ScanResult? _lastResult;
@@ -62,8 +54,6 @@ class _ScanPageState extends State<ScanPage> {
   late ApiClient _api;
   late ScanService _scanService;
   late PremiumService _premiumService;
-
-  bool get _isBusy => _loading || _imageScanLoading;
 
   bool get _isWeeklyScanLimitReached {
     if (_isPremium) return false;
@@ -198,7 +188,6 @@ class _ScanPageState extends State<ScanPage> {
     return {
       'riskScore': result.riskScore,
       'category': result.category,
-      'threatType': result.threatType,
       'reasons': result.reasons,
       'isPremium': result.isPremium,
       'weeklyLimit': result.weeklyLimit,
@@ -216,16 +205,12 @@ class _ScanPageState extends State<ScanPage> {
 
   Future<void> _setupShareIntent() async {
     _shareIntentChannel.setMethodCallHandler((call) async {
-      if (call.method == 'onSharedText') {
-        final sharedText = call.arguments as String?;
-        await _applySharedTextAndScan(sharedText);
+      if (call.method != 'onSharedText') {
         return;
       }
 
-      if (call.method == 'onSharedImage') {
-        final sharedImagePath = call.arguments as String?;
-        await _applySharedImageAndScan(sharedImagePath);
-      }
+      final sharedText = call.arguments as String?;
+      await _applySharedTextAndScan(sharedText);
     });
 
     final initialSharedText = await _shareIntentChannel.invokeMethod<String>(
@@ -234,15 +219,7 @@ class _ScanPageState extends State<ScanPage> {
 
     await _applySharedTextAndScan(initialSharedText);
 
-    final initialSharedImagePath =
-        await _shareIntentChannel.invokeMethod<String>(
-      'getInitialSharedImagePath',
-    );
-
-    await _applySharedImageAndScan(initialSharedImagePath);
-
     await _shareIntentChannel.invokeMethod<void>('clearInitialSharedText');
-    await _shareIntentChannel.invokeMethod<void>('clearInitialSharedImagePath');
   }
 
   Future<void> _applySharedTextAndScan(String? sharedText) async {
@@ -283,7 +260,7 @@ class _ScanPageState extends State<ScanPage> {
       return;
     }
 
-    if (_isBusy) return;
+    if (_loading) return;
     if (_isWeeklyScanLimitReached) return;
 
     await _scan();
@@ -338,92 +315,6 @@ class _ScanPageState extends State<ScanPage> {
       });
     } catch (_) {
       // Keep silent for MVP.
-    }
-  }
-
-  Future<void> _scanImage() async {
-    if (_isBusy) return;
-    if (_isWeeklyScanLimitReached) return;
-
-    final image = await _imagePicker.pickImage(source: ImageSource.gallery);
-
-    if (image == null) {
-      return;
-    }
-
-    await _applySharedImageAndScan(image.path);
-  }
-
-  Future<void> _applySharedImageAndScan(String? imagePath) async {
-    final path = imagePath?.trim();
-    if (path == null || path.isEmpty) {
-      return;
-    }
-
-    HomePage.globalKey.currentState?.openScanTab();
-
-    await _bootstrapFuture;
-    if (!mounted) return;
-
-    if (_isBusy) return;
-    if (_isWeeklyScanLimitReached) return;
-
-    setState(() {
-      _imageScanLoading = true;
-      _errorKey = null;
-      _errorMessage = null;
-      _noticeKey = null;
-    });
-
-    try {
-      final inputImage = InputImage.fromFilePath(path);
-      final recognizedText = await _textRecognizer.processImage(inputImage);
-      final extractedText = prepareImageScanText(
-        recognizedText.text,
-        maxLength: _maxInputLength,
-      );
-
-      if (!mounted) return;
-
-      if (extractedText.isEmpty) {
-        setState(() {
-          _lastResult = null;
-          _errorKey = 'errors.imageScanNoText';
-          _errorMessage = null;
-        });
-        return;
-      }
-
-      _controller.value = TextEditingValue(
-        text: extractedText,
-        selection: TextSelection.collapsed(offset: extractedText.length),
-      );
-
-      if (!mounted) return;
-
-      setState(() {
-        _hasInput = true;
-        _lastResult = null;
-        _errorKey = null;
-        _errorMessage = null;
-        _noticeKey = null;
-      });
-
-      await _scan();
-    } catch (e) {
-      if (!mounted) return;
-
-      setState(() {
-        _lastResult = null;
-        _errorKey = kDebugMode ? null : 'errors.imageScanFailed';
-        _errorMessage = kDebugMode ? e.toString() : null;
-      });
-    } finally {
-      if (mounted) {
-        setState(() {
-          _imageScanLoading = false;
-        });
-      }
     }
   }
 
@@ -577,7 +468,6 @@ class _ScanPageState extends State<ScanPage> {
   void dispose() {
     _shareIntentChannel.setMethodCallHandler(null);
     _controller.dispose();
-    _textRecognizer.close();
     super.dispose();
   }
 
@@ -607,7 +497,7 @@ class _ScanPageState extends State<ScanPage> {
               children: [
                 const Spacer(),
                 FilledButton(
-                  onPressed: _isBusy ? null : _onPremiumPressed,
+                  onPressed: _loading ? null : _onPremiumPressed,
                   child: Text(
                     _isPremium ? t.t('subscription.title') : t.t('premium.cta'),
                   ),
@@ -660,8 +550,8 @@ class _ScanPageState extends State<ScanPage> {
             const SizedBox(height: 16),
             TextField(
               controller: _controller,
-              minLines: 3,
-              maxLines: 3,
+              minLines: 4,
+              maxLines: 10,
               maxLength: _maxInputLength,
               decoration: InputDecoration(
                 labelText: t.t('scan.input.label'),
@@ -671,28 +561,11 @@ class _ScanPageState extends State<ScanPage> {
               textAlign: TextAlign.start,
             ),
             const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed:
-                  (_isBusy || _isWeeklyScanLimitReached) ? null : _scanImage,
-              icon: _imageScanLoading
-                  ? const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.image_search),
-              label: Text(
-                _imageScanLoading
-                    ? t.t('scan.image.extracting')
-                    : t.t('scan.image.button'),
-              ),
-            ),
-            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: FilledButton(
-                    onPressed: (_isBusy ||
+                    onPressed: (_loading ||
                             _isWeeklyScanLimitReached ||
                             _isCurrentInputAlreadyScanned)
                         ? null
@@ -709,7 +582,7 @@ class _ScanPageState extends State<ScanPage> {
                 const SizedBox(width: 12),
                 if (_hasInput)
                   OutlinedButton.icon(
-                    onPressed: _isBusy ? null : _clear,
+                    onPressed: _loading ? null : _clear,
                     icon: const Icon(Icons.delete_outline),
                     label: Text(t.t('actions.clear')),
                   ),
@@ -808,13 +681,6 @@ class _ResultCard extends StatelessWidget {
               t.t('categories.${result.category}'),
               result.category,
             ),
-            const SizedBox(height: 4),
-            _categoryRow(
-              context,
-              t.t('result.threatType'),
-              t.t('threatTypes.${result.threatType}'),
-              result.category,
-            ),
             const SizedBox(height: 10),
             Text(
               t.t('result.reasons'),
@@ -846,132 +712,13 @@ class _ResultCard extends StatelessWidget {
               textAlign: TextAlign.start,
             ),
             const SizedBox(height: 4),
-            ..._buildActionBullets(t),
-            if (result.category != 'low_risk') ...[
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: () async {
-                      await Clipboard.setData(
-                        ClipboardData(text: _buildSafetyAdvice(t)),
-                      );
-
-                      if (!context.mounted) return;
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(t.t('result.copyAdvice.copied')),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.copy),
-                    label: Text(t.t('result.copyAdvice.button')),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () async {
-                      await SharePlus.instance.share(
-                        ShareParams(text: _buildSafetyAdvice(t)),
-                      );
-                    },
-                    icon: const Icon(Icons.ios_share),
-                    label: Text(t.t('result.shareAdvice.button')),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      _showVerificationChecklist(context, t);
-                    },
-                    icon: const Icon(Icons.checklist),
-                    label: Text(t.t('result.checklist.button')),
-                  ),
-                ],
-              ),
-            ],
+            _bullet(t.t('result.action.block')),
+            _bullet(t.t('result.action.verify')),
+            _bullet(t.t('result.action.report')),
           ],
         ),
       ),
     );
-  }
-
-  void _showVerificationChecklist(
-    BuildContext context,
-    AppLocalizations t,
-  ) {
-    final checklistItems = result.category == 'low_risk'
-        ? [
-            t.t('result.checklist.low.sender'),
-            t.t('result.checklist.low.links'),
-            t.t('result.checklist.low.requests'),
-          ]
-        : [
-            t.t('result.checklist.risky.doNotClick'),
-            t.t('result.checklist.risky.officialWebsite'),
-            t.t('result.checklist.risky.contactProvider'),
-            t.t('result.checklist.risky.neverShareCodes'),
-            t.t('result.checklist.risky.report'),
-          ];
-
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(t.t('result.checklist.title')),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: checklistItems
-                .map(
-                  (item) => Padding(
-                    padding: const EdgeInsetsDirectional.only(bottom: 8),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.check_circle_outline, size: 18),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            item,
-                            textAlign: TextAlign.start,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-              child: Text(t.t('actions.close')),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  List<String> _buildActionTexts(AppLocalizations t) {
-    return buildScanActionAdviceContent(
-      result: result,
-      translate: (key) => t.t(key),
-      formatReason: (reason) => _formatReason(t, reason),
-    ).actions;
-  }
-
-  List<Widget> _buildActionBullets(AppLocalizations t) {
-    return _buildActionTexts(t).map(_bullet).toList();
-  }
-
-  String _buildSafetyAdvice(AppLocalizations t) {
-    return buildScanActionAdviceContent(
-      result: result,
-      translate: (key) => t.t(key),
-      formatReason: (reason) => _formatReason(t, reason),
-    ).safetyAdvice;
   }
 
   String _formatReason(AppLocalizations t, String reason) {
@@ -994,9 +741,6 @@ class _ResultCard extends StatelessWidget {
       'TOO_GOOD_TO_BE_TRUE',
       'SENSITIVE_DATA',
       'URGENCY_LANGUAGE',
-      'SUSPICIOUS_TLD',
-      'IP_URL',
-      'MANY_SUBDOMAINS',
     };
 
     if (heuristicReasons.contains(reason)) {
