@@ -19,7 +19,8 @@ import '../navigation/home_page.dart';
 import 'scan_models.dart';
 import 'scan_service.dart';
 import 'scan_action_advice.dart';
-import 'image_scan_text.dart';
+import 'image_qr_decoder.dart';
+import 'image_scan_content.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
@@ -378,8 +379,10 @@ class _ScanPageState extends State<ScanPage> {
     try {
       final inputImage = InputImage.fromFilePath(path);
       final recognizedText = await _textRecognizer.processImage(inputImage);
-      final extractedText = prepareImageScanText(
-        recognizedText.text,
+      final qrContents = await decodeQrContentsFromImageFile(path);
+      final extractedText = buildImageScanContent(
+        ocrText: recognizedText.text,
+        qrContents: qrContents,
         maxLength: _maxInputLength,
       );
 
