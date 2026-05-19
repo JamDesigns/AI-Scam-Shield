@@ -18,17 +18,23 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
   bool _loading = true;
   bool _hasError = false;
 
+  bool _contentLoaded = false;
+
   @override
-  void initState() {
-    super.initState();
-    _loadContent();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_contentLoaded) {
+      return;
+    }
+
+    _contentLoaded = true;
+    _loadContent(Localizations.localeOf(context).languageCode);
   }
 
-  Future<void> _loadContent() async {
+  Future<void> _loadContent(String locale) async {
     try {
-      final content = await rootBundle.loadString(
-        'assets/legal/privacy-policy.md',
-      );
+      final content = await _loadLocalizedPrivacyPolicy(locale);
 
       if (!mounted) return;
 
@@ -44,6 +50,16 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
         _loading = false;
         _hasError = true;
       });
+    }
+  }
+
+  Future<String> _loadLocalizedPrivacyPolicy(String locale) async {
+    try {
+      return await rootBundle.loadString(
+        'assets/legal/privacy-policy.$locale.md',
+      );
+    } catch (_) {
+      return rootBundle.loadString('assets/legal/privacy-policy.en.md');
     }
   }
 

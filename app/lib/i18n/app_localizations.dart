@@ -9,6 +9,7 @@ class AppLocalizations {
 
   final Locale locale;
   late Map<String, dynamic> _translations;
+  late Map<String, dynamic> _fallbackTranslations;
 
   static const List<Locale> supportedLocales = [
     Locale('en'),
@@ -23,19 +24,21 @@ class AppLocalizations {
   }
 
   Future<void> load() async {
+    final String fallbackData =
+        await rootBundle.loadString('assets/i18n/en.json');
+    _fallbackTranslations = json.decode(fallbackData) as Map<String, dynamic>;
+
     try {
       final String data = await rootBundle
           .loadString('assets/i18n/${locale.languageCode}.json');
       _translations = json.decode(data) as Map<String, dynamic>;
     } catch (_) {
-      final String fallbackData =
-          await rootBundle.loadString('assets/i18n/en.json');
-      _translations = json.decode(fallbackData) as Map<String, dynamic>;
+      _translations = _fallbackTranslations;
     }
   }
 
   String t(String key, {Map<String, String>? params}) {
-    final dynamic value = _translations[key];
+    final dynamic value = _translations[key] ?? _fallbackTranslations[key];
     if (value is! String) return key;
 
     var text = value;

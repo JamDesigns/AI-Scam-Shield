@@ -2,13 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=legal/terms-of-service.en.html">
   <title>Terms of Service – AI Scam Shield</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function () {
+      var supportedLocales = ['en', 'es', 'fr'];
+      var languages = navigator.languages && navigator.languages.length
+        ? navigator.languages
+        : [navigator.language || 'en'];
+
+      var selectedLocale = 'en';
+
+      for (var i = 0; i < languages.length; i++) {
+        var locale = String(languages[i]).toLowerCase().split('-')[0];
+
+        if (supportedLocales.indexOf(locale) !== -1) {
+          selectedLocale = locale;
+          break;
+        }
+      }
+
+      window.location.replace('legal/terms-of-service.' + selectedLocale + '.html');
+    })();
+  </script>
 </head>
 <body>
   <p>
     Redirecting to the Terms of Service.
-    <a href="legal/terms-of-service.en.html">Click here if you are not redirected.</a>
+    <a href="legal/terms-of-service.en.html">English</a> ·
+    <a href="legal/terms-of-service.es.html">Español</a> ·
+    <a href="legal/terms-of-service.fr.html">Français</a>
   </p>
 </body>
 </html>
