@@ -45,4 +45,4 @@ flutter:
   assets:
     - assets/brand/
     - assets/i18n/
-    - assets/legal/privacy-policy.md
+    - assets/legal/

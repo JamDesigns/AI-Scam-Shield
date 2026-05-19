@@ -15,6 +15,12 @@ void main() {
     expect(contents, [url]);
 
     await file.delete();
+
+    final fixturesDirectory = file.parent;
+    if (await fixturesDirectory.exists() &&
+        fixturesDirectory.listSync().isEmpty) {
+      await fixturesDirectory.delete();
+    }
   });
 
   test('decodeQrContentsFromImageFile returns empty list for missing file', () async {
