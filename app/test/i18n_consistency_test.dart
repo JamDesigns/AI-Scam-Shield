@@ -3,21 +3,26 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+const supportedLocales = ['en', 'es', 'fr', 'de', 'it'];
+
 void main() {
   test('i18n files have the same translation keys', () {
-    final en = _loadTranslations('en');
-    final es = _loadTranslations('es');
-    final fr = _loadTranslations('fr');
+    final referenceTranslations = _loadTranslations('en');
 
-    expect(es.keys.toSet(), en.keys.toSet());
-    expect(fr.keys.toSet(), en.keys.toSet());
+    for (final locale in supportedLocales.where((locale) => locale != 'en')) {
+      final translations = _loadTranslations(locale);
+
+      expect(
+        translations.keys.toSet(),
+        referenceTranslations.keys.toSet(),
+        reason: '$locale keys must match English keys',
+      );
+    }
   });
 
   test('i18n translation values are non-empty strings', () {
     final translationsByLocale = {
-      'en': _loadTranslations('en'),
-      'es': _loadTranslations('es'),
-      'fr': _loadTranslations('fr'),
+      for (final locale in supportedLocales) locale: _loadTranslations(locale),
     };
 
     for (final entry in translationsByLocale.entries) {
@@ -32,24 +37,22 @@ void main() {
   });
 
   test('i18n placeholders are consistent across locales', () {
-    final en = _loadTranslations('en');
-    final es = _loadTranslations('es');
-    final fr = _loadTranslations('fr');
+    final referenceTranslations = _loadTranslations('en');
 
-    for (final key in en.keys) {
-      final enPlaceholders = _extractPlaceholders(en[key]!);
+    for (final locale in supportedLocales.where((locale) => locale != 'en')) {
+      final translations = _loadTranslations(locale);
 
-      expect(
-        _extractPlaceholders(es[key]!),
-        enPlaceholders,
-        reason: 'Spanish placeholders mismatch for key: $key',
-      );
+      for (final key in referenceTranslations.keys) {
+        final referencePlaceholders = _extractPlaceholders(
+          referenceTranslations[key]!,
+        );
 
-      expect(
-        _extractPlaceholders(fr[key]!),
-        enPlaceholders,
-        reason: 'French placeholders mismatch for key: $key',
-      );
+        expect(
+          _extractPlaceholders(translations[key]!),
+          referencePlaceholders,
+          reason: '$locale placeholders mismatch for key: $key',
+        );
+      }
     }
   });
 }

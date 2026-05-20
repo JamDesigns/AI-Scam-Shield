@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('privacy policy markdown files exist for supported locales', () {
-    const locales = ['en', 'es', 'fr'];
+    const locales = ['en', 'es', 'fr', 'de', 'it'];
 
     for (final locale in locales) {
       final file = File('assets/legal/privacy-policy.$locale.md');
@@ -30,7 +30,7 @@ void main() {
   });
 
   test('public legal HTML files exist for supported locales', () {
-    const locales = ['en', 'es', 'fr'];
+    const locales = ['en', 'es', 'fr', 'de', 'it'];
     const documents = [
       'privacy-policy',
       'terms-of-service',
