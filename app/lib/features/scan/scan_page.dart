@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
@@ -21,6 +22,8 @@ import 'scan_service.dart';
 import 'scan_action_advice.dart';
 import 'image_qr_decoder.dart';
 import 'image_scan_content.dart';
+import 'image_metadata_signals.dart';
+import 'image_forensics_service.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
@@ -31,6 +34,8 @@ class ScanPage extends StatefulWidget {
 
 class _ScanPageState extends State<ScanPage> {
   static const int _maxInputLength = 1500;
+  static const int _mediaAnalysisMaxDimension = 1600;
+  static const int _mediaAnalysisJpegQuality = 82;
   static const MethodChannel _shareIntentChannel = MethodChannel(
     'com.jamdesigns.scamshield/share_intent',
   );
@@ -40,6 +45,7 @@ class _ScanPageState extends State<ScanPage> {
 
   final _controller = TextEditingController();
   final _imagePicker = ImagePicker();
+  final _imageForensicsService = ImageForensicsService();
   final _textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
 
   late final Future<void> _bootstrapFuture;
@@ -50,6 +56,7 @@ class _ScanPageState extends State<ScanPage> {
   bool _isPremium = false;
   bool _hasInput = false;
   ScanResult? _lastResult;
+  MediaAnalysisResult? _mediaAnalysisResult;
   ScanResult? _restoredLastResult;
   String? _lastScannedInput;
   String? _lastScannedFingerprint;
@@ -78,6 +85,34 @@ class _ScanPageState extends State<ScanPage> {
     final noAiScansLeft = aiRemaining != null && aiRemaining <= 0;
 
     return noNormalScansLeft && noAiScansLeft;
+  }
+
+  Uint8List _prepareMediaAnalysisImage(Uint8List imageBytes) {
+    final decodedImage = img.decodeImage(imageBytes);
+
+    if (decodedImage == null) {
+      throw const FormatException('Unsupported image format');
+    }
+
+    final orientedImage = img.bakeOrientation(decodedImage);
+
+    final resizedImage = orientedImage.width > _mediaAnalysisMaxDimension ||
+            orientedImage.height > _mediaAnalysisMaxDimension
+        ? img.copyResize(
+            orientedImage,
+            width: orientedImage.width >= orientedImage.height
+                ? _mediaAnalysisMaxDimension
+                : null,
+            height: orientedImage.height > orientedImage.width
+                ? _mediaAnalysisMaxDimension
+                : null,
+          )
+        : orientedImage;
+
+    return img.encodeJpg(
+      resizedImage,
+      quality: _mediaAnalysisJpegQuality,
+    );
   }
 
   String _normalizeInput(String value) {
@@ -342,11 +377,15 @@ class _ScanPageState extends State<ScanPage> {
     }
   }
 
-  Future<void> _scanImage() async {
+  Future<void> _analyzeImage() async {
     if (_isBusy) return;
     if (_isWeeklyScanLimitReached) return;
 
-    final image = await _imagePicker.pickImage(source: ImageSource.gallery);
+    final image = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1280,
+      imageQuality: 82,
+    );
 
     if (image == null) {
       return;
@@ -371,53 +410,72 @@ class _ScanPageState extends State<ScanPage> {
 
     setState(() {
       _imageScanLoading = true;
+      _lastResult = null;
+      _mediaAnalysisResult = null;
       _errorKey = null;
       _errorMessage = null;
       _noticeKey = null;
     });
 
     try {
+      final image = XFile(path);
       final inputImage = InputImage.fromFilePath(path);
+
       final recognizedText = await _textRecognizer.processImage(inputImage);
       final qrContents = await decodeQrContentsFromImageFile(path);
+
       final extractedText = buildImageScanContent(
         ocrText: recognizedText.text,
         qrContents: qrContents,
         maxLength: _maxInputLength,
       );
 
-      if (!mounted) return;
+      final imageBytes = await image.readAsBytes();
+      final forensicsResult = await _imageForensicsService.analyze(imageBytes);
+      final mediaAnalysisImageBytes = _prepareMediaAnalysisImage(imageBytes);
+      final imageBase64 = base64Encode(mediaAnalysisImageBytes);
 
-      if (extractedText.isEmpty) {
-        setState(() {
-          _lastResult = null;
-          _errorKey = 'errors.imageScanNoText';
-          _errorMessage = null;
-        });
-        return;
-      }
+      final metadataSignals = await buildSafeImageMetadataSignals(
+        image: image,
+        imageBytes: imageBytes,
+      );
+
+      final mediaSignals = metadataSignals.toSafeSignalLines().join('\n');
+
+      final result = await _scanService.analyzeMedia(
+        imageBase64: imageBase64,
+        extractedText: extractedText,
+        mediaSignals: mediaSignals,
+        imageForensicsRawLogit: forensicsResult.rawLogit,
+        imageForensicsThreshold: forensicsResult.threshold,
+        imageForensicsIsAiGenerated: forensicsResult.isAiGenerated,
+        outputLanguage:
+            WidgetsBinding.instance.platformDispatcher.locale.languageCode,
+      );
+
+      if (!mounted) return;
 
       _controller.value = TextEditingValue(
         text: extractedText,
         selection: TextSelection.collapsed(offset: extractedText.length),
       );
 
-      if (!mounted) return;
-
       setState(() {
-        _hasInput = true;
+        _hasInput = extractedText.isNotEmpty;
         _lastResult = null;
+        _mediaAnalysisResult = result;
         _errorKey = null;
         _errorMessage = null;
         _noticeKey = null;
       });
 
-      await _scan();
+      await _refreshAiQuota();
     } catch (e) {
       if (!mounted) return;
 
       setState(() {
         _lastResult = null;
+        _mediaAnalysisResult = null;
         _errorKey = kDebugMode ? null : 'errors.imageScanFailed';
         _errorMessage = kDebugMode ? e.toString() : null;
       });
@@ -581,6 +639,7 @@ class _ScanPageState extends State<ScanPage> {
     _shareIntentChannel.setMethodCallHandler(null);
     _controller.dispose();
     _textRecognizer.close();
+    _imageForensicsService.dispose();
     super.dispose();
   }
 
@@ -676,7 +735,7 @@ class _ScanPageState extends State<ScanPage> {
             const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed:
-                  (_isBusy || _isWeeklyScanLimitReached) ? null : _scanImage,
+                  (_isBusy || _isWeeklyScanLimitReached) ? null : _analyzeImage,
               icon: _imageScanLoading
                   ? const SizedBox(
                       height: 18,
@@ -768,9 +827,245 @@ class _ScanPageState extends State<ScanPage> {
                 ),
               ),
             const SizedBox(height: 6),
+            if (_mediaAnalysisResult != null)
+              _MediaAnalysisCard(result: _mediaAnalysisResult!),
             if (_lastResult != null) _ResultCard(result: _lastResult!),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _MediaAnalysisCard extends StatelessWidget {
+  const _MediaAnalysisCard({required this.result});
+
+  final MediaAnalysisResult result;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+
+    return Card(
+      margin: const EdgeInsetsDirectional.only(top: 0),
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(16, 14, 16, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              t.t('mediaAnalysis.title'),
+              style: Theme.of(context).textTheme.titleLarge,
+              textAlign: TextAlign.start,
+            ),
+            const SizedBox(height: 14),
+            Text(
+              t.t('mediaAnalysis.authenticity.title'),
+              style: Theme.of(context).textTheme.titleMedium,
+              textAlign: TextAlign.start,
+            ),
+            const SizedBox(height: 8),
+            _assessmentRow(
+              context,
+              t.t('mediaAnalysis.authenticity.assessment'),
+              t.t('mediaAnalysis.authenticity.${result.authenticity}'),
+              _authenticityLevel(result.authenticity),
+            ),
+            const SizedBox(height: 6),
+            _confidenceRow(
+              context,
+              t.t('mediaAnalysis.confidence'),
+              t.t(
+                'mediaAnalysis.confidence.${result.authenticityConfidence}',
+              ),
+            ),
+            if (result.authenticityReasons.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Text(
+                t.t('mediaAnalysis.reasons'),
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+              const SizedBox(height: 4),
+              ...result.authenticityReasons.map(_bullet),
+            ],
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 12),
+            Text(
+              t.t('mediaAnalysis.fraud.title'),
+              style: Theme.of(context).textTheme.titleMedium,
+              textAlign: TextAlign.start,
+            ),
+            const SizedBox(height: 8),
+            _assessmentRow(
+              context,
+              t.t('mediaAnalysis.fraud.assessment'),
+              t.t('mediaAnalysis.fraud.${result.fraudAssessment}'),
+              _fraudLevel(result.fraudAssessment),
+            ),
+            const SizedBox(height: 6),
+            _confidenceRow(
+              context,
+              t.t('mediaAnalysis.confidence'),
+              t.t('mediaAnalysis.confidence.${result.fraudConfidence}'),
+            ),
+            if (result.fraudReasons.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Text(
+                t.t('mediaAnalysis.reasons'),
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+              const SizedBox(height: 4),
+              ...result.fraudReasons.map(_bullet),
+            ],
+            if (result.explanation.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Text(
+                t.t('mediaAnalysis.explanation'),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                result.explanation,
+                textAlign: TextAlign.start,
+              ),
+            ],
+            if (result.disclaimer.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsetsDirectional.fromSTEB(12, 10, 12, 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.amber.withValues(alpha: 0.12),
+                  border: Border.all(
+                    color: Colors.amber.withValues(alpha: 0.35),
+                  ),
+                ),
+                child: Text(
+                  result.disclaimer,
+                  style: TextStyle(color: Colors.amber.shade800),
+                  textAlign: TextAlign.start,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _authenticityLevel(String authenticity) {
+    return switch (authenticity) {
+      'likely_authentic' => 'low',
+      'manipulated_or_synthetic' => 'high',
+      _ => 'undetermined',
+    };
+  }
+
+  String _fraudLevel(String fraudAssessment) {
+    return switch (fraudAssessment) {
+      'no_clear_signals' => 'low',
+      'possible_fraud' => 'medium',
+      'strong_fraud_signals' => 'high',
+      _ => 'undetermined',
+    };
+  }
+
+  Widget _assessmentRow(
+    BuildContext context,
+    String label,
+    String value,
+    String level,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final Color backgroundColor;
+    final Color foregroundColor;
+
+    switch (level) {
+      case 'high':
+        backgroundColor = colorScheme.error;
+        foregroundColor = colorScheme.onError;
+      case 'medium':
+        backgroundColor = Colors.amber.shade600;
+        foregroundColor = Colors.black87;
+      case 'low':
+        backgroundColor = Colors.green.shade700;
+        foregroundColor = Colors.white;
+      default:
+        backgroundColor = colorScheme.surfaceContainerHighest;
+        foregroundColor = colorScheme.onSurfaceVariant;
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Container(
+            padding: const EdgeInsetsDirectional.fromSTEB(10, 4, 10, 4),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: foregroundColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _confidenceRow(
+    BuildContext context,
+    String label,
+    String value,
+  ) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+      ],
+    );
+  }
+
+  Widget _bullet(String text) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• '),
+          Expanded(
+            child: Text(
+              text,
+              textAlign: TextAlign.start,
+            ),
+          ),
+        ],
       ),
     );
   }

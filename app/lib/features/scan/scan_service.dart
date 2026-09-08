@@ -13,6 +13,41 @@ class ScanService {
     return ScanResult.fromJson(json);
   }
 
+  Future<ImageAuthenticityResult> checkImageAuthenticity({
+    required String imageSignals,
+    required String imageBase64,
+  }) async {
+    final json = await _api.postJson('/image-authenticity', {
+      'imageSignals': imageSignals,
+      'imageBase64': imageBase64,
+    });
+    return ImageAuthenticityResult.fromJson(json);
+  }
+
+  Future<MediaAnalysisResult> analyzeMedia({
+    required String imageBase64,
+    required String extractedText,
+    required String mediaSignals,
+    required double imageForensicsRawLogit,
+    required double imageForensicsThreshold,
+    required bool imageForensicsIsAiGenerated,
+    required String outputLanguage,
+  }) async {
+    final json = await _api.postJson('/media-analysis', {
+      'imageBase64': imageBase64,
+      'extractedText': extractedText,
+      'mediaSignals': mediaSignals,
+      'imageForensics': {
+        'rawLogit': imageForensicsRawLogit,
+        'threshold': imageForensicsThreshold,
+        'isAiGenerated': imageForensicsIsAiGenerated,
+      },
+      'outputLanguage': outputLanguage,
+    });
+
+    return MediaAnalysisResult.fromJson(json);
+  }
+
   Future<AiQuotaStatus> fetchAiQuotaWeek() async {
     final json = await _api.getJson('/usage/week');
     return AiQuotaStatus.fromJson(json);

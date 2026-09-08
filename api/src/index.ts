@@ -19,7 +19,15 @@ import {
 } from "./db.js";
 import { getDefaultRules, scoreInput } from "./rules.js";
 import { translateWithDeepL } from "./translate.js";
-import { analyzeWithAI, type AiAnalysis, type ThreatType } from "./ai.js";
+import {
+  analyzeImageAuthenticityWithAI,
+  analyzeMediaWithAI,
+  analyzeWithAI,
+  type AiAnalysis,
+  type ImageAuthenticityAnalysis,
+  type MediaAnalysis,
+  type ThreatType,
+} from "./ai.js";
 
 function getIsoWeekKey(date: Date): { yearWeek: string; resetAt: string } {
   const d = new Date(
@@ -75,6 +83,177 @@ function buildInputPreview(input: string): string {
   return input.replace(/\s+/g, " ").trim().slice(0, 160);
 }
 
+function getDeepLTargetLanguage(language: string): string | null {
+  const value = language.trim().toLowerCase();
+
+  if (value === "es") return "ES";
+  if (value === "fr") return "FR";
+  if (value === "de") return "DE";
+  if (value === "it") return "IT";
+
+  return null;
+}
+
+async function translateImageAuthenticityAnalysis(params: {
+  analysis: ImageAuthenticityAnalysis;
+  outputLanguage: string;
+  authKey?: string;
+  apiBase: string;
+}): Promise<ImageAuthenticityAnalysis> {
+  const targetLang = getDeepLTargetLanguage(params.outputLanguage);
+
+  if (!targetLang || !params.authKey || params.authKey.trim().length === 0) {
+    return params.analysis;
+  }
+
+  const [reasonsTranslation, explanationTranslation, disclaimerTranslation] =
+    await Promise.all([
+      translateWithDeepL({
+        text: params.analysis.reasons.join("\n"),
+        authKey: params.authKey,
+        apiBase: params.apiBase,
+        targetLang,
+      }),
+      translateWithDeepL({
+        text: params.analysis.explanation,
+        authKey: params.authKey,
+        apiBase: params.apiBase,
+        targetLang,
+      }),
+      translateWithDeepL({
+        text: params.analysis.disclaimer,
+        authKey: params.authKey,
+        apiBase: params.apiBase,
+        targetLang,
+      }),
+    ]);
+
+  const translatedReasons = reasonsTranslation.text
+    .split("\n")
+    .map((reason) => reason.trim())
+    .filter((reason) => reason.length > 0);
+
+  return {
+    ...params.analysis,
+    reasons:
+      translatedReasons.length > 0
+        ? translatedReasons
+        : params.analysis.reasons,
+    explanation: explanationTranslation.text.trim(),
+    disclaimer: disclaimerTranslation.text.trim(),
+  };
+}
+
+async function translateMediaAnalysis(params: {
+  analysis: MediaAnalysis;
+  outputLanguage: string;
+  authKey?: string;
+  apiBase: string;
+}): Promise<MediaAnalysis> {
+  const targetLang = getDeepLTargetLanguage(params.outputLanguage);
+
+  if (!targetLang || !params.authKey || params.authKey.trim().length === 0) {
+    return params.analysis;
+  }
+
+  const explanationSeparatorIndex = params.analysis.explanation.indexOf("\n\n");
+
+  const authenticityExplanation =
+    explanationSeparatorIndex >= 0
+      ? params.analysis.explanation.slice(0, explanationSeparatorIndex)
+      : params.analysis.explanation;
+
+  const fraudExplanation =
+    explanationSeparatorIndex >= 0
+      ? params.analysis.explanation.slice(explanationSeparatorIndex + 2)
+      : "";
+
+  const [
+    authenticityReasonsTranslation,
+    fraudReasonsTranslation,
+    authenticityExplanationTranslation,
+    fraudExplanationTranslation,
+    disclaimerTranslation,
+  ] = await Promise.all([
+    params.analysis.authenticityReasons.length > 0
+      ? translateWithDeepL({
+          text: params.analysis.authenticityReasons.join("\n"),
+          authKey: params.authKey,
+          apiBase: params.apiBase,
+          targetLang,
+        })
+      : Promise.resolve({ text: "" }),
+
+    params.analysis.fraudReasons.length > 0
+      ? translateWithDeepL({
+          text: params.analysis.fraudReasons.join("\n"),
+          authKey: params.authKey,
+          apiBase: params.apiBase,
+          targetLang,
+        })
+      : Promise.resolve({ text: "" }),
+
+    authenticityExplanation.trim().length > 0
+      ? translateWithDeepL({
+          text: authenticityExplanation,
+          authKey: params.authKey,
+          apiBase: params.apiBase,
+          targetLang,
+        })
+      : Promise.resolve({ text: "" }),
+
+    fraudExplanation.trim().length > 0
+      ? translateWithDeepL({
+          text: fraudExplanation,
+          authKey: params.authKey,
+          apiBase: params.apiBase,
+          targetLang,
+        })
+      : Promise.resolve({ text: "" }),
+
+    params.analysis.disclaimer.trim().length > 0
+      ? translateWithDeepL({
+          text: params.analysis.disclaimer,
+          authKey: params.authKey,
+          apiBase: params.apiBase,
+          targetLang,
+        })
+      : Promise.resolve({ text: "" }),
+  ]);
+
+  const translatedAuthenticityReasons = authenticityReasonsTranslation.text
+    .split("\n")
+    .map((reason) => reason.trim())
+    .filter((reason) => reason.length > 0);
+
+  const translatedFraudReasons = fraudReasonsTranslation.text
+    .split("\n")
+    .map((reason) => reason.trim())
+    .filter((reason) => reason.length > 0);
+
+  const translatedExplanation = [
+    authenticityExplanationTranslation.text.trim() ||
+      authenticityExplanation.trim(),
+    fraudExplanationTranslation.text.trim() || fraudExplanation.trim(),
+  ]
+    .filter((text) => text.length > 0)
+    .join("\n\n");
+
+  return {
+    ...params.analysis,
+    authenticityReasons:
+      translatedAuthenticityReasons.length > 0
+        ? translatedAuthenticityReasons
+        : params.analysis.authenticityReasons,
+    fraudReasons:
+      translatedFraudReasons.length > 0
+        ? translatedFraudReasons
+        : params.analysis.fraudReasons,
+    explanation: translatedExplanation,
+    disclaimer: disclaimerTranslation.text.trim() || params.analysis.disclaimer,
+  };
+}
+
 const SCAN_RATE_LIMIT_WINDOW_MS = 3000;
 const lastScanAtByDevice = new Map<string, number>();
 
@@ -96,7 +275,7 @@ const envSchema = z.object({
   AI_PROVIDER: z.enum(["ollama"]).default("ollama"),
   AI_MODE: z.enum(["local", "cloud"]).default("local"),
   AI_BASE_URL: z.string().optional(),
-  AI_MODEL: z.string().default("llama3.1:8b"),
+  AI_MODEL: z.string().default("llava:latest"),
   AI_API_KEY: z.string().optional(),
 });
 
@@ -124,6 +303,7 @@ const env = envSchema.parse({
 
 const app = Fastify({
   logger: true,
+  bodyLimit: 10 * 1024 * 1024,
 });
 
 await app.register(cors, {
@@ -499,6 +679,267 @@ app.post("/scan", async (req, reply) => {
 
     isPremium,
   };
+});
+
+app.post("/media-analysis", async (req, reply) => {
+  const deviceId = req.headers["x-device-id"];
+
+  if (typeof deviceId !== "string" || deviceId.length === 0) {
+    return reply.code(400).send({ error: "missing_device_id" });
+  }
+
+  const bodySchema = z.object({
+    imageBase64: z.string().min(1).max(8_000_000),
+    extractedText: z.string().max(5000).default(""),
+    mediaSignals: z.string().max(5000).default(""),
+    imageForensics: z
+      .object({
+        rawLogit: z.number(),
+        threshold: z.number(),
+        isAiGenerated: z.boolean(),
+      })
+      .optional(),
+    outputLanguage: z.string().min(2).max(5).default("en"),
+  });
+
+  const parsedBody = bodySchema.safeParse(req.body);
+
+  if (!parsedBody.success) {
+    req.log.warn(
+      { issues: parsedBody.error.issues },
+      "Invalid media analysis request",
+    );
+    return reply.code(400).send({
+      error: "invalid_request",
+      issues: parsedBody.error.issues,
+    });
+  }
+
+  const body = parsedBody.data;
+
+  const now = Date.now();
+  const lastScanAt = lastScanAtByDevice.get(deviceId);
+
+  if (
+    typeof lastScanAt === "number" &&
+    now - lastScanAt < SCAN_RATE_LIMIT_WINDOW_MS
+  ) {
+    return reply.code(429).send({
+      error: "rate_limited",
+      retryAfterMs: SCAN_RATE_LIMIT_WINDOW_MS - (now - lastScanAt),
+    });
+  }
+
+  lastScanAtByDevice.set(deviceId, now);
+
+  const { yearWeek, resetAt } = getIsoWeekKey(new Date());
+  const isPremium = await getPremiumStatus(pool, deviceId);
+
+  if (!isPremium) {
+    const totalWeeklyUsed = await getWeeklyUsage(pool, deviceId, yearWeek);
+
+    if (totalWeeklyUsed >= env.FREE_WEEKLY_LIMIT) {
+      return reply.code(402).send({
+        error: "quota_exceeded",
+        limit: env.FREE_WEEKLY_LIMIT,
+        remaining: 0,
+        resetAt,
+      });
+    }
+
+    const currentAi = await getWeeklyAiUsage(pool, deviceId, yearWeek);
+
+    if (currentAi >= env.FREE_WEEKLY_AI_LIMIT) {
+      return reply.code(402).send({
+        error: "ai_quota_exceeded",
+        limit: env.FREE_WEEKLY_AI_LIMIT,
+        remaining: 0,
+        resetAt,
+      });
+    }
+  }
+
+  const aiBaseUrl = env.AI_BASE_URL?.trim().length
+    ? env.AI_BASE_URL.trim()
+    : env.AI_MODE === "cloud"
+      ? "https://ollama.com"
+      : "http://host.docker.internal:11434";
+
+  const aiConfigured =
+    env.AI_PROVIDER === "ollama" &&
+    typeof env.AI_MODEL === "string" &&
+    env.AI_MODEL.trim().length > 0 &&
+    typeof aiBaseUrl === "string" &&
+    aiBaseUrl.length > 0 &&
+    (env.AI_MODE === "local" ||
+      (typeof env.AI_API_KEY === "string" && env.AI_API_KEY.trim().length > 0));
+
+  if (!aiConfigured) {
+    return reply.code(503).send({
+      error: "ai_unavailable",
+      message: "AI analysis is not configured",
+    });
+  }
+
+  const AI_MEDIA_ANALYSIS_TIMEOUT_MS = 90000;
+
+  try {
+    let analysis = await withTimeout(
+      analyzeMediaWithAI({
+        baseUrl: aiBaseUrl,
+        apiKey: env.AI_MODE === "cloud" ? env.AI_API_KEY?.trim() : undefined,
+        model: env.AI_MODEL,
+        imageBase64: body.imageBase64,
+        extractedText: body.extractedText,
+        mediaSignals: body.mediaSignals,
+        imageForensics: body.imageForensics,
+        outputLanguage: body.outputLanguage,
+      }),
+      AI_MEDIA_ANALYSIS_TIMEOUT_MS,
+      `AI media analysis timed out after ${AI_MEDIA_ANALYSIS_TIMEOUT_MS}ms`,
+    );
+
+    try {
+      analysis = await translateMediaAnalysis({
+        analysis,
+        outputLanguage: body.outputLanguage,
+        authKey: env.DEEPL_AUTH_KEY,
+        apiBase: env.DEEPL_API_BASE,
+      });
+    } catch (e) {
+      req.log.warn(
+        { err: e },
+        "DeepL media analysis response translation failed",
+      );
+    }
+
+    if (!isPremium) {
+      await incrementWeeklyUsage(pool, deviceId, yearWeek);
+      await incrementWeeklyAiUsage(pool, deviceId, yearWeek);
+    }
+
+    const totalWeeklyUsed = await getWeeklyUsage(pool, deviceId, yearWeek);
+    const aiWeeklyUsed = await getWeeklyAiUsage(pool, deviceId, yearWeek);
+    const aiWeeklyLimit = isPremium ? null : env.FREE_WEEKLY_AI_LIMIT;
+    const aiWeeklyRemaining = isPremium
+      ? null
+      : Math.max(0, env.FREE_WEEKLY_AI_LIMIT - aiWeeklyUsed);
+
+    return {
+      ...analysis,
+      isPremium,
+      aiUsed: true,
+      aiWeeklyLimit,
+      aiWeeklyUsed,
+      aiWeeklyRemaining,
+      aiResetAt: resetAt,
+      aiUnlimited: isPremium,
+      totalWeeklyUsed,
+    };
+  } catch (e) {
+    req.log.warn({ err: e }, "AI media analysis failed");
+
+    return reply.code(503).send({
+      error: "ai_unavailable",
+      message: "AI media analysis failed",
+    });
+  }
+});
+
+app.post("/image-authenticity", async (req, reply) => {
+  const deviceId = req.headers["x-device-id"];
+
+  if (typeof deviceId !== "string" || deviceId.length === 0) {
+    return reply.code(400).send({ error: "missing_device_id" });
+  }
+
+  const bodySchema = z.object({
+    imageSignals: z.string().min(1).max(5000),
+    imageBase64: z.string().min(1).max(4_000_000),
+    outputLanguage: z.string().min(2).max(5).default("en"),
+  });
+
+  const body = bodySchema.parse(req.body);
+
+  const MAX_IMAGE_SIGNALS_LENGTH = 3000;
+
+  if (body.imageSignals.length > MAX_IMAGE_SIGNALS_LENGTH) {
+    return reply.code(400).send({
+      error: "input_too_long",
+      maxLength: MAX_IMAGE_SIGNALS_LENGTH,
+    });
+  }
+
+  const isPremium = await getPremiumStatus(pool, deviceId);
+
+  if (!isPremium) {
+    return reply.code(403).send({ error: "premium_required" });
+  }
+
+  const aiBaseUrl = env.AI_BASE_URL?.trim().length
+    ? env.AI_BASE_URL.trim()
+    : env.AI_MODE === "cloud"
+      ? "https://ollama.com"
+      : "http://host.docker.internal:11434";
+
+  const aiConfigured =
+    env.AI_PROVIDER === "ollama" &&
+    typeof env.AI_MODEL === "string" &&
+    env.AI_MODEL.trim().length > 0 &&
+    typeof aiBaseUrl === "string" &&
+    aiBaseUrl.length > 0 &&
+    (env.AI_MODE === "local" ||
+      (typeof env.AI_API_KEY === "string" && env.AI_API_KEY.trim().length > 0));
+
+  if (!aiConfigured) {
+    return reply.code(503).send({
+      error: "ai_unavailable",
+      message: "AI analysis is not configured",
+    });
+  }
+
+  const AI_IMAGE_AUTHENTICITY_TIMEOUT_MS = 90000;
+
+  try {
+    let analysis = await withTimeout(
+      analyzeImageAuthenticityWithAI({
+        baseUrl: aiBaseUrl,
+        apiKey: env.AI_MODE === "cloud" ? env.AI_API_KEY?.trim() : undefined,
+        model: env.AI_MODEL,
+        imageSignals: body.imageSignals,
+        imageBase64: body.imageBase64,
+        outputLanguage: body.outputLanguage,
+      }),
+      AI_IMAGE_AUTHENTICITY_TIMEOUT_MS,
+      `AI image authenticity analysis timed out after ${AI_IMAGE_AUTHENTICITY_TIMEOUT_MS}ms`,
+    );
+
+    try {
+      analysis = await translateImageAuthenticityAnalysis({
+        analysis,
+        outputLanguage: body.outputLanguage,
+        authKey: env.DEEPL_AUTH_KEY,
+        apiBase: env.DEEPL_API_BASE,
+      });
+    } catch (e) {
+      req.log.warn(
+        { err: e },
+        "DeepL image authenticity response translation failed",
+      );
+    }
+
+    return {
+      ...analysis,
+      isPremium,
+    };
+  } catch (e) {
+    req.log.warn({ err: e }, "AI image authenticity analysis failed");
+
+    return reply.code(503).send({
+      error: "ai_unavailable",
+      message: "AI image authenticity analysis failed",
+    });
+  }
 });
 
 app.post("/admin/subscriptions/set", async (req, reply) => {

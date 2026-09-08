@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
@@ -19,8 +20,17 @@ class PremiumService {
 
   final ApiClient _api;
 
-  /// Source of truth: RevenueCat entitlement.
+  /// Source of truth in release: RevenueCat entitlement.
+  /// In debug mode, the backend mirror is checked first to test Premium-only flows.
   Future<bool> isPremium() async {
+    if (kDebugMode) {
+      final backendStatus = await fetchBackendStatus();
+
+      if (backendStatus.isPremium) {
+        return true;
+      }
+    }
+
     final info = await Purchases.getCustomerInfo();
     return info.entitlements.active.containsKey(entitlementId);
   }
