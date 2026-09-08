@@ -190,3 +190,101 @@ class ScanActivityItem {
     );
   }
 }
+
+class ImageAuthenticityResult {
+  ImageAuthenticityResult({
+    required this.category,
+    required this.confidence,
+    required this.reasons,
+    required this.explanation,
+    required this.disclaimer,
+    required this.isPremium,
+  });
+
+  final String category;
+  final String confidence;
+  final List<String> reasons;
+  final String explanation;
+  final String disclaimer;
+  final bool isPremium;
+
+  factory ImageAuthenticityResult.fromJson(Map<String, dynamic> json) {
+    return ImageAuthenticityResult(
+      category: json['category'] as String? ?? 'inconclusive',
+      confidence: json['confidence'] as String? ?? 'low',
+      reasons: (json['reasons'] as List<dynamic>? ?? const []).cast<String>(),
+      explanation: json['explanation'] as String? ?? '',
+      disclaimer: json['disclaimer'] as String? ?? '',
+      isPremium: json['isPremium'] as bool? ?? false,
+    );
+  }
+}
+
+class MediaAnalysisResult {
+  MediaAnalysisResult({
+    required this.authenticity,
+    required this.authenticityConfidence,
+    required this.fraudAssessment,
+    required this.fraudConfidence,
+    required this.authenticityReasons,
+    required this.fraudReasons,
+    required this.explanation,
+    required this.disclaimer,
+    required this.isPremium,
+    required this.aiUsed,
+    required this.aiWeeklyLimit,
+    required this.aiWeeklyUsed,
+    required this.aiWeeklyRemaining,
+    required this.aiResetAt,
+    required this.aiUnlimited,
+    required this.totalWeeklyUsed,
+  });
+
+  final String authenticity;
+  final String authenticityConfidence;
+
+  final String fraudAssessment;
+  final String fraudConfidence;
+
+  final List<String> authenticityReasons;
+  final List<String> fraudReasons;
+
+  final String explanation;
+  final String disclaimer;
+
+  final bool isPremium;
+  final bool aiUsed;
+
+  final int? aiWeeklyLimit;
+  final int aiWeeklyUsed;
+  final int? aiWeeklyRemaining;
+  final String? aiResetAt;
+  final bool aiUnlimited;
+
+  final int totalWeeklyUsed;
+
+  factory MediaAnalysisResult.fromJson(Map<String, dynamic> json) {
+    return MediaAnalysisResult(
+      authenticity: json['authenticity'] as String? ?? 'inconclusive',
+      authenticityConfidence:
+          json['authenticityConfidence'] as String? ?? 'low',
+      fraudAssessment: json['fraudAssessment'] as String? ?? 'no_clear_signals',
+      fraudConfidence: json['fraudConfidence'] as String? ?? 'low',
+      authenticityReasons:
+          (json['authenticityReasons'] as List<dynamic>? ?? const [])
+              .cast<String>(),
+      fraudReasons:
+          (json['fraudReasons'] as List<dynamic>? ?? const []).cast<String>(),
+      explanation: json['explanation'] as String? ?? '',
+      disclaimer: json['disclaimer'] as String? ?? '',
+      isPremium: json['isPremium'] as bool? ?? false,
+      aiUsed: json['aiUsed'] as bool? ?? false,
+      aiWeeklyLimit: (json['aiWeeklyLimit'] as num?)?.toInt(),
+      aiWeeklyUsed: (json['aiWeeklyUsed'] as num?)?.toInt() ?? 0,
+      aiWeeklyRemaining: (json['aiWeeklyRemaining'] as num?)?.toInt(),
+      aiResetAt: json['aiResetAt'] as String?,
+      aiUnlimited: json['aiUnlimited'] as bool? ?? false,
+      totalWeeklyUsed: (json['totalWeeklyUsed'] as num?)?.toInt() ?? 0,
+    );
+  }
+}

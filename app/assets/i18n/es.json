@@ -1,12 +1,10 @@
 {
   "app.title": "Scam Shield",
-
   "nav.scan": "Escanear",
   "nav.stats": "Estadísticas",
   "nav.about": "Acerca de",
   "stats.title": "Estadísticas",
   "about.title": "Acerca de",
-
   "scan.title": "Escanear",
   "scan.subtitle": "Pega un enlace, mensaje o escanea una imagen para comprobar si es una estafa.",
   "scan.maxLength": "Longitud máxima del mensaje: {max} caracteres.",
@@ -17,7 +15,6 @@
   "scan.example": "Ejemplo: Tu cuenta está bloqueada. Verifica en https://secure-login-paypaI.com",
   "scan.aiQuota.unlimited": "AI Pro: Ilimitado (Premium)",
   "scan.aiQuota.free": "Usos de AI Pro restantes esta semana: {remaining}/{limit} (Ilimitado con Premium)",
-
   "stats.scansToday": "Hoy",
   "stats.scansWeek": "Esta semana",
   "stats.scansMonth": "Este mes",
@@ -33,7 +30,6 @@
   "stats.chart.threats": "Amenazas",
   "stats.chart.threatsShort": "A",
   "stats.empty": "Sin escaneos aún",
-
   "about.description": "Escáner antiestafas con IA que ayuda a detectar enlaces y mensajes sospechosos.",
   "about.version": "Versión",
   "about.privacyTitle": "Política de privacidad",
@@ -41,7 +37,6 @@
   "about.openPrivacyPolicy": "Abrir política de privacidad",
   "about.unknownVersion": "Desconocida",
   "about.emailCopied": "Correo copiado al portapapeles",
-
   "result.title": "Resultado",
   "result.riskScore": "Nivel de riesgo",
   "result.category": "Categoría",
@@ -71,13 +66,11 @@
   "result.checklist.risky.contactProvider": "Contacta con el banco, proveedor o servicio por canales oficiales.",
   "result.checklist.risky.neverShareCodes": "Nunca compartas contraseñas, códigos de verificación, datos de tarjeta ni frases semilla.",
   "result.checklist.risky.report": "Reporta el mensaje al proveedor si afecta a dinero, cuentas o datos personales.",
-
   "premium.badge": "Premium",
   "premium.locked": "Función Premium",
   "premium.cta": "Hazte Premium",
   "premium.description": "Escaneos ilimitados y explicaciones avanzadas.",
   "premium.restore": "Restaurar",
-
   "errors.network": "Error de red. Comprueba tu conexión.",
   "errors.unknown": "Algo ha salido mal.",
   "errors.weeklyLimitExceeded": "Has alcanzado el límite semanal gratuito de escaneos. Hazte Premium para escaneos ilimitados.",
@@ -85,7 +78,6 @@
   "errors.rateLimited": "Espera unos segundos antes de volver a escanear.",
   "errors.imageScanNoText": "No se ha detectado texto legible ni código QR en la imagen.",
   "errors.imageScanFailed": "No se pudo leer la imagen. Prueba con otra captura o código QR.",
-
   "reasons.URL_TYPO": "La URL contiene un error sospechoso (posible suplantación).",
   "reasons.SHORTENER": "El enlace usa un acortador de URL.",
   "reasons.URGENCY_LANGUAGE": "El mensaje usa urgencia o tácticas de presión.",
@@ -94,11 +86,9 @@
   "reasons.IP_URL": "El enlace utiliza una dirección IP sin formato en lugar de un dominio.",
   "reasons.SUSPICIOUS_PATH": "El enlace contiene palabras clave de inicio de sesión/verificación sospechosas.",
   "reasons.MANY_SUBDOMAINS": "El enlace utiliza muchos subdominios, lo cual es común en las estafas de suplantación de identidad.",
-
   "categories.low_risk": "Riesgo bajo",
   "categories.medium_risk": "Riesgo medio",
   "categories.high_risk": "Riesgo alto",
-
   "threatTypes.bank_phishing": "Phishing bancario",
   "threatTypes.malware": "Malware",
   "threatTypes.investment_scam": "Estafa de inversión",
@@ -108,21 +98,53 @@
   "threatTypes.crypto_scam": "Estafa cripto",
   "threatTypes.unknown_suspicious": "Sospechoso / desconocido",
   "threatTypes.none": "Sin amenaza específica detectada",
-
   "actions.refresh": "Actualizar",
   "premium.activated": "Premium activado",
   "errors.paywall": "No se pudo abrir la pantalla de pago.",
-
   "actions.close": "Cerrar",
   "premium.iapNotReady": "Las compras integradas aún no están conectadas. Usa el toggle de admin en backend para pruebas.",
   "premium.restoreNotReady": "La restauración aún no está conectada.",
-
   "actions.clear": "Limpiar",
-
   "subscription.title": "Suscripción",
   "subscription.subtitle": "Gestiona la configuración de tu suscripción.",
   "subscription.manageCta": "Gestionar suscripción",
   "subscription.manageHint": "Puedes cancelar la renovación o actualizar los datos de pago desde la pantalla de suscripción.",
   "scan.weeklyQuota.free": "Escaneos normales restantes esta semana: {remaining}/{limit}",
-  "errors.weeklyAndAiLimitExceeded": "AI Pro y el escaneo normal han alcanzado el límite semanal gratuito. Hazte Premium para acceso ilimitado."
+  "errors.weeklyAndAiLimitExceeded": "AI Pro y el escaneo normal han alcanzado el límite semanal gratuito. Hazte Premium para acceso ilimitado.",
+  "imageAuthenticity.button": "Comprobar autenticidad de imagen",
+  "imageAuthenticity.checking": "Comprobando imagen...",
+  "imageAuthenticity.title": "Comprobación de autenticidad",
+  "imageAuthenticity.category": "Evaluación",
+  "imageAuthenticity.confidence": "Confianza",
+  "imageAuthenticity.reasons": "Señales",
+  "imageAuthenticity.categories.likely_ai_generated": "Podría estar generada por IA",
+  "imageAuthenticity.categories.likely_manipulated": "Podría estar manipulada",
+  "imageAuthenticity.categories.likely_authentic": "Sin señales claras de manipulación",
+  "imageAuthenticity.categories.inconclusive": "No concluyente",
+  "imageAuthenticity.confidence.low": "Baja",
+  "imageAuthenticity.confidence.medium": "Media",
+  "imageAuthenticity.confidence.high": "Alta",
+  "errors.imageAuthenticityFailed": "No se pudo comprobar la autenticidad de la imagen. Prueba con otra imagen.",
+  "imageAuthenticity.alertLevel": "Nivel de alerta",
+  "imageAuthenticity.alertLevels.low": "Bajo",
+  "imageAuthenticity.alertLevels.medium": "Medio",
+  "imageAuthenticity.alertLevels.high": "Alto",
+  "imageAuthenticity.alertLevels.undetermined": "No determinado",
+  "mediaAnalysis.title": "Análisis de imagen",
+  "mediaAnalysis.authenticity.title": "Autenticidad",
+  "mediaAnalysis.authenticity.assessment": "Evaluación",
+  "mediaAnalysis.fraud.title": "Riesgo de fraude",
+  "mediaAnalysis.fraud.assessment": "Evaluación",
+  "mediaAnalysis.confidence": "Certeza de la evaluación",
+  "mediaAnalysis.reasons": "Señales",
+  "mediaAnalysis.explanation": "Explicación",
+  "mediaAnalysis.authenticity.likely_authentic": "Parece auténtica",
+  "mediaAnalysis.authenticity.manipulated_or_synthetic": "Manipulada o sintética",
+  "mediaAnalysis.authenticity.inconclusive": "No concluyente",
+  "mediaAnalysis.fraud.no_clear_signals": "Sin señales claras de fraude",
+  "mediaAnalysis.fraud.possible_fraud": "Posible fraude",
+  "mediaAnalysis.fraud.strong_fraud_signals": "Señales fuertes de fraude",
+  "mediaAnalysis.confidence.low": "Baja",
+  "mediaAnalysis.confidence.medium": "Media",
+  "mediaAnalysis.confidence.high": "Alta"
 }

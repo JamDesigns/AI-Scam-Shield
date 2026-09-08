@@ -1,12 +1,10 @@
 {
   "app.title": "Scam Shield",
-
   "nav.scan": "Scan",
   "nav.stats": "Stats",
   "nav.about": "About",
   "stats.title": "Stats",
   "about.title": "About",
-
   "scan.title": "Scan",
   "scan.subtitle": "Paste a link, message, or scan an image to check for scams.",
   "scan.maxLength": "Maximum message length: {max} characters.",
@@ -17,7 +15,6 @@
   "scan.example": "Example: Your account is locked. Verify at https://secure-login-paypaI.com",
   "scan.aiQuota.unlimited": "AI Pro: Unlimited (Premium)",
   "scan.aiQuota.free": "AI Pro uses left this week: {remaining}/{limit} (Unlimited with Premium)",
-
   "stats.scansToday": "Today",
   "stats.scansWeek": "This week",
   "stats.scansMonth": "This month",
@@ -33,7 +30,6 @@
   "stats.chart.threats": "Threats",
   "stats.chart.threatsShort": "T",
   "stats.empty": "No scans yet",
-
   "about.description": "AI scam scanner that helps detect suspicious links and messages.",
   "about.version": "Version",
   "about.privacyTitle": "Privacy policy",
@@ -41,7 +37,6 @@
   "about.openPrivacyPolicy": "Open privacy policy",
   "about.unknownVersion": "Unknown",
   "about.emailCopied": "Email copied to clipboard",
-
   "result.title": "Result",
   "result.riskScore": "Risk score",
   "result.category": "Category",
@@ -71,13 +66,11 @@
   "result.checklist.risky.contactProvider": "Contact the bank, provider, or service through official channels.",
   "result.checklist.risky.neverShareCodes": "Never share passwords, verification codes, card details, or seed phrases.",
   "result.checklist.risky.report": "Report the message to the provider if money, accounts, or personal data are involved.",
-
   "premium.badge": "Premium",
   "premium.locked": "Premium feature",
   "premium.cta": "Go Premium",
   "premium.description": "Unlimited scans and advanced explanations.",
   "premium.restore": "Restore",
-
   "errors.network": "Network error. Check your connection.",
   "errors.unknown": "Something went wrong.",
   "errors.weeklyLimitExceeded": "You have reached the free weekly scan limit. Go Premium for unlimited scans.",
@@ -85,7 +78,6 @@
   "errors.rateLimited": "Please wait a few seconds before scanning again.",
   "errors.imageScanNoText": "No readable text or QR code was detected in the image.",
   "errors.imageScanFailed": "Could not read the image. Try another screenshot or QR code.",
-
   "reasons.URL_TYPO": "The URL contains a suspicious typo (possible impersonation).",
   "reasons.SHORTENER": "The link uses a URL shortener.",
   "reasons.URGENCY_LANGUAGE": "The message uses urgency or pressure tactics.",
@@ -94,11 +86,9 @@
   "reasons.IP_URL": "The link uses a raw IP address instead of a domain.",
   "reasons.SUSPICIOUS_PATH": "The link contains suspicious login/verification keywords.",
   "reasons.MANY_SUBDOMAINS": "The link uses many subdomains, which is common in impersonation scams.",
-
   "categories.low_risk": "Low risk",
   "categories.medium_risk": "Medium risk",
   "categories.high_risk": "High risk",
-
   "threatTypes.bank_phishing": "Bank phishing",
   "threatTypes.malware": "Malware",
   "threatTypes.investment_scam": "Investment scam",
@@ -108,22 +98,53 @@
   "threatTypes.crypto_scam": "Crypto scam",
   "threatTypes.unknown_suspicious": "Unknown / suspicious",
   "threatTypes.none": "No specific threat detected",
-
   "actions.refresh": "Refresh",
   "premium.activated": "Premium activated",
   "errors.paywall": "Could not open the paywall.",
-
   "actions.close": "Close",
   "premium.iapNotReady": "IAP not wired yet. Use backend admin toggle for testing.",
   "premium.restoreNotReady": "Restore not wired yet.",
-
   "actions.clear": "Clear",
-
   "subscription.title": "Subscription",
   "subscription.subtitle": "Manage your subscription settings.",
   "subscription.manageCta": "Manage subscription",
   "subscription.manageHint": "You can cancel renewal or update billing details from the subscription screen.",
-
   "scan.weeklyQuota.free": "Normal scans left this week: {remaining}/{limit}",
-  "errors.weeklyAndAiLimitExceeded": "AI Pro and normal scan reached the free weekly limit. Go Premium for unlimited access."
+  "errors.weeklyAndAiLimitExceeded": "AI Pro and normal scan reached the free weekly limit. Go Premium for unlimited access.",
+  "imageAuthenticity.button": "Check image authenticity",
+  "imageAuthenticity.checking": "Checking image...",
+  "imageAuthenticity.title": "Image authenticity check",
+  "imageAuthenticity.category": "Assessment",
+  "imageAuthenticity.confidence": "Confidence",
+  "imageAuthenticity.reasons": "Signals",
+  "imageAuthenticity.categories.likely_ai_generated": "May be AI-generated",
+  "imageAuthenticity.categories.likely_manipulated": "May be manipulated",
+  "imageAuthenticity.categories.likely_authentic": "No strong manipulation signals",
+  "imageAuthenticity.categories.inconclusive": "Inconclusive",
+  "imageAuthenticity.confidence.low": "Low",
+  "imageAuthenticity.confidence.medium": "Medium",
+  "imageAuthenticity.confidence.high": "High",
+  "errors.imageAuthenticityFailed": "Could not check the image authenticity. Try another image.",
+  "imageAuthenticity.alertLevel": "Alert level",
+  "imageAuthenticity.alertLevels.low": "Low",
+  "imageAuthenticity.alertLevels.medium": "Medium",
+  "imageAuthenticity.alertLevels.high": "High",
+  "imageAuthenticity.alertLevels.undetermined": "Undetermined",
+  "mediaAnalysis.title": "Image analysis",
+  "mediaAnalysis.authenticity.title": "Authenticity",
+  "mediaAnalysis.authenticity.assessment": "Assessment",
+  "mediaAnalysis.fraud.title": "Fraud risk",
+  "mediaAnalysis.fraud.assessment": "Assessment",
+  "mediaAnalysis.confidence": "Assessment certainty",
+  "mediaAnalysis.reasons": "Signals",
+  "mediaAnalysis.explanation": "Explanation",
+  "mediaAnalysis.authenticity.likely_authentic": "Likely authentic",
+  "mediaAnalysis.authenticity.manipulated_or_synthetic": "Manipulated or synthetic",
+  "mediaAnalysis.authenticity.inconclusive": "Inconclusive",
+  "mediaAnalysis.fraud.no_clear_signals": "No clear fraud signals",
+  "mediaAnalysis.fraud.possible_fraud": "Possible fraud",
+  "mediaAnalysis.fraud.strong_fraud_signals": "Strong fraud signals",
+  "mediaAnalysis.confidence.low": "Low",
+  "mediaAnalysis.confidence.medium": "Medium",
+  "mediaAnalysis.confidence.high": "High"
 }
