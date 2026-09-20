@@ -1,3 +1,5 @@
+import type { AiProvider } from "./ai/ai-provider.js";
+
 export type RiskCategory = "low_risk" | "medium_risk" | "high_risk";
 
 export type ThreatType =
@@ -43,9 +45,7 @@ export type MediaAnalysis = {
 };
 
 type AnalyzeMediaWithAIParams = {
-  baseUrl: string;
-  apiKey?: string;
-  model: string;
+  provider: AiProvider;
   imageBase64?: string;
   extractedText: string;
   mediaSignals: string;
@@ -101,24 +101,16 @@ type ImageAuthenticityDecisionSignals = {
 };
 
 type AnalyzeWithAIParams = {
-  baseUrl: string;
-  apiKey?: string;
-  model: string;
+  provider: AiProvider;
   input: string;
   outputLanguage: string;
 };
 
 type AnalyzeImageAuthenticityWithAIParams = {
-  baseUrl: string;
-  apiKey?: string;
-  model: string;
+  provider: AiProvider;
   imageSignals: string;
   imageBase64?: string;
   outputLanguage: string;
-};
-
-type OllamaGenerateResponse = {
-  response?: string;
 };
 
 function normalizeOutputLanguage(language: string): string {
@@ -183,12 +175,11 @@ export async function analyzeWithAI(
     params.input,
   ].join("\n");
 
-  const parsed = await requestOllamaJson({
-    baseUrl: params.baseUrl,
-    apiKey: params.apiKey,
-    model: params.model,
+  const parsed: any = await params.provider.requestJson({
+    mode: "completion",
     system,
     prompt,
+    temperature: 0.2,
     schema: {
       type: "object",
       properties: {
@@ -347,13 +338,19 @@ export async function analyzeImageAuthenticityWithAI(
     params.imageSignals,
   ].join("\n");
 
-  const parsed = await requestOllamaChatJson({
-    baseUrl: params.baseUrl,
-    apiKey: params.apiKey,
-    model: params.model,
+  const parsed: any = await params.provider.requestJson({
+    mode: "conversation",
     system,
     prompt,
-    imageBase64: params.imageBase64,
+    media: params.imageBase64
+      ? [
+          {
+            dataBase64: params.imageBase64,
+            mimeType: "image/jpeg",
+          },
+        ]
+      : undefined,
+    temperature: 0.1,
     schema: {
       type: "object",
       properties: {
@@ -678,13 +675,19 @@ export async function analyzeMediaWithAI(
   ].join("\n");
 
   const [authenticityParsed, fraudParsed] = await Promise.all([
-    requestOllamaChatJson({
-      baseUrl: params.baseUrl,
-      apiKey: params.apiKey,
-      model: params.model,
+    params.provider.requestJson<any>({
+      mode: "conversation",
       system: authenticitySystem,
       prompt: authenticityPrompt,
-      imageBase64: params.imageBase64,
+      media: params.imageBase64
+        ? [
+            {
+              dataBase64: params.imageBase64,
+              mimeType: "image/jpeg",
+            },
+          ]
+        : undefined,
+      temperature: 0.1,
       schema: {
         type: "object",
         properties: {
@@ -711,13 +714,19 @@ export async function analyzeMediaWithAI(
         required: ["authenticity", "confidence", "reasons", "explanation"],
       },
     }),
-    requestOllamaChatJson({
-      baseUrl: params.baseUrl,
-      apiKey: params.apiKey,
-      model: params.model,
+    params.provider.requestJson<any>({
+      mode: "conversation",
       system: fraudSystem,
       prompt: fraudPrompt,
-      imageBase64: params.imageBase64,
+      media: params.imageBase64
+        ? [
+            {
+              dataBase64: params.imageBase64,
+              mimeType: "image/jpeg",
+            },
+          ]
+        : undefined,
+      temperature: 0.1,
       schema: {
         type: "object",
         properties: {
@@ -803,129 +812,6 @@ export async function analyzeMediaWithAI(
     disclaimer:
       "This is an automated estimate and cannot prove authenticity or fraudulent intent with certainty.",
   };
-}
-
-async function requestOllamaChatJson(params: {
-  baseUrl: string;
-  apiKey?: string;
-  model: string;
-  system?: string;
-  prompt: string;
-  imageBase64?: string;
-  schema: Record<string, unknown>;
-}): Promise<any> {
-  const headers: Record<string, string> = {
-    "content-type": "application/json",
-  };
-
-  if (params.apiKey && params.apiKey.trim().length > 0) {
-    headers.Authorization = `Bearer ${params.apiKey}`;
-  }
-
-  const messages = [
-    ...(params.system
-      ? [
-          {
-            role: "system",
-            content: params.system,
-          },
-        ]
-      : []),
-    {
-      role: "user",
-      content: params.prompt,
-      ...(params.imageBase64 ? { images: [params.imageBase64] } : {}),
-    },
-  ];
-
-  const res = await fetch(`${params.baseUrl}/api/chat`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      model: params.model,
-      messages,
-      stream: false,
-      format: params.schema,
-      options: {
-        temperature: 0.1,
-      },
-    }),
-  });
-
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(`AI request failed (${res.status}): ${txt}`);
-  }
-
-  const json = (await res.json()) as {
-    message?: {
-      content?: string;
-    };
-  };
-
-  const content = json.message?.content;
-
-  if (typeof content !== "string" || content.trim().length === 0) {
-    throw new Error("AI returned empty content");
-  }
-
-  try {
-    return JSON.parse(content);
-  } catch {
-    throw new Error("AI response was not valid JSON");
-  }
-}
-
-async function requestOllamaJson(params: {
-  baseUrl: string;
-  apiKey?: string;
-  model: string;
-  system?: string;
-  prompt: string;
-  imageBase64?: string;
-  schema: Record<string, unknown>;
-}): Promise<any> {
-  const headers: Record<string, string> = {
-    "content-type": "application/json",
-  };
-
-  if (params.apiKey && params.apiKey.trim().length > 0) {
-    headers.Authorization = `Bearer ${params.apiKey}`;
-  }
-
-  const res = await fetch(`${params.baseUrl}/api/generate`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      model: params.model,
-      ...(params.system ? { system: params.system } : {}),
-      prompt: params.prompt,
-      ...(params.imageBase64 ? { images: [params.imageBase64] } : {}),
-      stream: false,
-      format: params.schema,
-      options: {
-        temperature: 0.2,
-      },
-    }),
-  });
-
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(`AI request failed (${res.status}): ${txt}`);
-  }
-
-  const json = (await res.json()) as OllamaGenerateResponse;
-  const content = json?.response;
-
-  if (typeof content !== "string" || content.trim().length === 0) {
-    throw new Error("AI returned empty content");
-  }
-
-  try {
-    return JSON.parse(content);
-  } catch {
-    throw new Error("AI response was not valid JSON");
-  }
 }
 
 function normalizeMediaAuthenticityAssessment(

@@ -1,35 +1,50 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
   analyzeImageAuthenticityWithAI,
   analyzeMediaWithAI,
   analyzeWithAI,
 } from "./ai.js";
+import type {
+  AiProvider,
+  AiProviderRequest,
+} from "./ai/ai-provider.js";
+
+class TestAiProvider implements AiProvider {
+  readonly name = "test";
+  readonly requests: AiProviderRequest[] = [];
+
+  private responseIndex = 0;
+
+  constructor(private readonly responses: unknown[]) {}
+
+  async requestJson<T = unknown>(
+    params: AiProviderRequest,
+  ): Promise<T> {
+    this.requests.push(params);
+
+    const response = this.responses[this.responseIndex];
+
+    if (this.responseIndex < this.responses.length - 1) {
+      this.responseIndex += 1;
+    }
+
+    return response as T;
+  }
+}
 
 describe("analyzeWithAI", () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  it("sends text analysis requests to Ollama generate API", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        response: JSON.stringify({
-          riskScore: 90,
-          category: "high_risk",
-          threatType: "bank_phishing",
-          reasons: ["Urgent banking credential request"],
-          explanation: "This looks like a banking phishing attempt.",
-        }),
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+  it("requests structured text analysis through the configured provider", async () => {
+    const provider = new TestAiProvider([{
+      riskScore: 90,
+      category: "high_risk",
+      threatType: "bank_phishing",
+      reasons: ["Urgent banking credential request"],
+      explanation: "This looks like a banking phishing attempt.",
+    }]);
 
     const result = await analyzeWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llama3.1:8b",
+      provider,
       input: "Your bank account will be blocked. Verify your password now.",
       outputLanguage: "en",
     });
@@ -37,97 +52,55 @@ describe("analyzeWithAI", () => {
     expect(result.riskScore).toBe(90);
     expect(result.category).toBe("high_risk");
     expect(result.threatType).toBe("bank_phishing");
-    expect(result.reasons).toEqual(["Urgent banking credential request"]);
+    expect(result.reasons).toEqual([
+      "Urgent banking credential request",
+    ]);
 
-    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(provider.requests).toHaveLength(1);
 
-    const [url, request] = fetchMock.mock.calls[0];
-    const body = JSON.parse(request.body);
+    const request = provider.requests[0];
 
-    expect(url).toBe("http://ollama.local/api/generate");
-    expect(body.model).toBe("llama3.1:8b");
-    expect(body.prompt).toContain("Your bank account will be blocked");
-    expect(body.stream).toBe(false);
-    expect(body.format.required).toContain("riskScore");
-  });
-
-  it("adds Authorization header when apiKey is provided", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        response: JSON.stringify({
-          riskScore: 20,
-          category: "low_risk",
-          threatType: "none",
-          reasons: ["No clear scam signals"],
-          explanation: "No strong scam indicators were found.",
-        }),
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
-
-    await analyzeWithAI({
-      baseUrl: "http://ollama.local",
-      apiKey: "cloud-test-key",
-      model: "llama3.1:8b",
-      input: "Hello, can we meet tomorrow?",
-      outputLanguage: "en",
-    });
-
-    const [, request] = fetchMock.mock.calls[0];
-
-    expect(request.headers.Authorization).toBe("Bearer cloud-test-key");
+    expect(request.mode).toBe("completion");
+    expect(request.prompt).toContain(
+      "Your bank account will be blocked",
+    );
+    expect(request.temperature).toBe(0.2);
+    expect(request.schema.required).toContain("riskScore");
+    expect(request.media).toBeUndefined();
   });
 
   it("asks for German output when outputLanguage is de", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        response: JSON.stringify({
-          riskScore: 20,
-          category: "low_risk",
-          threatType: "none",
-          reasons: ["Keine klaren Betrugssignale"],
-          explanation: "Es gibt keine starken Hinweise auf Betrug.",
-        }),
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([{
+      riskScore: 20,
+      category: "low_risk",
+      threatType: "none",
+      reasons: ["Keine klaren Betrugssignale"],
+      explanation: "Es gibt keine starken Hinweise auf Betrug.",
+    }]);
 
     await analyzeWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llama3.1:8b",
+      provider,
       input: "Hello, can we meet tomorrow?",
       outputLanguage: "de",
     });
 
-    const [, request] = fetchMock.mock.calls[0];
-    const body = JSON.parse(request.body);
-
-    expect(JSON.stringify(body)).toContain("German");
+    expect(provider.requests).toHaveLength(1);
+    expect(
+      JSON.stringify(provider.requests[0]),
+    ).toContain("German");
   });
 
   it("normalizes invalid text AI response values safely", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        response: JSON.stringify({
-          riskScore: 999,
-          category: "critical",
-          threatType: "unknown",
-          reasons: ["  "],
-          explanation: "",
-        }),
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([{
+      riskScore: 999,
+      category: "critical",
+      threatType: "unknown",
+      reasons: ["  "],
+      explanation: "",
+    }]);
 
     const result = await analyzeWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llama3.1:8b",
+      provider,
       input: "Suspicious message",
       outputLanguage: "it",
     });
@@ -141,33 +114,19 @@ describe("analyzeWithAI", () => {
 });
 
 describe("analyzeImageAuthenticityWithAI", () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  it("sends imageBase64 to Ollama chat API as message images payload", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            category: "likely_ai_generated",
-            confidence: "medium",
-            reasons: ["Synthetic-looking details"],
-            explanation:
-              "This image shows some signs that may be AI-generated.",
-            disclaimer:
-              "This is only an estimate and cannot prove whether the image is authentic.",
-          }),
-        },
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+  it("requests structured image analysis through the configured provider", async () => {
+    const provider = new TestAiProvider([{
+      category: "likely_ai_generated",
+      confidence: "medium",
+      reasons: ["Synthetic-looking details"],
+      explanation:
+        "This image shows some signs that may be AI-generated.",
+      disclaimer:
+        "This is only an estimate and cannot prove whether the image is authentic.",
+    }]);
 
     const result = await analyzeImageAuthenticityWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llava:latest",
+      provider,
       imageSignals: "File name: test-image.jpg",
       imageBase64: "base64-image-content",
       outputLanguage: "en",
@@ -177,89 +136,73 @@ describe("analyzeImageAuthenticityWithAI", () => {
     expect(result.confidence).toBe("medium");
     expect(result.reasons).toEqual(["Synthetic-looking details"]);
 
-    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(provider.requests).toHaveLength(1);
 
-    const [url, request] = fetchMock.mock.calls[0];
-    const body = JSON.parse(request.body);
+    const request = provider.requests[0];
 
-    expect(url).toBe("http://ollama.local/api/chat");
-    expect(body.model).toBe("llava:latest");
-    expect(body.messages[0].role).toBe("system");
-    expect(body.messages[1].role).toBe("user");
-    expect(body.messages[1].images).toEqual(["base64-image-content"]);
-    expect(body.messages[1].content).toContain("File name: test-image.jpg");
-    expect(body.format.required).toContain("disclaimer");
-    expect(body.format.required).toContain("visualStyle");
-    expect(body.format.required).toContain("contextWarningLevel");
-    expect(body.format.required).toContain("ordinarySceneLikelihood");
-    expect(body.format.required).toContain("artificialSubjectEvidence");
-    expect(body.format.required).toContain("roleContextMismatchLevel");
-    expect(body.format.required).toContain("sensitiveOrFraudContextLevel");
-    expect(body.format.properties.subjectType.enum).toContain("animal");
-    expect(body.format.properties.subjectType.enum).toContain(
-      "artificial_non_human",
+    expect(request.mode).toBe("conversation");
+    expect(request.temperature).toBe(0.1);
+    expect(request.media).toEqual([
+      {
+        dataBase64: "base64-image-content",
+        mimeType: "image/jpeg",
+      },
+    ]);
+    expect(request.prompt).toContain("File name: test-image.jpg");
+    expect(request.schema.required).toContain("disclaimer");
+    expect(request.schema.required).toContain("visualStyle");
+    expect(request.schema.required).toContain("contextWarningLevel");
+    expect(request.schema.required).toContain("ordinarySceneLikelihood");
+    expect(request.schema.required).toContain("artificialSubjectEvidence");
+    expect(request.schema.required).toContain("roleContextMismatchLevel");
+    expect(request.schema.required).toContain(
+      "sensitiveOrFraudContextLevel",
     );
-    expect(body.format.properties.subjectType.enum).toContain("animal");
-    expect(body.format.properties.subjectType.enum).toContain(
+
+    const properties = request.schema.properties as Record<
+      string,
+      { enum?: string[] }
+    >;
+
+    expect(properties.subjectType.enum).toContain("animal");
+    expect(properties.subjectType.enum).toContain(
       "artificial_non_human",
     );
   });
 
   it("asks for German image output when outputLanguage is de", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            category: "inconclusive",
-            confidence: "low",
-            reasons: ["Nicht genügend Hinweise"],
-            explanation:
-              "Es gibt nicht genügend Hinweise für eine klare Einschätzung.",
-            disclaimer:
-              "Dies ist nur eine Schätzung und kann die Echtheit nicht beweisen.",
-          }),
-        },
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([{
+      category: "inconclusive",
+      confidence: "low",
+      reasons: ["Nicht genügend Hinweise"],
+      explanation:
+        "Es gibt nicht genügend Hinweise für eine klare Einschätzung.",
+      disclaimer:
+        "Dies ist nur eine Schätzung und kann die Echtheit nicht beweisen.",
+    }]);
 
     await analyzeImageAuthenticityWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llava:latest",
+      provider,
       imageSignals: "File name: test-image.jpg",
       imageBase64: "base64-image-content",
       outputLanguage: "de",
     });
 
-    const [, request] = fetchMock.mock.calls[0];
-    const body = JSON.parse(request.body);
-
-    expect(JSON.stringify(body.messages)).toContain("German");
+    expect(provider.requests).toHaveLength(1);
+    expect(JSON.stringify(provider.requests[0])).toContain("German");
   });
 
   it("normalizes invalid image AI response values safely", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            category: "definitely_fake",
-            confidence: "certain",
-            reasons: ["  "],
-            explanation: "",
-            disclaimer: "",
-          }),
-        },
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([{
+      category: "definitely_fake",
+      confidence: "certain",
+      reasons: ["  "],
+      explanation: "",
+      disclaimer: "",
+    }]);
 
     const result = await analyzeImageAuthenticityWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llava:latest",
+      provider,
       imageSignals: "File name: test-image.jpg",
       imageBase64: "base64-image-content",
       outputLanguage: "it",
@@ -273,37 +216,28 @@ describe("analyzeImageAuthenticityWithAI", () => {
     );
     expect(result.disclaimer).toContain("This is only an estimate");
   });
-  it("prefers manipulated when structured signals describe a photographic contextual mismatch", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            category: "likely_ai_generated",
-            confidence: "high",
-            visualStyle: "photographic",
-            subjectType: "human",
-            contextWarningLevel: "high",
-            manipulationLikelihood: "medium",
-            generationLikelihood: "low",
-            reasons: [
-              "Unusual clothing for the visible context",
-              "Meme-like staging",
-            ],
-            explanation:
-              "The image looks photographic, but the scene appears staged or out of context.",
-            disclaimer:
-              "This is only an estimate and cannot prove authenticity.",
-          }),
-        },
-      }),
-    });
 
-    vi.stubGlobal("fetch", fetchMock);
+  it("prefers manipulated when structured signals describe a photographic contextual mismatch", async () => {
+    const provider = new TestAiProvider([{
+      category: "likely_ai_generated",
+      confidence: "high",
+      visualStyle: "photographic",
+      subjectType: "human",
+      contextWarningLevel: "high",
+      manipulationLikelihood: "medium",
+      generationLikelihood: "low",
+      reasons: [
+        "Unusual clothing for the visible context",
+        "Meme-like staging",
+      ],
+      explanation:
+        "The image looks photographic, but the scene appears staged or out of context.",
+      disclaimer:
+        "This is only an estimate and cannot prove authenticity.",
+    }]);
 
     const result = await analyzeImageAuthenticityWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llava:latest",
+      provider,
       imageSignals: "File name: contextual-mismatch.jpg",
       imageBase64: "base64-image-content",
       outputLanguage: "en",
@@ -314,36 +248,26 @@ describe("analyzeImageAuthenticityWithAI", () => {
   });
 
   it("does not classify a real animal scene as AI-generated from weak signals", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            category: "likely_ai_generated",
-            confidence: "high",
-            visualStyle: "synthetic",
-            subjectType: "animal",
-            contextWarningLevel: "none",
-            manipulationLikelihood: "none",
-            generationLikelihood: "high",
-            reasons: [
-              "Low detail due to distance",
-              "Small animal subject in an outdoor scene",
-            ],
-            explanation:
-              "The image shows an animal in an ordinary outdoor scene without contextual warning signals.",
-            disclaimer:
-              "This is only an estimate and cannot prove authenticity.",
-          }),
-        },
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([{
+      category: "likely_ai_generated",
+      confidence: "high",
+      visualStyle: "synthetic",
+      subjectType: "animal",
+      contextWarningLevel: "none",
+      manipulationLikelihood: "none",
+      generationLikelihood: "high",
+      reasons: [
+        "Low detail due to distance",
+        "Small animal subject in an outdoor scene",
+      ],
+      explanation:
+        "The image shows an animal in an ordinary outdoor scene without contextual warning signals.",
+      disclaimer:
+        "This is only an estimate and cannot prove authenticity.",
+    }]);
 
     const result = await analyzeImageAuthenticityWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llava:latest",
+      provider,
       imageSignals: "File name: real-cat.jpg",
       imageBase64: "base64-image-content",
       outputLanguage: "en",
@@ -354,36 +278,26 @@ describe("analyzeImageAuthenticityWithAI", () => {
   });
 
   it("keeps artificial non-human subjects as likely AI-generated", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            category: "likely_ai_generated",
-            confidence: "high",
-            visualStyle: "synthetic",
-            subjectType: "artificial_non_human",
-            contextWarningLevel: "medium",
-            manipulationLikelihood: "low",
-            generationLikelihood: "high",
-            reasons: [
-              "Artificial non-human subject",
-              "Synthetic-looking scene",
-            ],
-            explanation:
-              "The image shows an artificial non-human subject in a synthetic-looking scene.",
-            disclaimer:
-              "This is only an estimate and cannot prove authenticity.",
-          }),
-        },
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([{
+      category: "likely_ai_generated",
+      confidence: "high",
+      visualStyle: "synthetic",
+      subjectType: "artificial_non_human",
+      contextWarningLevel: "medium",
+      manipulationLikelihood: "low",
+      generationLikelihood: "high",
+      reasons: [
+        "Artificial non-human subject",
+        "Synthetic-looking scene",
+      ],
+      explanation:
+        "The image shows an artificial non-human subject in a synthetic-looking scene.",
+      disclaimer:
+        "This is only an estimate and cannot prove authenticity.",
+    }]);
 
     const result = await analyzeImageAuthenticityWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llava:latest",
+      provider,
       imageSignals: "File name: robot.jpg",
       imageBase64: "base64-image-content",
       outputLanguage: "en",
@@ -394,40 +308,30 @@ describe("analyzeImageAuthenticityWithAI", () => {
   });
 
   it("keeps ordinary animal scenes as low alert even when the model overstates generation", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            category: "likely_ai_generated",
-            confidence: "high",
-            visualStyle: "synthetic",
-            subjectType: "animal",
-            contextWarningLevel: "none",
-            manipulationLikelihood: "none",
-            generationLikelihood: "high",
-            ordinarySceneLikelihood: "high",
-            artificialSubjectEvidence: "low",
-            roleContextMismatchLevel: "none",
-            sensitiveOrFraudContextLevel: "none",
-            reasons: [
-              "Low detail due to distance",
-              "Small animal subject in an ordinary outdoor scene",
-            ],
-            explanation:
-              "The image shows an animal in an ordinary outdoor scene without fraud, sensitive items, or role mismatch.",
-            disclaimer:
-              "This is only an estimate and cannot prove authenticity.",
-          }),
-        },
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([{
+      category: "likely_ai_generated",
+      confidence: "high",
+      visualStyle: "synthetic",
+      subjectType: "animal",
+      contextWarningLevel: "none",
+      manipulationLikelihood: "none",
+      generationLikelihood: "high",
+      ordinarySceneLikelihood: "high",
+      artificialSubjectEvidence: "low",
+      roleContextMismatchLevel: "none",
+      sensitiveOrFraudContextLevel: "none",
+      reasons: [
+        "Low detail due to distance",
+        "Small animal subject in an ordinary outdoor scene",
+      ],
+      explanation:
+        "The image shows an animal in an ordinary outdoor scene without fraud, sensitive items, or role mismatch.",
+      disclaimer:
+        "This is only an estimate and cannot prove authenticity.",
+    }]);
 
     const result = await analyzeImageAuthenticityWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llava:latest",
+      provider,
       imageSignals: "File name: real-cat.jpg",
       imageBase64: "base64-image-content",
       outputLanguage: "en",
@@ -438,40 +342,30 @@ describe("analyzeImageAuthenticityWithAI", () => {
   });
 
   it("normalizes human role-context mismatch to manipulated", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            category: "likely_authentic",
-            confidence: "high",
-            visualStyle: "photographic",
-            subjectType: "human",
-            contextWarningLevel: "low",
-            manipulationLikelihood: "none",
-            generationLikelihood: "none",
-            ordinarySceneLikelihood: "low",
-            artificialSubjectEvidence: "none",
-            roleContextMismatchLevel: "high",
-            sensitiveOrFraudContextLevel: "none",
-            reasons: [
-              "Role-inconsistent clothing",
-              "Implausible public context",
-            ],
-            explanation:
-              "The image looks photographic, but the human subject appears in a role-inconsistent public context.",
-            disclaimer:
-              "This is only an estimate and cannot prove authenticity.",
-          }),
-        },
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([{
+      category: "likely_authentic",
+      confidence: "high",
+      visualStyle: "photographic",
+      subjectType: "human",
+      contextWarningLevel: "low",
+      manipulationLikelihood: "none",
+      generationLikelihood: "none",
+      ordinarySceneLikelihood: "low",
+      artificialSubjectEvidence: "none",
+      roleContextMismatchLevel: "high",
+      sensitiveOrFraudContextLevel: "none",
+      reasons: [
+        "Role-inconsistent clothing",
+        "Implausible public context",
+      ],
+      explanation:
+        "The image looks photographic, but the human subject appears in a role-inconsistent public context.",
+      disclaimer:
+        "This is only an estimate and cannot prove authenticity.",
+    }]);
 
     const result = await analyzeImageAuthenticityWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llava:latest",
+      provider,
       imageSignals: "File name: public-figure-context.jpg",
       imageBase64: "base64-image-content",
       outputLanguage: "en",
@@ -482,37 +376,27 @@ describe("analyzeImageAuthenticityWithAI", () => {
   });
 
   it("normalizes weak AI-generated decisions with no warning signals to low alert", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            category: "likely_ai_generated",
-            confidence: "low",
-            visualStyle: "photographic",
-            subjectType: "human",
-            contextWarningLevel: "none",
-            manipulationLikelihood: "none",
-            generationLikelihood: "none",
-            ordinarySceneLikelihood: "none",
-            artificialSubjectEvidence: "none",
-            roleContextMismatchLevel: "none",
-            sensitiveOrFraudContextLevel: "none",
-            reasons: ["No clear visual warning signals"],
-            explanation:
-              "The image does not show clear visual or contextual warning signals.",
-            disclaimer:
-              "This is only an estimate and cannot prove authenticity.",
-          }),
-        },
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([{
+      category: "likely_ai_generated",
+      confidence: "low",
+      visualStyle: "photographic",
+      subjectType: "human",
+      contextWarningLevel: "none",
+      manipulationLikelihood: "none",
+      generationLikelihood: "none",
+      ordinarySceneLikelihood: "none",
+      artificialSubjectEvidence: "none",
+      roleContextMismatchLevel: "none",
+      sensitiveOrFraudContextLevel: "none",
+      reasons: ["No clear visual warning signals"],
+      explanation:
+        "The image does not show clear visual or contextual warning signals.",
+      disclaimer:
+        "This is only an estimate and cannot prove authenticity.",
+    }]);
 
     const result = await analyzeImageAuthenticityWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llava:latest",
+      provider,
       imageSignals: "File name: ordinary-scene.jpg",
       imageBase64: "base64-image-content",
       outputLanguage: "en",
@@ -523,37 +407,27 @@ describe("analyzeImageAuthenticityWithAI", () => {
   });
 
   it("rewrites the narrative when a weak AI decision is normalized to authentic", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            category: "likely_ai_generated",
-            confidence: "low",
-            visualStyle: "photographic",
-            subjectType: "human",
-            contextWarningLevel: "none",
-            manipulationLikelihood: "none",
-            generationLikelihood: "none",
-            ordinarySceneLikelihood: "none",
-            artificialSubjectEvidence: "none",
-            roleContextMismatchLevel: "none",
-            sensitiveOrFraudContextLevel: "none",
-            reasons: ["The image could have been generated by AI."],
-            explanation:
-              "The image could have been generated by AI or digitally manipulated.",
-            disclaimer:
-              "This is only an estimate and cannot prove authenticity.",
-          }),
-        },
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([{
+      category: "likely_ai_generated",
+      confidence: "low",
+      visualStyle: "photographic",
+      subjectType: "human",
+      contextWarningLevel: "none",
+      manipulationLikelihood: "none",
+      generationLikelihood: "none",
+      ordinarySceneLikelihood: "none",
+      artificialSubjectEvidence: "none",
+      roleContextMismatchLevel: "none",
+      sensitiveOrFraudContextLevel: "none",
+      reasons: ["The image could have been generated by AI."],
+      explanation:
+        "The image could have been generated by AI or digitally manipulated.",
+      disclaimer:
+        "This is only an estimate and cannot prove authenticity.",
+    }]);
 
     const result = await analyzeImageAuthenticityWithAI({
-      baseUrl: "http://ollama.local",
-      model: "llava:latest",
+      provider,
       imageSignals: "File name: ordinary-scene.jpg",
       imageBase64: "base64-image-content",
       outputLanguage: "es",
@@ -566,40 +440,30 @@ describe("analyzeImageAuthenticityWithAI", () => {
   });
 
   it("keeps ordinary photographic object scenes as low alert when only medium manipulation is reported", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            category: "likely_manipulated",
-            confidence: "medium",
-            visualStyle: "photographic",
-            subjectType: "object",
-            contextWarningLevel: "low",
-            manipulationLikelihood: "medium",
-            generationLikelihood: "none",
-            ordinarySceneLikelihood: "none",
-            artificialSubjectEvidence: "none",
-            roleContextMismatchLevel: "none",
-            sensitiveOrFraudContextLevel: "none",
-            reasons: [
-              "Perspective looks unusual",
-              "Lighting and shadows are not perfectly balanced",
-            ],
-            explanation:
-              "The image may have unusual perspective or lighting, but it shows an ordinary real-world scene without clear manipulation indicators.",
-            disclaimer:
-              "This is only an estimate and cannot prove authenticity.",
-          }),
-        },
-      }),
-    });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([{
+      category: "likely_manipulated",
+      confidence: "medium",
+      visualStyle: "photographic",
+      subjectType: "object",
+      contextWarningLevel: "low",
+      manipulationLikelihood: "medium",
+      generationLikelihood: "none",
+      ordinarySceneLikelihood: "none",
+      artificialSubjectEvidence: "none",
+      roleContextMismatchLevel: "none",
+      sensitiveOrFraudContextLevel: "none",
+      reasons: [
+        "Perspective looks unusual",
+        "Lighting and shadows are not perfectly balanced",
+      ],
+      explanation:
+        "The image may have unusual perspective or lighting, but it shows an ordinary real-world scene without clear manipulation indicators.",
+      disclaimer:
+        "This is only an estimate and cannot prove authenticity.",
+    }]);
 
     const result = await analyzeImageAuthenticityWithAI({
-      baseUrl: "http://ollama.local",
-      model: "gemma3:4b",
+      provider,
       imageSignals: "File name: ordinary-yard.jpg",
       imageBase64: "base64-image-content",
       outputLanguage: "en",
@@ -611,40 +475,23 @@ describe("analyzeImageAuthenticityWithAI", () => {
 });
 
 it("forces manipulated_or_synthetic when image forensics is positive even if the visual model says authentic", async () => {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            authenticity: "likely_authentic",
-            confidence: "high",
-            reasons: ["The image appears visually coherent"],
-            explanation: "The image appears authentic.",
-          }),
-        },
-      }),
-    })
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            fraudAssessment: "no_clear_signals",
-            confidence: "low",
-            reasons: ["No clear fraud-related content"],
-            explanation: "No clear fraud signals were found.",
-          }),
-        },
-      }),
-    });
-
-  vi.stubGlobal("fetch", fetchMock);
+  const provider = new TestAiProvider([
+    {
+      authenticity: "likely_authentic",
+      confidence: "high",
+      reasons: ["The image appears visually coherent"],
+      explanation: "The image appears authentic.",
+    },
+    {
+      fraudAssessment: "no_clear_signals",
+      confidence: "low",
+      reasons: ["No clear fraud-related content"],
+      explanation: "No clear fraud signals were found.",
+    },
+  ]);
 
   const result = await analyzeMediaWithAI({
-    baseUrl: "http://ollama.local",
-    model: "gemma3:4b",
+    provider,
     imageBase64: "base64-ai-image",
     extractedText: "",
     mediaSignals: "File name: generated-face.jpg",
@@ -664,50 +511,33 @@ it("forces manipulated_or_synthetic when image forensics is positive even if the
   expect(result.fraudAssessment).toBe("no_clear_signals");
   expect(result.fraudConfidence).toBe("low");
 
-  const [, authenticityRequest] = fetchMock.mock.calls[0];
-  const authenticityBody = JSON.parse(authenticityRequest.body);
-  const authenticityMessages = JSON.stringify(authenticityBody.messages);
+  expect(provider.requests).toHaveLength(2);
 
-  expect(authenticityMessages).not.toContain("12.638696670532227");
-  expect(authenticityMessages).not.toContain("1.359375");
-  expect(authenticityMessages).not.toContain("forensic detector");
+  const authenticityRequest = JSON.stringify(provider.requests[0]);
+
+  expect(authenticityRequest).not.toContain("12.638696670532227");
+  expect(authenticityRequest).not.toContain("1.359375");
+  expect(authenticityRequest).not.toContain("forensic detector");
 });
 
 it("keeps high authenticity confidence when image forensics and the visual model strongly agree", async () => {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            authenticity: "manipulated_or_synthetic",
-            confidence: "high",
-            reasons: ["Strong synthetic visual evidence"],
-            explanation: "The image appears synthetic.",
-          }),
-        },
-      }),
-    })
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            fraudAssessment: "no_clear_signals",
-            confidence: "medium",
-            reasons: [],
-            explanation: "No clear fraud signals were found.",
-          }),
-        },
-      }),
-    });
-
-  vi.stubGlobal("fetch", fetchMock);
+  const provider = new TestAiProvider([
+    {
+      authenticity: "manipulated_or_synthetic",
+      confidence: "high",
+      reasons: ["Strong synthetic visual evidence"],
+      explanation: "The image appears synthetic.",
+    },
+    {
+      fraudAssessment: "no_clear_signals",
+      confidence: "medium",
+      reasons: [],
+      explanation: "No clear fraud signals were found.",
+    },
+  ]);
 
   const result = await analyzeMediaWithAI({
-    baseUrl: "http://ollama.local",
-    model: "gemma3:4b",
+    provider,
     imageBase64: "base64-ai-image",
     extractedText: "",
     mediaSignals: "",
@@ -726,40 +556,23 @@ it("keeps high authenticity confidence when image forensics and the visual model
 });
 
 it("does not let a negative forensic result override a visual manipulation assessment", async () => {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            authenticity: "manipulated_or_synthetic",
-            confidence: "medium",
-            reasons: ["Visible compositing inconsistencies"],
-            explanation: "The image shows signs of visual manipulation.",
-          }),
-        },
-      }),
-    })
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            fraudAssessment: "possible_fraud",
-            confidence: "medium",
-            reasons: ["Suspicious financial context"],
-            explanation: "Some fraud-related warning signs are present.",
-          }),
-        },
-      }),
-    });
-
-  vi.stubGlobal("fetch", fetchMock);
+  const provider = new TestAiProvider([
+    {
+      authenticity: "manipulated_or_synthetic",
+      confidence: "medium",
+      reasons: ["Visible compositing inconsistencies"],
+      explanation: "The image shows signs of visual manipulation.",
+    },
+    {
+      fraudAssessment: "possible_fraud",
+      confidence: "medium",
+      reasons: ["Suspicious financial context"],
+      explanation: "Some fraud-related warning signs are present.",
+    },
+  ]);
 
   const result = await analyzeMediaWithAI({
-    baseUrl: "http://ollama.local",
-    model: "gemma3:4b",
+    provider,
     imageBase64: "base64-image",
     extractedText: "",
     mediaSignals: "",
@@ -781,40 +594,23 @@ it("does not let a negative forensic result override a visual manipulation asses
 });
 
 it("preserves the visual authenticity assessment when image forensics is negative", async () => {
-  const fetchMock = vi
-    .fn()
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            authenticity: "likely_authentic",
-            confidence: "medium",
-            reasons: ["No meaningful visual alteration signals"],
-            explanation: "The image appears visually coherent.",
-          }),
-        },
-      }),
-    })
-    .mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        message: {
-          content: JSON.stringify({
-            fraudAssessment: "strong_fraud_signals",
-            confidence: "high",
-            reasons: ["The visible message requests account credentials"],
-            explanation: "The content contains strong phishing signals.",
-          }),
-        },
-      }),
-    });
-
-  vi.stubGlobal("fetch", fetchMock);
+  const provider = new TestAiProvider([
+    {
+      authenticity: "likely_authentic",
+      confidence: "medium",
+      reasons: ["No meaningful visual alteration signals"],
+      explanation: "The image appears visually coherent.",
+    },
+    {
+      fraudAssessment: "strong_fraud_signals",
+      confidence: "high",
+      reasons: ["The visible message requests account credentials"],
+      explanation: "The content contains strong phishing signals.",
+    },
+  ]);
 
   const result = await analyzeMediaWithAI({
-    baseUrl: "http://ollama.local",
-    model: "gemma3:4b",
+    provider,
     imageBase64: "base64-real-screenshot",
     extractedText: "Send your password now",
     mediaSignals: "Screenshot image",
@@ -836,47 +632,26 @@ it("preserves the visual authenticity assessment when image forensics is negativ
 });
 
 describe("analyzeMediaWithAI", () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
   it("sends separate authenticity and fraud multimodal requests", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          message: {
-            content: JSON.stringify({
-              authenticity: "manipulated_or_synthetic",
-              confidence: "high",
-              reasons: ["Rendered or composited scene"],
-              explanation: "The media appears synthetic.",
-            }),
-          },
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          message: {
-            content: JSON.stringify({
-              fraudAssessment: "strong_fraud_signals",
-              confidence: "high",
-              reasons: [
-                "Identity credential and money are linked suspiciously",
-              ],
-              explanation: "The media contains strong fraud-related context.",
-            }),
-          },
-        }),
-      });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([
+      {
+        authenticity: "manipulated_or_synthetic",
+        confidence: "high",
+        reasons: ["Rendered or composited scene"],
+        explanation: "The media appears synthetic.",
+      },
+      {
+        fraudAssessment: "strong_fraud_signals",
+        confidence: "high",
+        reasons: [
+          "Identity credential and money are linked suspiciously",
+        ],
+        explanation: "The media contains strong fraud-related context.",
+      },
+    ]);
 
     const result = await analyzeMediaWithAI({
-      baseUrl: "http://ollama.local",
-      model: "gemma3:4b",
+      provider,
       imageBase64: "base64-image-content",
       extractedText: "IDENTITY DOCUMENT",
       mediaSignals: "QR detected: false\nFile name: robot.jpg",
@@ -888,23 +663,25 @@ describe("analyzeMediaWithAI", () => {
     expect(result.fraudAssessment).toBe("strong_fraud_signals");
     expect(result.fraudConfidence).toBe("high");
 
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(provider.requests).toHaveLength(2);
 
-    const [authenticityUrl, authenticityRequest] = fetchMock.mock.calls[0];
-    const authenticityBody = JSON.parse(authenticityRequest.body);
+    const authenticityRequest = provider.requests[0];
 
-    expect(authenticityUrl).toBe("http://ollama.local/api/chat");
-    expect(authenticityBody.model).toBe("gemma3:4b");
-    expect(authenticityBody.messages[1].images).toEqual([
-      "base64-image-content",
+    expect(authenticityRequest.mode).toBe("conversation");
+    expect(authenticityRequest.temperature).toBe(0.1);
+    expect(authenticityRequest.media).toEqual([
+      {
+        dataBase64: "base64-image-content",
+        mimeType: "image/jpeg",
+      },
     ]);
-    expect(authenticityBody.messages[1].content).not.toContain(
+    expect(authenticityRequest.prompt).not.toContain(
       "IDENTITY DOCUMENT",
     );
-    expect(authenticityBody.messages[1].content).toContain(
+    expect(authenticityRequest.prompt).toContain(
       "File name: robot.jpg",
     );
-    expect(authenticityBody.format.required).toEqual(
+    expect(authenticityRequest.schema.required).toEqual(
       expect.arrayContaining([
         "authenticity",
         "confidence",
@@ -913,15 +690,19 @@ describe("analyzeMediaWithAI", () => {
       ]),
     );
 
-    const [fraudUrl, fraudRequest] = fetchMock.mock.calls[1];
-    const fraudBody = JSON.parse(fraudRequest.body);
+    const fraudRequest = provider.requests[1];
 
-    expect(fraudUrl).toBe("http://ollama.local/api/chat");
-    expect(fraudBody.model).toBe("gemma3:4b");
-    expect(fraudBody.messages[1].images).toEqual(["base64-image-content"]);
-    expect(fraudBody.messages[1].content).toContain("IDENTITY DOCUMENT");
-    expect(fraudBody.messages[1].content).toContain("File name: robot.jpg");
-    expect(fraudBody.format.required).toEqual(
+    expect(fraudRequest.mode).toBe("conversation");
+    expect(fraudRequest.temperature).toBe(0.1);
+    expect(fraudRequest.media).toEqual([
+      {
+        dataBase64: "base64-image-content",
+        mimeType: "image/jpeg",
+      },
+    ]);
+    expect(fraudRequest.prompt).toContain("IDENTITY DOCUMENT");
+    expect(fraudRequest.prompt).toContain("File name: robot.jpg");
+    expect(fraudRequest.schema.required).toEqual(
       expect.arrayContaining([
         "fraudAssessment",
         "confidence",
@@ -932,41 +713,24 @@ describe("analyzeMediaWithAI", () => {
   });
 
   it("keeps authenticity and fraud assessments independent", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          message: {
-            content: JSON.stringify({
-              authenticity: "manipulated_or_synthetic",
-              confidence: "high",
-              reasons: ["The scene appears to be a CGI render"],
-              explanation: "The image appears synthetic.",
-            }),
-          },
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          message: {
-            content: JSON.stringify({
-              fraudAssessment: "no_clear_signals",
-              confidence: "medium",
-              reasons: ["No meaningful scam-related context is visible"],
-              explanation:
-                "The available content does not show clear fraud signals.",
-            }),
-          },
-        }),
-      });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([
+      {
+        authenticity: "manipulated_or_synthetic",
+        confidence: "high",
+        reasons: ["The scene appears to be a CGI render"],
+        explanation: "The image appears synthetic.",
+      },
+      {
+        fraudAssessment: "no_clear_signals",
+        confidence: "medium",
+        reasons: ["No meaningful scam-related context is visible"],
+        explanation:
+          "The available content does not show clear fraud signals.",
+      },
+    ]);
 
     const result = await analyzeMediaWithAI({
-      baseUrl: "http://ollama.local",
-      model: "gemma3:4b",
+      provider,
       imageBase64: "base64-promotional-render",
       extractedText: "",
       mediaSignals: "Promotional image",
@@ -980,43 +744,26 @@ describe("analyzeMediaWithAI", () => {
   });
 
   it("can report strong fraud signals in visually authentic media", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          message: {
-            content: JSON.stringify({
-              authenticity: "likely_authentic",
-              confidence: "medium",
-              reasons: ["No clear signs of visual fabrication"],
-              explanation: "The capture itself appears plausible.",
-            }),
-          },
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          message: {
-            content: JSON.stringify({
-              fraudAssessment: "strong_fraud_signals",
-              confidence: "high",
-              reasons: [
-                "The extracted text requests account credentials urgently",
-              ],
-              explanation:
-                "The content contains strong phishing-related signals.",
-            }),
-          },
-        }),
-      });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([
+      {
+        authenticity: "likely_authentic",
+        confidence: "medium",
+        reasons: ["No clear signs of visual fabrication"],
+        explanation: "The capture itself appears plausible.",
+      },
+      {
+        fraudAssessment: "strong_fraud_signals",
+        confidence: "high",
+        reasons: [
+          "The extracted text requests account credentials urgently",
+        ],
+        explanation:
+          "The content contains strong phishing-related signals.",
+      },
+    ]);
 
     const result = await analyzeMediaWithAI({
-      baseUrl: "http://ollama.local",
-      model: "gemma3:4b",
+      provider,
       imageBase64: "base64-screenshot",
       extractedText: "Your account is blocked. Send your password now.",
       mediaSignals: "Screenshot image",
@@ -1030,105 +777,77 @@ describe("analyzeMediaWithAI", () => {
   });
 
   it("still analyzes visual content when OCR text is empty", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          message: {
-            content: JSON.stringify({
-              authenticity: "inconclusive",
-              confidence: "low",
-              reasons: ["Not enough reliable authenticity evidence"],
-              explanation: "The authenticity assessment is inconclusive.",
-            }),
-          },
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          message: {
-            content: JSON.stringify({
-              fraudAssessment: "possible_fraud",
-              confidence: "medium",
-              reasons: [
-                "Suspicious relationship between visible financial elements",
-              ],
-              explanation:
-                "The visual context contains some fraud-related warning signs.",
-            }),
-          },
-        }),
-      });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([
+      {
+        authenticity: "inconclusive",
+        confidence: "low",
+        reasons: ["Not enough reliable authenticity evidence"],
+        explanation: "The authenticity assessment is inconclusive.",
+      },
+      {
+        fraudAssessment: "possible_fraud",
+        confidence: "medium",
+        reasons: [
+          "Suspicious relationship between visible financial elements",
+        ],
+        explanation:
+          "The visual context contains some fraud-related warning signs.",
+      },
+    ]);
 
     await analyzeMediaWithAI({
-      baseUrl: "http://ollama.local",
-      model: "gemma3:4b",
+      provider,
       imageBase64: "base64-image-content",
       extractedText: "",
       mediaSignals: "File name: shared-image.jpg",
       outputLanguage: "es",
     });
 
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(provider.requests).toHaveLength(2);
 
-    const [, authenticityRequest] = fetchMock.mock.calls[0];
-    const authenticityBody = JSON.parse(authenticityRequest.body);
+    const authenticityRequest = provider.requests[0];
 
-    expect(authenticityBody.messages[1].images).toEqual([
-      "base64-image-content",
+    expect(authenticityRequest.media).toEqual([
+      {
+        dataBase64: "base64-image-content",
+        mimeType: "image/jpeg",
+      },
     ]);
-    expect(authenticityBody.messages[1].content).not.toContain(
+    expect(authenticityRequest.prompt).not.toContain(
       "Extracted text:",
     );
-    expect(JSON.stringify(authenticityBody.messages)).toContain("Spanish");
+    expect(JSON.stringify(authenticityRequest)).toContain("Spanish");
 
-    const [, fraudRequest] = fetchMock.mock.calls[1];
-    const fraudBody = JSON.parse(fraudRequest.body);
+    const fraudRequest = provider.requests[1];
 
-    expect(fraudBody.messages[1].images).toEqual(["base64-image-content"]);
-    expect(fraudBody.messages[1].content).toContain("Extracted text:\n(none)");
-    expect(JSON.stringify(fraudBody.messages)).toContain("Spanish");
+    expect(fraudRequest.media).toEqual([
+      {
+        dataBase64: "base64-image-content",
+        mimeType: "image/jpeg",
+      },
+    ]);
+    expect(fraudRequest.prompt).toContain("Extracted text:\n(none)");
+    expect(JSON.stringify(fraudRequest)).toContain("Spanish");
   });
 
   it("normalizes invalid media analysis values safely without decision overrides", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          message: {
-            content: JSON.stringify({
-              authenticity: "definitely_fake",
-              confidence: "certain",
-              reasons: ["  "],
-              explanation: "",
-            }),
-          },
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          message: {
-            content: JSON.stringify({
-              fraudAssessment: "guaranteed_scam",
-              confidence: "certain",
-              reasons: null,
-              explanation: "",
-            }),
-          },
-        }),
-      });
-
-    vi.stubGlobal("fetch", fetchMock);
+    const provider = new TestAiProvider([
+      {
+        authenticity: "definitely_fake",
+        confidence: "certain",
+        reasons: ["  "],
+        explanation: "",
+      },
+      {
+        fraudAssessment: "guaranteed_scam",
+        confidence: "certain",
+        reasons: null,
+        explanation: "",
+      },
+    ]);
 
     const result = await analyzeMediaWithAI({
-      baseUrl: "http://ollama.local",
-      model: "gemma3:4b",
+      provider,
       imageBase64: "base64-image-content",
       extractedText: "",
       mediaSignals: "",

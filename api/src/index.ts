@@ -28,6 +28,7 @@ import {
   type MediaAnalysis,
   type ThreatType,
 } from "./ai.js";
+import { createAiProvider } from "./ai/ai-provider-factory.js";
 
 function getIsoWeekKey(date: Date): { yearWeek: string; resetAt: string } {
   const d = new Date(
@@ -272,8 +273,8 @@ const envSchema = z.object({
   DEEPL_API_BASE: z.string().default("https://api-free.deepl.com"),
   DEEPL_TARGET_LANG: z.string().default("EN"),
 
-  AI_PROVIDER: z.enum(["ollama"]).default("ollama"),
-  AI_MODE: z.enum(["local", "cloud"]).default("local"),
+  AI_PROVIDER: z.string().min(1).default("ollama"),
+  AI_MODE: z.string().min(1).default("local"),
   AI_BASE_URL: z.string().optional(),
   AI_MODEL: z.string().default("llava:latest"),
   AI_API_KEY: z.string().optional(),
@@ -299,6 +300,14 @@ const env = envSchema.parse({
   AI_BASE_URL: process.env.AI_BASE_URL,
   AI_MODEL: process.env.AI_MODEL,
   AI_API_KEY: process.env.AI_API_KEY,
+});
+
+const aiProvider = createAiProvider({
+  provider: env.AI_PROVIDER,
+  mode: env.AI_MODE,
+  baseUrl: env.AI_BASE_URL,
+  model: env.AI_MODEL,
+  apiKey: env.AI_API_KEY,
 });
 
 const app = Fastify({
@@ -533,25 +542,10 @@ app.post("/scan", async (req, reply) => {
   const scan = scoreInput(textForScoring, rules);
   const classic = scan;
 
-  const aiBaseUrl = env.AI_BASE_URL?.trim().length
-    ? env.AI_BASE_URL.trim()
-    : env.AI_MODE === "cloud"
-      ? "https://ollama.com"
-      : "http://host.docker.internal:11434";
-
-  const aiConfigured =
-    env.AI_PROVIDER === "ollama" &&
-    typeof env.AI_MODEL === "string" &&
-    env.AI_MODEL.trim().length > 0 &&
-    typeof aiBaseUrl === "string" &&
-    aiBaseUrl.length > 0 &&
-    (env.AI_MODE === "local" ||
-      (typeof env.AI_API_KEY === "string" && env.AI_API_KEY.trim().length > 0));
-
   let aiAllowed = false;
   let aiUsed = false;
 
-  if (aiConfigured) {
+  if (aiProvider) {
     if (isPremium) {
       aiAllowed = true;
     } else {
@@ -571,13 +565,11 @@ app.post("/scan", async (req, reply) => {
   const AI_ANALYSIS_TIMEOUT_MS = 90000;
   let ai: AiAnalysis | null = null;
 
-  if (aiAllowed) {
+  if (aiAllowed && aiProvider) {
     try {
       ai = await withTimeout(
         analyzeWithAI({
-          baseUrl: aiBaseUrl,
-          apiKey: env.AI_MODE === "cloud" ? env.AI_API_KEY?.trim() : undefined,
-          model: env.AI_MODEL,
+          provider: aiProvider,
           input: body.input,
           outputLanguage: body.outputLanguage,
         }),
@@ -759,22 +751,7 @@ app.post("/media-analysis", async (req, reply) => {
     }
   }
 
-  const aiBaseUrl = env.AI_BASE_URL?.trim().length
-    ? env.AI_BASE_URL.trim()
-    : env.AI_MODE === "cloud"
-      ? "https://ollama.com"
-      : "http://host.docker.internal:11434";
-
-  const aiConfigured =
-    env.AI_PROVIDER === "ollama" &&
-    typeof env.AI_MODEL === "string" &&
-    env.AI_MODEL.trim().length > 0 &&
-    typeof aiBaseUrl === "string" &&
-    aiBaseUrl.length > 0 &&
-    (env.AI_MODE === "local" ||
-      (typeof env.AI_API_KEY === "string" && env.AI_API_KEY.trim().length > 0));
-
-  if (!aiConfigured) {
+  if (!aiProvider) {
     return reply.code(503).send({
       error: "ai_unavailable",
       message: "AI analysis is not configured",
@@ -786,9 +763,7 @@ app.post("/media-analysis", async (req, reply) => {
   try {
     let analysis = await withTimeout(
       analyzeMediaWithAI({
-        baseUrl: aiBaseUrl,
-        apiKey: env.AI_MODE === "cloud" ? env.AI_API_KEY?.trim() : undefined,
-        model: env.AI_MODEL,
+        provider: aiProvider,
         imageBase64: body.imageBase64,
         extractedText: body.extractedText,
         mediaSignals: body.mediaSignals,
@@ -876,22 +851,7 @@ app.post("/image-authenticity", async (req, reply) => {
     return reply.code(403).send({ error: "premium_required" });
   }
 
-  const aiBaseUrl = env.AI_BASE_URL?.trim().length
-    ? env.AI_BASE_URL.trim()
-    : env.AI_MODE === "cloud"
-      ? "https://ollama.com"
-      : "http://host.docker.internal:11434";
-
-  const aiConfigured =
-    env.AI_PROVIDER === "ollama" &&
-    typeof env.AI_MODEL === "string" &&
-    env.AI_MODEL.trim().length > 0 &&
-    typeof aiBaseUrl === "string" &&
-    aiBaseUrl.length > 0 &&
-    (env.AI_MODE === "local" ||
-      (typeof env.AI_API_KEY === "string" && env.AI_API_KEY.trim().length > 0));
-
-  if (!aiConfigured) {
+  if (!aiProvider) {
     return reply.code(503).send({
       error: "ai_unavailable",
       message: "AI analysis is not configured",
@@ -903,9 +863,7 @@ app.post("/image-authenticity", async (req, reply) => {
   try {
     let analysis = await withTimeout(
       analyzeImageAuthenticityWithAI({
-        baseUrl: aiBaseUrl,
-        apiKey: env.AI_MODE === "cloud" ? env.AI_API_KEY?.trim() : undefined,
-        model: env.AI_MODEL,
+        provider: aiProvider,
         imageSignals: body.imageSignals,
         imageBase64: body.imageBase64,
         outputLanguage: body.outputLanguage,
