@@ -1,6 +1,7 @@
 import "dotenv/config";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import multipart from "@fastify/multipart";
 import { z } from "zod";
 import { inferClassicThreatType } from "./threat-type.js";
 
@@ -29,6 +30,7 @@ import {
   type ThreatType,
 } from "./ai.js";
 import { createAiProvider } from "./ai/ai-provider-factory.js";
+import { runMigrations } from "./migrations.js";
 
 function getIsoWeekKey(date: Date): { yearWeek: string; resetAt: string } {
   const d = new Date(
@@ -319,7 +321,11 @@ await app.register(cors, {
   origin: env.CORS_ORIGIN === "*" ? true : env.CORS_ORIGIN,
 });
 
+await app.register(multipart);
+
 const pool = createPool(env.DATABASE_URL);
+
+await runMigrations(pool);
 
 app.addHook("preHandler", async (req) => {
   const deviceId = req.headers["x-device-id"];
