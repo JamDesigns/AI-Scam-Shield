@@ -256,3 +256,209 @@ export async function getScanActivity(
     isThreat: Boolean(row.is_threat),
   }));
 }
+
+export type MediaAnalysisJobStatus =
+  | "submitting"
+  | "processing"
+  | "completed"
+  | "failed";
+
+export type CreateMediaAnalysisJobParams = {
+  id: string;
+  deviceId: string;
+  provider: string;
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
+  outputLanguage: string;
+};
+
+export type MediaAnalysisJob = {
+  id: string;
+  deviceId: string;
+  provider: string;
+  providerSubmissionId: string | null;
+  status: MediaAnalysisJobStatus;
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
+  outputLanguage: string;
+  result: unknown | null;
+  errorMessage: string | null;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+};
+
+export async function createMediaAnalysisJob(
+  pool: pg.Pool,
+  params: CreateMediaAnalysisJobParams,
+): Promise<void> {
+  await pool.query(
+    `
+    INSERT INTO media_analysis_jobs(
+      id,
+      device_id,
+      provider,
+      status,
+      filename,
+      mime_type,
+      size_bytes,
+      output_language
+    )
+    VALUES($1, $2, $3, 'submitting', $4, $5, $6, $7)
+    `,
+    [
+      params.id,
+      params.deviceId,
+      params.provider,
+      params.filename,
+      params.mimeType,
+      params.sizeBytes,
+      params.outputLanguage,
+    ],
+  );
+}
+
+export async function markMediaAnalysisJobProcessing(
+  pool: pg.Pool,
+  id: string,
+  deviceId: string,
+  providerSubmissionId: string,
+): Promise<void> {
+  await pool.query(
+    `
+    UPDATE media_analysis_jobs
+    SET
+      provider_submission_id = $3,
+      status = 'processing',
+      updated_at = NOW()
+    WHERE id = $1
+      AND device_id = $2
+    `,
+    [id, deviceId, providerSubmissionId],
+  );
+}
+
+export async function completeMediaAnalysisJob(
+  pool: pg.Pool,
+  params: {
+    id: string;
+    deviceId: string;
+    providerSubmissionId?: string;
+    result: unknown;
+  },
+): Promise<void> {
+  await pool.query(
+    `
+    UPDATE media_analysis_jobs
+    SET
+      provider_submission_id = COALESCE($3, provider_submission_id),
+      status = 'completed',
+      result_json = $4::jsonb,
+      error_message = NULL,
+      updated_at = NOW(),
+      completed_at = NOW()
+    WHERE id = $1
+      AND device_id = $2
+    `,
+    [
+      params.id,
+      params.deviceId,
+      params.providerSubmissionId ?? null,
+      JSON.stringify(params.result),
+    ],
+  );
+}
+
+export async function failMediaAnalysisJob(
+  pool: pg.Pool,
+  params: {
+    id: string;
+    deviceId: string;
+    providerSubmissionId?: string;
+    errorMessage?: string;
+  },
+): Promise<void> {
+  await pool.query(
+    `
+    UPDATE media_analysis_jobs
+    SET
+      provider_submission_id = COALESCE($3, provider_submission_id),
+      status = 'failed',
+      error_message = $4,
+      updated_at = NOW(),
+      completed_at = NOW()
+    WHERE id = $1
+      AND device_id = $2
+    `,
+    [
+      params.id,
+      params.deviceId,
+      params.providerSubmissionId ?? null,
+      params.errorMessage ?? null,
+    ],
+  );
+}
+
+export async function getMediaAnalysisJob(
+  pool: pg.Pool,
+  id: string,
+  deviceId: string,
+): Promise<MediaAnalysisJob | null> {
+  const res = await pool.query(
+    `
+    SELECT
+      id,
+      device_id,
+      provider,
+      provider_submission_id,
+      status,
+      filename,
+      mime_type,
+      size_bytes,
+      output_language,
+      result_json,
+      error_message,
+      created_at,
+      updated_at,
+      completed_at
+    FROM media_analysis_jobs
+    WHERE id = $1
+      AND device_id = $2
+    `,
+    [id, deviceId],
+  );
+
+  const row = res.rows[0];
+
+  if (!row) {
+    return null;
+  }
+
+  return {
+    id: String(row.id),
+    deviceId: String(row.device_id),
+    provider: String(row.provider),
+    providerSubmissionId:
+      row.provider_submission_id === null
+        ? null
+        : String(row.provider_submission_id),
+    status: String(row.status) as MediaAnalysisJobStatus,
+    filename: String(row.filename),
+    mimeType: String(row.mime_type),
+    sizeBytes: Number(row.size_bytes),
+    outputLanguage: String(row.output_language),
+    result: row.result_json ?? null,
+    errorMessage:
+      row.error_message === null
+        ? null
+        : String(row.error_message),
+    createdAt: new Date(row.created_at).toISOString(),
+    updatedAt: new Date(row.updated_at).toISOString(),
+    completedAt:
+      row.completed_at === null
+        ? null
+        : new Date(row.completed_at).toISOString(),
+  };
+}

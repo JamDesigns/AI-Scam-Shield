@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { randomUUID } from "node:crypto";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import multipart from "@fastify/multipart";
@@ -30,6 +31,7 @@ import {
   type ThreatType,
 } from "./ai.js";
 import { createAiProvider } from "./ai/ai-provider-factory.js";
+import { createMediaForensicsProvider } from "./forensics/media-forensics-provider-factory.js";
 import { runMigrations } from "./migrations.js";
 
 function getIsoWeekKey(date: Date): { yearWeek: string; resetAt: string } {
@@ -80,6 +82,10 @@ function withTimeout<T>(
 
 function createEventId(): string {
   return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 14)}`;
+}
+
+function createMediaAnalysisId(): string {
+  return randomUUID();
 }
 
 function buildInputPreview(input: string): string {
@@ -280,6 +286,13 @@ const envSchema = z.object({
   AI_BASE_URL: z.string().optional(),
   AI_MODEL: z.string().default("llava:latest"),
   AI_API_KEY: z.string().optional(),
+
+  FORENSICS_PROVIDER: z.string().min(1).default("hive"),
+  FORENSICS_BASE_URL: z.string().optional(),
+  FORENSICS_MODEL: z
+    .string()
+    .default("hive/ai-generated-and-deepfake-content-detection"),
+  FORENSICS_API_KEY: z.string().optional(),
 });
 
 const env = envSchema.parse({
@@ -302,6 +315,11 @@ const env = envSchema.parse({
   AI_BASE_URL: process.env.AI_BASE_URL,
   AI_MODEL: process.env.AI_MODEL,
   AI_API_KEY: process.env.AI_API_KEY,
+
+  FORENSICS_PROVIDER: process.env.FORENSICS_PROVIDER,
+  FORENSICS_BASE_URL: process.env.FORENSICS_BASE_URL,
+  FORENSICS_MODEL: process.env.FORENSICS_MODEL,
+  FORENSICS_API_KEY: process.env.FORENSICS_API_KEY,
 });
 
 const aiProvider = createAiProvider({
@@ -310,6 +328,13 @@ const aiProvider = createAiProvider({
   baseUrl: env.AI_BASE_URL,
   model: env.AI_MODEL,
   apiKey: env.AI_API_KEY,
+});
+
+const mediaForensicsProvider = createMediaForensicsProvider({
+  provider: env.FORENSICS_PROVIDER,
+  baseUrl: env.FORENSICS_BASE_URL,
+  model: env.FORENSICS_MODEL,
+  apiKey: env.FORENSICS_API_KEY,
 });
 
 const app = Fastify({

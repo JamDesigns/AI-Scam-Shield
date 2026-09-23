@@ -1,49 +1,58 @@
 import type { Readable } from "node:stream";
 
-export type MediaForensicsInput = {
+export type MediaForensicsProviderMedia = {
   filename: string;
   mimeType: string;
   sizeBytes: number;
   createReadStream: () => Readable;
 };
 
-export type MediaForensicsSignal = {
+export type MediaForensicsGeneratorScore = {
   name: string;
-  verdict: "authentic" | "suspicious" | "inconclusive";
-  confidence?: number;
+  score: number;
+};
+
+export type MediaForensicsObservation = {
+  frameIndex?: number;
+  timestampSeconds?: number;
+  aiGeneratedScore?: number;
+  notAiGeneratedScore?: number;
+  deepfakeScore?: number;
+  aiGeneratedAudioScore?: number;
+  notAiGeneratedAudioScore?: number;
+  generatorScores?: MediaForensicsGeneratorScore[];
 };
 
 export type MediaForensicsCompletedResult = {
-  verdict: "authentic" | "suspicious" | "inconclusive";
-  confidence?: number;
-  signals: MediaForensicsSignal[];
+  status: "completed";
+  submissionId?: string;
+  observations: MediaForensicsObservation[];
 };
 
-export type MediaForensicsPollResult =
-  | {
-      status: "processing";
-    }
-  | {
-      status: "completed";
-      result: MediaForensicsCompletedResult;
-    }
-  | {
-      status: "failed";
-      error?: string;
-    };
-
-export type MediaForensicsSubmission = {
+export type MediaForensicsProcessingResult = {
+  status: "processing";
   submissionId: string;
 };
+
+export type MediaForensicsFailedResult = {
+  status: "failed";
+  submissionId?: string;
+  error?: string;
+};
+
+export type MediaForensicsProviderResult =
+  | MediaForensicsCompletedResult
+  | MediaForensicsProcessingResult
+  | MediaForensicsFailedResult;
 
 export interface MediaForensicsProvider {
   readonly name: string;
 
-  submit(
-    media: MediaForensicsInput,
-  ): Promise<MediaForensicsSubmission>;
+  analyze(
+    media: MediaForensicsProviderMedia,
+  ): Promise<MediaForensicsProviderResult>;
 
-  getResult(
+  getResult?(
     submissionId: string,
-  ): Promise<MediaForensicsPollResult>;
+  ): Promise<MediaForensicsProviderResult>;
 }
