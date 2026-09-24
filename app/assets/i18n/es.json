@@ -12,6 +12,11 @@
   "scan.button": "Escanear",
   "scan.image.button": "Escanear imagen",
   "scan.image.extracting": "Leyendo imagen...",
+  "scan.media.button": "Escanear imagen/vídeo",
+  "scan.media.choose": "¿Qué quieres escanear?",
+  "scan.media.image": "Imagen",
+  "scan.media.video": "Vídeo",
+  "scan.video.analyzing": "Analizando vídeo...",
   "scan.example": "Ejemplo: Tu cuenta está bloqueada. Verifica en https://secure-login-paypaI.com",
   "scan.aiQuota.unlimited": "AI Pro: Ilimitado (Premium)",
   "scan.aiQuota.free": "Usos de AI Pro restantes esta semana: {remaining}/{limit} (Ilimitado con Premium)",
@@ -146,5 +151,15 @@
   "mediaAnalysis.fraud.strong_fraud_signals": "Señales fuertes de fraude",
   "mediaAnalysis.confidence.low": "Baja",
   "mediaAnalysis.confidence.medium": "Media",
-  "mediaAnalysis.confidence.high": "Alta"
+  "mediaAnalysis.confidence.high": "Alta",
+  "videoAnalysis.title": "Análisis forense de vídeo",
+  "videoAnalysis.aiGenerated": "Contenido generado por IA",
+  "videoAnalysis.deepfake": "Deepfake",
+  "videoAnalysis.detected": "Detectado",
+  "videoAnalysis.notDetected": "No detectado",
+  "videoAnalysis.maxScore": "Puntuación máxima",
+  "videoAnalysis.topGenerator": "Generador más probable",
+  "videoAnalysis.suspiciousMoments": "Momentos sospechosos",
+  "videoAnalysis.processing": "El vídeo sigue procesándose...",
+  "errors.videoScanFailed": "No se pudo analizar el vídeo. Prueba con otro archivo."
 }

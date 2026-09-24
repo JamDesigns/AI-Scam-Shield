@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import 'app_config.dart';
 
@@ -69,6 +70,52 @@ class ApiClient {
             body: json.encode(enrichedPayload),
           )
           .timeout(_timeout);
+
+      final body = _tryDecodeMap(res.body);
+
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        return body ?? <String, dynamic>{};
+      }
+
+      throw ApiException(
+        message: 'POST $path failed: ${res.statusCode}',
+        statusCode: res.statusCode,
+        body: body,
+      );
+    } on TimeoutException {
+      throw ApiException(
+        message: 'POST $path failed: timeout',
+        statusCode: 408,
+        body: const {'error': 'timeout'},
+      );
+    }
+  }
+
+  Future<Map<String, dynamic>> postMultipartFile({
+    required String path,
+    required String fieldName,
+    required String filePath,
+    required String mimeType,
+    Map<String, String> fields = const <String, String>{},
+  }) async {
+    try {
+      final request = http.MultipartRequest('POST', _u(path))
+        ..headers.addAll({
+          'accept': 'application/json',
+          'x-device-id': deviceId,
+        })
+        ..fields.addAll(fields)
+        ..files.add(
+          await http.MultipartFile.fromPath(
+            fieldName,
+            filePath,
+            contentType: MediaType.parse(mimeType),
+          ),
+        );
+
+      final streamedResponse = await request.send().timeout(_timeout);
+      final res =
+          await http.Response.fromStream(streamedResponse).timeout(_timeout);
 
       final body = _tryDecodeMap(res.body);
 

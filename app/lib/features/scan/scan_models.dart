@@ -288,3 +288,98 @@ class MediaAnalysisResult {
     );
   }
 }
+
+class VideoAnalysisResult {
+  VideoAnalysisResult({
+    required this.analysisId,
+    required this.status,
+    required this.forensics,
+  });
+
+  final String analysisId;
+  final String status;
+  final MediaForensicsEvidence? forensics;
+
+  bool get isCompleted => status == 'completed';
+  bool get isProcessing => status == 'processing';
+  bool get isFailed => status == 'failed';
+
+  factory VideoAnalysisResult.fromJson(Map<String, dynamic> json) {
+    final rawForensics = json['forensics'] ?? json['result'];
+
+    return VideoAnalysisResult(
+      analysisId: json['analysisId'] as String? ?? '',
+      status: json['status'] as String? ?? '',
+      forensics: rawForensics is Map<String, dynamic>
+          ? MediaForensicsEvidence.fromJson(rawForensics)
+          : null,
+    );
+  }
+}
+
+class MediaForensicsEvidence {
+  MediaForensicsEvidence({
+    required this.provider,
+    required this.aiGeneratedDetected,
+    required this.deepfakeDetected,
+    required this.maxAiGeneratedScore,
+    required this.maxDeepfakeScore,
+    required this.maxAiGeneratedAudioScore,
+    required this.topGenerator,
+    required this.suspiciousTimestamps,
+  });
+
+  final String provider;
+  final bool aiGeneratedDetected;
+  final bool deepfakeDetected;
+  final double? maxAiGeneratedScore;
+  final double? maxDeepfakeScore;
+  final double? maxAiGeneratedAudioScore;
+  final MediaForensicsTopGenerator? topGenerator;
+  final List<double> suspiciousTimestamps;
+
+  factory MediaForensicsEvidence.fromJson(Map<String, dynamic> json) {
+    final rawTopGenerator = json['topGenerator'];
+
+    return MediaForensicsEvidence(
+      provider: json['provider'] as String? ?? '',
+      aiGeneratedDetected:
+          json['aiGeneratedDetected'] as bool? ?? false,
+      deepfakeDetected:
+          json['deepfakeDetected'] as bool? ?? false,
+      maxAiGeneratedScore:
+          (json['maxAiGeneratedScore'] as num?)?.toDouble(),
+      maxDeepfakeScore:
+          (json['maxDeepfakeScore'] as num?)?.toDouble(),
+      maxAiGeneratedAudioScore:
+          (json['maxAiGeneratedAudioScore'] as num?)?.toDouble(),
+      topGenerator: rawTopGenerator is Map<String, dynamic>
+          ? MediaForensicsTopGenerator.fromJson(rawTopGenerator)
+          : null,
+      suspiciousTimestamps:
+          (json['suspiciousTimestamps'] as List<dynamic>? ?? const [])
+              .whereType<num>()
+              .map((value) => value.toDouble())
+              .toList(),
+    );
+  }
+}
+
+class MediaForensicsTopGenerator {
+  MediaForensicsTopGenerator({
+    required this.name,
+    required this.score,
+  });
+
+  final String name;
+  final double score;
+
+  factory MediaForensicsTopGenerator.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return MediaForensicsTopGenerator(
+      name: json['name'] as String? ?? '',
+      score: (json['score'] as num?)?.toDouble() ?? 0,
+    );
+  }
+}
