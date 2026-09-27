@@ -114,7 +114,9 @@ function buildHiveEvidence(
     maxAiGeneratedScore,
     maxDeepfakeScore,
     maxAiGeneratedAudioScore,
-    topGenerator: getTopGenerator(observations),
+    topGenerator: aiGeneratedDetected
+      ? getTopGenerator(observations)
+      : null,
     suspiciousTimestamps,
   };
 }
