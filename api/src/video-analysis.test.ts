@@ -3,10 +3,14 @@ import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => {
   const analyze = vi.fn();
   const transcribe = vi.fn();
+  const requestJson = vi.fn();
+  const extractVideoFrames = vi.fn();
 
   return {
     analyze,
     transcribe,
+    requestJson,
+    extractVideoFrames,
     createPool: vi.fn(() => ({})),
     ensureDevice: vi.fn(async () => undefined),
     getPremiumStatus: vi.fn(async () => true),
@@ -51,7 +55,10 @@ vi.mock("./migrations.js", () => ({
 }));
 
 vi.mock("./ai/ai-provider-factory.js", () => ({
-  createAiProvider: vi.fn(() => null),
+  createAiProvider: vi.fn(() => ({
+    name: "test-ai",
+    requestJson: mocks.requestJson,
+  })),
 }));
 
 vi.mock("./forensics/media-forensics-provider-factory.js", () => ({
@@ -66,6 +73,10 @@ vi.mock("./transcription/media-transcription-provider-factory.js", () => ({
     name: "deepgram",
     transcribe: mocks.transcribe,
   })),
+}));
+
+vi.mock("./video/video-frame-extractor.js", () => ({
+  extractVideoFrames: mocks.extractVideoFrames,
 }));
 
 process.env.NODE_ENV = "test";
@@ -153,6 +164,27 @@ describe("POST /video-analysis", () => {
           language: "es",
         },
       ],
+    });
+
+    mocks.extractVideoFrames.mockResolvedValue([
+      {
+        timestampSeconds: 1,
+        dataBase64: "frame-one-base64",
+        mimeType: "image/jpeg",
+      },
+      {
+        timestampSeconds: 3,
+        dataBase64: "frame-two-base64",
+        mimeType: "image/jpeg",
+      },
+    ]);
+
+    mocks.requestJson.mockResolvedValue({
+      riskScore: 12,
+      category: "low_risk",
+      threatType: "none",
+      reasons: ["No clear scam indicators"],
+      explanation: "No clear scam pattern was detected.",
     });
   });
 
@@ -298,6 +330,13 @@ describe("POST /video-analysis", () => {
         confidence: 0.98,
         languages: ["es"],
       },
+      analysis: {
+        riskScore: 12,
+        category: "low_risk",
+        threatType: "none",
+        reasons: ["No clear scam indicators"],
+        explanation: "No clear scam pattern was detected.",
+      },
     });
 
     expect(payload.analysisId).toEqual(expect.any(String));
@@ -317,6 +356,26 @@ describe("POST /video-analysis", () => {
 
     expect(mocks.analyze).toHaveBeenCalledTimes(1);
     expect(mocks.transcribe).toHaveBeenCalledTimes(1);
+    expect(mocks.extractVideoFrames).toHaveBeenCalledTimes(1);
+    expect(mocks.requestJson).toHaveBeenCalledTimes(1);
+
+    expect(mocks.requestJson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: "conversation",
+        media: [
+          {
+            dataBase64: "frame-one-base64",
+            mimeType: "image/jpeg",
+            filename: "video-frame-1.jpg",
+          },
+          {
+            dataBase64: "frame-two-base64",
+            mimeType: "image/jpeg",
+            filename: "video-frame-2.jpg",
+          },
+        ],
+      }),
+    );
 
     expect(mocks.completeMediaAnalysisJob).toHaveBeenCalledWith(
       expect.anything(),
@@ -327,6 +386,7 @@ describe("POST /video-analysis", () => {
         result: {
           forensics: payload.forensics,
           transcription: payload.transcription,
+          analysis: payload.analysis,
         },
       },
     );
@@ -426,6 +486,14 @@ describe("GET /video-analysis/:analysisId", () => {
       languages: ["es"],
     };
 
+    const analysis = {
+      riskScore: 12,
+      category: "low_risk",
+      threatType: "none",
+      reasons: ["No clear scam indicators"],
+      explanation: "No clear scam pattern was detected.",
+    };
+
     mocks.getMediaAnalysisJob.mockResolvedValueOnce({
       id: analysisId,
       deviceId: "video-test-device-structured",
@@ -439,6 +507,7 @@ describe("GET /video-analysis/:analysisId", () => {
       result: {
         forensics,
         transcription,
+        analysis,
       },
       errorMessage: null,
       createdAt: new Date("2026-09-28T09:00:00.000Z"),
@@ -463,6 +532,7 @@ describe("GET /video-analysis/:analysisId", () => {
       status: "completed",
       result: forensics,
       transcription,
+      analysis,
       createdAt: "2026-09-28T09:00:00.000Z",
       updatedAt: "2026-09-28T09:00:02.000Z",
       completedAt: "2026-09-28T09:00:02.000Z",
@@ -471,6 +541,9 @@ describe("GET /video-analysis/:analysisId", () => {
     expect(payload).not.toHaveProperty("transcript");
     expect(JSON.stringify(payload)).not.toContain(
       "Hola, esta es una prueba.",
+    );
+    expect(JSON.stringify(payload)).not.toContain(
+      "frame-one-base64",
     );
   });
 

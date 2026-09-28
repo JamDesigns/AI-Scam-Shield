@@ -1114,3 +1114,188 @@ function normalizeImageAuthenticityConfidence(
 
   return "low";
 }
+
+type AnalyzeVideoWithAIParams = {
+  provider: AiProvider;
+  transcript: string;
+  frames: Array<{
+    timestampSeconds: number;
+    dataBase64: string;
+    mimeType: "image/jpeg";
+  }>;
+  forensics: {
+    aiGeneratedDetected: boolean;
+    deepfakeDetected: boolean;
+    maxAiGeneratedScore: number | null;
+    maxDeepfakeScore: number | null;
+    maxAiGeneratedAudioScore: number | null;
+    suspiciousTimestamps: number[];
+  };
+  outputLanguage: string;
+};
+
+export async function analyzeVideoWithAI(
+  params: AnalyzeVideoWithAIParams,
+): Promise<AiAnalysis> {
+  const outputLanguage = normalizeOutputLanguage(
+    params.outputLanguage,
+  );
+
+  const system = [
+    "You are an expert multimodal anti-scam analyst.",
+    "Evaluate the supplied video content for scam, fraud, impersonation, phishing, credential theft, financial manipulation, malware delivery, fake support, account takeover, delivery scams, crypto scams, or other deceptive intent.",
+    "Use the spoken transcript, sampled video frames, and supplied forensic evidence together.",
+    "The sampled images are ordered chronologically and correspond to the timestamps listed in the prompt.",
+    "AI-generated or deepfake evidence describes media authenticity. It is not by itself proof of fraudulent intent.",
+    "Only increase fraud risk from synthetic or manipulated media when it meaningfully supports impersonation, deception, misleading claims, or another scam pattern.",
+    "Do not claim that a person, organization, brand, institution, or public figure is present unless that identity is clearly supported by visible or spoken evidence.",
+    "Do not invent dialogue, text, actions, URLs, payment requests, identities, or events that are not observable in the supplied evidence.",
+    "If evidence is insufficient, reflect that uncertainty in the risk score and category.",
+    "Return ONLY valid JSON matching the required schema.",
+    "Do not include markdown or extra commentary.",
+    `Write reasons and explanation in ${outputLanguage}.`,
+    "The explanation must be concise, practical, and no more than 3 sentences.",
+  ].join(" ");
+
+  const frameTimeline =
+    params.frames.length > 0
+      ? params.frames
+          .map(
+            (frame, index) =>
+              `Frame ${index + 1}: ${frame.timestampSeconds}s`,
+          )
+          .join("\n")
+      : "(no sampled frames)";
+
+  const forensicSignals = [
+    `AI-generated detected: ${params.forensics.aiGeneratedDetected}`,
+    `Deepfake detected: ${params.forensics.deepfakeDetected}`,
+    `Maximum AI-generated score: ${
+      params.forensics.maxAiGeneratedScore ?? "unknown"
+    }`,
+    `Maximum deepfake score: ${
+      params.forensics.maxDeepfakeScore ?? "unknown"
+    }`,
+    `Maximum AI-generated audio score: ${
+      params.forensics.maxAiGeneratedAudioScore ?? "unknown"
+    }`,
+    `Suspicious timestamps: ${
+      params.forensics.suspiciousTimestamps.length > 0
+        ? params.forensics.suspiciousTimestamps
+            .map((value) => `${value}s`)
+            .join(", ")
+        : "none"
+    }`,
+  ].join("\n");
+
+  const prompt = [
+    "Analyze this video for scam risk.",
+    "",
+    "Return a JSON object with this exact schema:",
+    '{ "riskScore": number(0..100), "category": "low_risk"|"medium_risk"|"high_risk", "threatType": "bank_phishing"|"malware"|"investment_scam"|"fake_support"|"account_takeover"|"delivery_scam"|"crypto_scam"|"unknown_suspicious"|"none", "reasons": string[], "explanation": string }',
+    "",
+    "Threat type definitions:",
+    "- bank_phishing: impersonates a bank, payment provider, or financial institution to steal credentials or payment details.",
+    "- malware: tries to make the user download, install, open, or execute a suspicious file, app, attachment, or update.",
+    "- investment_scam: promises unrealistic profits, trading returns, passive income, or fake investment opportunities.",
+    "- fake_support: impersonates customer support, technical support, or a service agent to manipulate the user.",
+    "- account_takeover: tries to steal login credentials, verification codes, OTP codes, passwords, or account access.",
+    "- delivery_scam: impersonates a courier, delivery service, customs office, or package tracking flow.",
+    "- crypto_scam: targets crypto wallets, seed phrases, private keys, exchanges, tokens, or blockchain payments.",
+    "- unknown_suspicious: suspicious scam-like content that does not clearly fit the other types.",
+    "- none: no meaningful scam pattern detected.",
+    "",
+    "Rules:",
+    "- riskScore must reflect the overall scam or fraud risk supported by the supplied evidence.",
+    "- category must align with riskScore (>=70 high_risk, >=35 medium_risk).",
+    "- threatType must not be none when category is medium_risk or high_risk.",
+    "- Synthetic or deepfake evidence alone must not cause medium_risk or high_risk.",
+    "- reasons must describe concrete observable scam indicators.",
+    "- explanation must include practical guidance for the user.",
+    "",
+    "Spoken transcript:",
+    params.transcript.trim() || "(no recognizable speech)",
+    "",
+    "Sampled frame timeline:",
+    frameTimeline,
+    "",
+    "Independent forensic evidence:",
+    forensicSignals,
+  ].join("\n");
+
+  const parsed: any = await params.provider.requestJson({
+    mode: "conversation",
+    system,
+    prompt,
+    media: params.frames.map((frame, index) => ({
+      dataBase64: frame.dataBase64,
+      mimeType: frame.mimeType,
+      filename: `video-frame-${index + 1}.jpg`,
+    })),
+    temperature: 0.1,
+    schema: {
+      type: "object",
+      properties: {
+        riskScore: {
+          type: "integer",
+          minimum: 0,
+          maximum: 100,
+        },
+        category: {
+          type: "string",
+          enum: ["low_risk", "medium_risk", "high_risk"],
+        },
+        threatType: {
+          type: "string",
+          enum: [
+            "bank_phishing",
+            "malware",
+            "investment_scam",
+            "fake_support",
+            "account_takeover",
+            "delivery_scam",
+            "crypto_scam",
+            "unknown_suspicious",
+            "none",
+          ],
+        },
+        reasons: {
+          type: "array",
+          items: { type: "string" },
+        },
+        explanation: {
+          type: "string",
+        },
+      },
+      required: [
+        "riskScore",
+        "category",
+        "threatType",
+        "reasons",
+        "explanation",
+      ],
+    },
+  });
+
+  const riskScore = clampInt(parsed?.riskScore, 0, 100);
+  const category = normalizeCategory(parsed?.category);
+  const threatType = normalizeThreatType(
+    parsed?.threatType,
+    category,
+  );
+  const reasons = normalizeStringList(parsed?.reasons);
+
+  const explanation =
+    typeof parsed?.explanation === "string" &&
+    parsed.explanation.trim().length > 0
+      ? parsed.explanation.trim()
+      : "No explanation provided.";
+
+  return {
+    riskScore,
+    category,
+    threatType,
+    reasons,
+    explanation,
+  };
+}

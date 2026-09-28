@@ -31,6 +31,7 @@ import { translateWithDeepL } from "./translate.js";
 import {
   analyzeImageAuthenticityWithAI,
   analyzeMediaWithAI,
+  analyzeVideoWithAI,
   analyzeWithAI,
   type AiAnalysis,
   type ImageAuthenticityAnalysis,
@@ -41,6 +42,7 @@ import { createAiProvider } from "./ai/ai-provider-factory.js";
 import { createMediaForensicsProvider } from "./forensics/media-forensics-provider-factory.js";
 import { buildMediaForensicsEvidence } from "./forensics/media-forensics-evidence.js";
 import { createMediaTranscriptionProvider } from "./transcription/media-transcription-provider-factory.js";
+import { extractVideoFrames } from "./video/video-frame-extractor.js";
 import { runMigrations } from "./migrations.js";
 
 function getIsoWeekKey(date: Date): { yearWeek: string; resetAt: string } {
@@ -819,6 +821,13 @@ app.post(
       });
     }
 
+    if (!aiProvider) {
+      return reply.code(503).send({
+        error: "ai_unavailable",
+        message: "Semantic AI analysis is not configured",
+      });
+    }
+
     lastScanAtByDevice.set(deviceId, now);
 
     let analysisId: string | null = null;
@@ -1017,6 +1026,68 @@ app.post(
         languages: transcriptionResult.languages,
       };
 
+      let frames;
+
+      try {
+        frames = await extractVideoFrames({
+          filePath: file.filepath,
+        });
+      } catch (error) {
+        await failMediaAnalysisJob(pool, {
+          id: analysisId,
+          deviceId,
+          providerSubmissionId:
+            providerResult.submissionId,
+          errorMessage:
+            error instanceof Error
+              ? error.message
+              : "Video frame extraction failed",
+        });
+
+        req.log.warn(
+          { err: error, analysisId },
+          "Video frame extraction failed",
+        );
+
+        return reply.code(503).send({
+          error: "video_processing_failed",
+          analysisId,
+        });
+      }
+
+      let analysis: AiAnalysis;
+
+      try {
+        analysis = await analyzeVideoWithAI({
+          provider: aiProvider,
+          transcript: transcriptionResult.transcript,
+          frames,
+          forensics: evidence,
+          outputLanguage: outputLanguageResult.data,
+        });
+      } catch (error) {
+        await failMediaAnalysisJob(pool, {
+          id: analysisId,
+          deviceId,
+          providerSubmissionId:
+            providerResult.submissionId,
+          errorMessage:
+            error instanceof Error
+              ? error.message
+              : "Video semantic analysis failed",
+        });
+
+        req.log.warn(
+          { err: error, analysisId },
+          "Video semantic analysis failed",
+        );
+
+        return reply.code(503).send({
+          error: "ai_unavailable",
+          analysisId,
+        });
+      }
+
       await completeMediaAnalysisJob(pool, {
         id: analysisId,
         deviceId,
@@ -1025,6 +1096,7 @@ app.post(
         result: {
           forensics: evidence,
           transcription,
+          analysis,
         },
       });
 
@@ -1046,6 +1118,7 @@ app.post(
         status: "completed",
         forensics: evidence,
         transcription,
+        analysis,
       };
     } catch (error) {
       if (
@@ -1143,6 +1216,10 @@ app.get("/video-analysis/:analysisId", async (req, reply) => {
       ...(hasStructuredResult &&
       "transcription" in storedResult
         ? { transcription: storedResult.transcription }
+        : {}),
+      ...(hasStructuredResult &&
+      "analysis" in storedResult
+        ? { analysis: storedResult.analysis }
         : {}),
       createdAt: job.createdAt,
       updatedAt: job.updatedAt,
