@@ -812,6 +812,13 @@ app.post(
       });
     }
 
+    if (!mediaTranscriptionProvider) {
+      return reply.code(503).send({
+        error: "transcription_unavailable",
+        message: "Media transcription is not configured",
+      });
+    }
+
     lastScanAtByDevice.set(deviceId, now);
 
     let analysisId: string | null = null;
@@ -967,12 +974,58 @@ app.post(
         result: providerResult,
       });
 
+      let transcriptionResult;
+
+      try {
+        transcriptionResult =
+          await mediaTranscriptionProvider.transcribe({
+            filename: file.filename,
+            mimeType,
+            sizeBytes: fileStats.size,
+            createReadStream: () =>
+              createReadStream(file.filepath),
+          });
+      } catch (error) {
+        await failMediaAnalysisJob(pool, {
+          id: analysisId,
+          deviceId,
+          providerSubmissionId:
+            providerResult.submissionId,
+          errorMessage:
+            error instanceof Error
+              ? error.message
+              : "Media transcription failed",
+        });
+
+        req.log.warn(
+          { err: error, analysisId },
+          "Video transcription failed",
+        );
+
+        return reply.code(503).send({
+          error: "transcription_unavailable",
+          analysisId,
+        });
+      }
+
+      const transcription = {
+        provider: mediaTranscriptionProvider.name,
+        hasSpeech: transcriptionResult.transcript.length > 0,
+        ...(typeof transcriptionResult.confidence === "number"
+          ? { confidence: transcriptionResult.confidence }
+          : {}),
+        languages: transcriptionResult.languages,
+      };
+
       await completeMediaAnalysisJob(pool, {
         id: analysisId,
         deviceId,
         providerSubmissionId:
           providerResult.submissionId,
-        result: evidence,
+        result: {
+          forensics: evidence,
+          transcription,
+        },
       });
 
       if (!isPremium) {
@@ -992,6 +1045,7 @@ app.post(
         analysisId,
         status: "completed",
         forensics: evidence,
+        transcription,
       };
     } catch (error) {
       if (
@@ -1069,10 +1123,27 @@ app.get("/video-analysis/:analysisId", async (req, reply) => {
   }
 
   if (job.status === "completed") {
+    const storedResult =
+      job.result &&
+      typeof job.result === "object" &&
+      !Array.isArray(job.result)
+        ? (job.result as Record<string, unknown>)
+        : null;
+
+    const hasStructuredResult =
+      storedResult !== null &&
+      "forensics" in storedResult;
+
     return {
       analysisId: job.id,
       status: job.status,
-      result: job.result,
+      result: hasStructuredResult
+        ? storedResult.forensics
+        : job.result,
+      ...(hasStructuredResult &&
+      "transcription" in storedResult
+        ? { transcription: storedResult.transcription }
+        : {}),
       createdAt: job.createdAt,
       updatedAt: job.updatedAt,
       completedAt: job.completedAt,
@@ -1083,7 +1154,7 @@ app.get("/video-analysis/:analysisId", async (req, reply) => {
     return {
       analysisId: job.id,
       status: job.status,
-      error: "forensics_failed",
+      error: "media_analysis_failed",
       createdAt: job.createdAt,
       updatedAt: job.updatedAt,
       completedAt: job.completedAt,

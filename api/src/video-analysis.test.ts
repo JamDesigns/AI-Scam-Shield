@@ -2,9 +2,11 @@ import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => {
   const analyze = vi.fn();
+  const transcribe = vi.fn();
 
   return {
     analyze,
+    transcribe,
     createPool: vi.fn(() => ({})),
     ensureDevice: vi.fn(async () => undefined),
     getPremiumStatus: vi.fn(async () => true),
@@ -59,6 +61,13 @@ vi.mock("./forensics/media-forensics-provider-factory.js", () => ({
   })),
 }));
 
+vi.mock("./transcription/media-transcription-provider-factory.js", () => ({
+  createMediaTranscriptionProvider: vi.fn(() => ({
+    name: "deepgram",
+    transcribe: mocks.transcribe,
+  })),
+}));
+
 process.env.NODE_ENV = "test";
 process.env.DATABASE_URL =
   "postgres://test:test@localhost:5432/scam_shield_test";
@@ -68,6 +77,9 @@ process.env.FORENSICS_PROVIDER = "hive";
 process.env.FORENSICS_MODEL =
   "hive/ai-generated-and-deepfake-content-detection";
 process.env.FORENSICS_API_KEY = "test-forensics-key";
+process.env.TRANSCRIPTION_PROVIDER = "deepgram";
+process.env.TRANSCRIPTION_MODEL = "nova-3";
+process.env.TRANSCRIPTION_API_KEY = "test-transcription-key";
 
 const { app } = await import("./index.js");
 
@@ -123,6 +135,22 @@ describe("POST /video-analysis", () => {
           aiGeneratedScore: 0.95,
           notAiGeneratedScore: 0.05,
           deepfakeScore: 0.1,
+        },
+      ],
+    });
+
+    mocks.transcribe.mockResolvedValue({
+      requestId: "deepgram-request-123",
+      transcript: "Hola, esta es una prueba.",
+      confidence: 0.98,
+      languages: ["es"],
+      words: [
+        {
+          text: "Hola,",
+          startSeconds: 0.5,
+          endSeconds: 0.9,
+          confidence: 0.99,
+          language: "es",
         },
       ],
     });
@@ -264,6 +292,12 @@ describe("POST /video-analysis", () => {
         maxDeepfakeScore: 0.1,
         suspiciousTimestamps: [0],
       },
+      transcription: {
+        provider: "deepgram",
+        hasSpeech: true,
+        confidence: 0.98,
+        languages: ["es"],
+      },
     });
 
     expect(payload.analysisId).toEqual(expect.any(String));
@@ -282,14 +316,19 @@ describe("POST /video-analysis", () => {
     );
 
     expect(mocks.analyze).toHaveBeenCalledTimes(1);
+    expect(mocks.transcribe).toHaveBeenCalledTimes(1);
 
     expect(mocks.completeMediaAnalysisJob).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({
+      {
         id: payload.analysisId,
         deviceId: "video-test-device-001",
         providerSubmissionId: "hive-task-123",
-      }),
+        result: {
+          forensics: payload.forensics,
+          transcription: payload.transcription,
+        },
+      },
     );
 
     expect(mocks.failMediaAnalysisJob).not.toHaveBeenCalled();
@@ -364,6 +403,115 @@ describe("GET /video-analysis/:analysisId", () => {
       analysisId,
       "video-test-device-get",
     );
+  });
+
+  it("returns structured transcription metadata without transcript text", async () => {
+    const analysisId = "96d274c1-68e2-4812-8070-bfd156c2ef36";
+
+    const forensics = {
+      provider: "hive",
+      aiGeneratedDetected: false,
+      deepfakeDetected: false,
+      maxAiGeneratedScore: 0.01,
+      maxDeepfakeScore: 0,
+      maxAiGeneratedAudioScore: null,
+      topGenerator: null,
+      suspiciousTimestamps: [],
+    };
+
+    const transcription = {
+      provider: "deepgram",
+      hasSpeech: true,
+      confidence: 0.98,
+      languages: ["es"],
+    };
+
+    mocks.getMediaAnalysisJob.mockResolvedValueOnce({
+      id: analysisId,
+      deviceId: "video-test-device-structured",
+      provider: "hive",
+      providerSubmissionId: "hive-task-structured-123",
+      status: "completed",
+      filename: "clip.mp4",
+      mimeType: "video/mp4",
+      sizeBytes: 1234,
+      outputLanguage: "es",
+      result: {
+        forensics,
+        transcription,
+      },
+      errorMessage: null,
+      createdAt: new Date("2026-09-28T09:00:00.000Z"),
+      updatedAt: new Date("2026-09-28T09:00:02.000Z"),
+      completedAt: new Date("2026-09-28T09:00:02.000Z"),
+    });
+
+    const response = await app.inject({
+      method: "GET",
+      url: `/video-analysis/${analysisId}`,
+      headers: {
+        "x-device-id": "video-test-device-structured",
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+
+    const payload = response.json();
+
+    expect(payload).toEqual({
+      analysisId,
+      status: "completed",
+      result: forensics,
+      transcription,
+      createdAt: "2026-09-28T09:00:00.000Z",
+      updatedAt: "2026-09-28T09:00:02.000Z",
+      completedAt: "2026-09-28T09:00:02.000Z",
+    });
+
+    expect(payload).not.toHaveProperty("transcript");
+    expect(JSON.stringify(payload)).not.toContain(
+      "Hola, esta es una prueba.",
+    );
+  });
+
+  it("returns a generic media analysis error for failed jobs", async () => {
+    const analysisId = "08dcb9c5-4fbe-46c4-87bd-4da361f31320";
+
+    mocks.getMediaAnalysisJob.mockResolvedValueOnce({
+      id: analysisId,
+      deviceId: "video-test-device-failed",
+      provider: "hive",
+      providerSubmissionId: "hive-task-failed-123",
+      status: "failed",
+      filename: "clip.mp4",
+      mimeType: "video/mp4",
+      sizeBytes: 1234,
+      outputLanguage: "es",
+      result: null,
+      errorMessage: "External provider failed",
+      createdAt: new Date("2026-09-28T09:00:00.000Z"),
+      updatedAt: new Date("2026-09-28T09:00:02.000Z"),
+      completedAt: new Date("2026-09-28T09:00:02.000Z"),
+    });
+
+    const response = await app.inject({
+      method: "GET",
+      url: `/video-analysis/${analysisId}`,
+      headers: {
+        "x-device-id": "video-test-device-failed",
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+
+    expect(response.json()).toEqual({
+      analysisId,
+      status: "failed",
+      error: "media_analysis_failed",
+      createdAt: "2026-09-28T09:00:00.000Z",
+      updatedAt: "2026-09-28T09:00:02.000Z",
+      completedAt: "2026-09-28T09:00:02.000Z",
+    });
   });
 
   it("returns 404 when the analysis does not belong to the device", async () => {
