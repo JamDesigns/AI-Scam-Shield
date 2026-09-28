@@ -973,6 +973,36 @@ describe("analyzeVideoWithAI", () => {
     ]);
   });
 
+  it("normalizes missing spaces between video explanation sentences", async () => {
+    const provider = new TestAiProvider([{
+      riskScore: 10,
+      category: "low_risk",
+      threatType: "none",
+      reasons: ["No scam indicators"],
+      explanation:
+        "No se detectan señales de estafa.Se recomienda mantener precaución.",
+    }]);
+
+    const result = await analyzeVideoWithAI({
+      provider,
+      transcript: "Vídeo de prueba.",
+      frames: [],
+      forensics: {
+        aiGeneratedDetected: false,
+        deepfakeDetected: false,
+        maxAiGeneratedScore: null,
+        maxDeepfakeScore: null,
+        maxAiGeneratedAudioScore: null,
+        suspiciousTimestamps: [],
+      },
+      outputLanguage: "es",
+    });
+
+    expect(result.explanation).toBe(
+      "No se detectan señales de estafa. Se recomienda mantener precaución.",
+    );
+  });
+
   it("normalizes invalid video AI response values safely", async () => {
     const provider = new TestAiProvider([{
       riskScore: 999,

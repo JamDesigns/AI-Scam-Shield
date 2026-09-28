@@ -860,6 +860,12 @@ function normalizeStringList(value: unknown): string[] {
     : [];
 }
 
+function normalizeNarrativeText(value: string): string {
+  return value
+    .trim()
+    .replace(/([a-zà-öø-ÿ0-9][.!?])(?=[A-ZÀ-ÖØ-Þ])/g, "$1 ");
+}
+
 function clampInt(v: any, min: number, max: number): number {
   const n = Number(v);
   if (!Number.isFinite(n)) return min;
@@ -1290,7 +1296,7 @@ export async function analyzeVideoWithAI(
   const explanation =
     typeof parsed?.explanation === "string" &&
     parsed.explanation.trim().length > 0
-      ? parsed.explanation.trim()
+      ? normalizeNarrativeText(parsed.explanation)
       : "No explanation provided.";
 
   return {
