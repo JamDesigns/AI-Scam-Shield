@@ -1153,7 +1153,9 @@ export async function analyzeVideoWithAI(
     "If evidence is insufficient, reflect that uncertainty in the risk score and category.",
     "Return ONLY valid JSON matching the required schema.",
     "Do not include markdown or extra commentary.",
-    `Write reasons and explanation in ${outputLanguage}.`,
+    `All user-facing text in reasons and explanation MUST be written exclusively in ${outputLanguage}.`,
+    "When referring to the overall supplied media, always call it a video, never an image, photo, picture, or frame.",
+    "Individual sampled frames may be described as frames only when necessary.",
     "The explanation must be concise, practical, and no more than 3 sentences.",
   ].join(" ");
 

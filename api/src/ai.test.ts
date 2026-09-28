@@ -930,6 +930,13 @@ describe("analyzeVideoWithAI", () => {
     expect(request.mode).toBe("conversation");
     expect(request.temperature).toBe(0.1);
 
+    expect(request.system).toContain(
+      "All user-facing text in reasons and explanation MUST be written exclusively in",
+    );
+    expect(request.system).toContain(
+      "When referring to the overall supplied media, always call it a video, never an image, photo, picture, or frame.",
+    );
+
     expect(request.media).toEqual([
       {
         dataBase64: "frame-one-base64",
