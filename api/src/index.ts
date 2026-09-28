@@ -40,6 +40,7 @@ import {
 import { createAiProvider } from "./ai/ai-provider-factory.js";
 import { createMediaForensicsProvider } from "./forensics/media-forensics-provider-factory.js";
 import { buildMediaForensicsEvidence } from "./forensics/media-forensics-evidence.js";
+import { createMediaTranscriptionProvider } from "./transcription/media-transcription-provider-factory.js";
 import { runMigrations } from "./migrations.js";
 
 function getIsoWeekKey(date: Date): { yearWeek: string; resetAt: string } {
@@ -301,6 +302,11 @@ const envSchema = z.object({
     .string()
     .default("hive/ai-generated-and-deepfake-content-detection"),
   FORENSICS_API_KEY: z.string().optional(),
+
+  TRANSCRIPTION_PROVIDER: z.string().min(1).default("deepgram"),
+  TRANSCRIPTION_BASE_URL: z.string().optional(),
+  TRANSCRIPTION_MODEL: z.string().default("nova-3"),
+  TRANSCRIPTION_API_KEY: z.string().optional(),
 });
 
 const env = envSchema.parse({
@@ -328,6 +334,11 @@ const env = envSchema.parse({
   FORENSICS_BASE_URL: process.env.FORENSICS_BASE_URL,
   FORENSICS_MODEL: process.env.FORENSICS_MODEL,
   FORENSICS_API_KEY: process.env.FORENSICS_API_KEY,
+
+  TRANSCRIPTION_PROVIDER: process.env.TRANSCRIPTION_PROVIDER,
+  TRANSCRIPTION_BASE_URL: process.env.TRANSCRIPTION_BASE_URL,
+  TRANSCRIPTION_MODEL: process.env.TRANSCRIPTION_MODEL,
+  TRANSCRIPTION_API_KEY: process.env.TRANSCRIPTION_API_KEY,
 });
 
 const aiProvider = createAiProvider({
@@ -343,6 +354,13 @@ const mediaForensicsProvider = createMediaForensicsProvider({
   baseUrl: env.FORENSICS_BASE_URL,
   model: env.FORENSICS_MODEL,
   apiKey: env.FORENSICS_API_KEY,
+});
+
+const mediaTranscriptionProvider = createMediaTranscriptionProvider({
+  provider: env.TRANSCRIPTION_PROVIDER,
+  baseUrl: env.TRANSCRIPTION_BASE_URL,
+  model: env.TRANSCRIPTION_MODEL,
+  apiKey: env.TRANSCRIPTION_API_KEY,
 });
 
 const app = Fastify({
