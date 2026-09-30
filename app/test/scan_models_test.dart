@@ -85,4 +85,71 @@ void main() {
 
     expect(item.threatType, 'none');
   });
+
+  test('VideoAnalysisResult parses semantic analysis', () {
+    final result = VideoAnalysisResult.fromJson({
+      'analysisId': 'video-analysis-123',
+      'status': 'completed',
+      'forensics': {
+        'provider': 'hive',
+        'aiGeneratedDetected': false,
+        'deepfakeDetected': false,
+        'maxAiGeneratedScore': 0.01,
+        'maxDeepfakeScore': 0.02,
+        'maxAiGeneratedAudioScore': 0.03,
+        'topGenerator': null,
+        'suspiciousTimestamps': <num>[],
+      },
+      'analysis': {
+        'riskScore': 82,
+        'category': 'high_risk',
+        'threatType': 'bank_phishing',
+        'reasons': [
+          'Solicita credenciales bancarias.',
+          'Utiliza lenguaje de urgencia.',
+        ],
+        'explanation':
+            'El vídeo intenta obtener información bancaria sensible.',
+      },
+    });
+
+    expect(result.analysisId, 'video-analysis-123');
+    expect(result.status, 'completed');
+    expect(result.forensics, isNotNull);
+    expect(result.analysis, isNotNull);
+    expect(result.analysis!.riskScore, 82);
+    expect(result.analysis!.category, 'high_risk');
+    expect(result.analysis!.threatType, 'bank_phishing');
+    expect(result.analysis!.reasons, [
+      'Solicita credenciales bancarias.',
+      'Utiliza lenguaje de urgencia.',
+    ]);
+    expect(
+      result.analysis!.explanation,
+      'El vídeo intenta obtener información bancaria sensible.',
+    );
+  });
+
+  test('VideoAnalysisResult keeps legacy responses compatible', () {
+    final result = VideoAnalysisResult.fromJson({
+      'analysisId': 'legacy-video-analysis',
+      'status': 'completed',
+      'result': {
+        'provider': 'hive',
+        'aiGeneratedDetected': true,
+        'deepfakeDetected': false,
+        'maxAiGeneratedScore': 0.95,
+        'maxDeepfakeScore': 0.1,
+        'maxAiGeneratedAudioScore': null,
+        'topGenerator': null,
+        'suspiciousTimestamps': [1, 3],
+      },
+    });
+
+    expect(result.forensics, isNotNull);
+    expect(result.forensics!.provider, 'hive');
+    expect(result.forensics!.aiGeneratedDetected, isTrue);
+    expect(result.forensics!.suspiciousTimestamps, [1.0, 3.0]);
+    expect(result.analysis, isNull);
+  });
 }

@@ -294,11 +294,13 @@ class VideoAnalysisResult {
     required this.analysisId,
     required this.status,
     required this.forensics,
+    required this.analysis,
   });
 
   final String analysisId;
   final String status;
   final MediaForensicsEvidence? forensics;
+  final VideoSemanticAnalysis? analysis;
 
   bool get isCompleted => status == 'completed';
   bool get isProcessing => status == 'processing';
@@ -306,6 +308,7 @@ class VideoAnalysisResult {
 
   factory VideoAnalysisResult.fromJson(Map<String, dynamic> json) {
     final rawForensics = json['forensics'] ?? json['result'];
+    final rawAnalysis = json['analysis'];
 
     return VideoAnalysisResult(
       analysisId: json['analysisId'] as String? ?? '',
@@ -313,6 +316,37 @@ class VideoAnalysisResult {
       forensics: rawForensics is Map<String, dynamic>
           ? MediaForensicsEvidence.fromJson(rawForensics)
           : null,
+      analysis: rawAnalysis is Map<String, dynamic>
+          ? VideoSemanticAnalysis.fromJson(rawAnalysis)
+          : null,
+    );
+  }
+}
+
+class VideoSemanticAnalysis {
+  VideoSemanticAnalysis({
+    required this.riskScore,
+    required this.category,
+    required this.threatType,
+    required this.reasons,
+    required this.explanation,
+  });
+
+  final int riskScore;
+  final String category;
+  final String threatType;
+  final List<String> reasons;
+  final String explanation;
+
+  factory VideoSemanticAnalysis.fromJson(Map<String, dynamic> json) {
+    return VideoSemanticAnalysis(
+      riskScore: (json['riskScore'] as num?)?.toInt() ?? 0,
+      category: json['category'] as String? ?? 'low_risk',
+      threatType: json['threatType'] as String? ?? 'none',
+      reasons: (json['reasons'] as List<dynamic>? ?? const [])
+          .whereType<String>()
+          .toList(),
+      explanation: json['explanation'] as String? ?? '',
     );
   }
 }

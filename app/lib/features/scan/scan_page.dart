@@ -1077,6 +1077,7 @@ class _VideoAnalysisCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final evidence = result.forensics;
+    final analysis = result.analysis;
 
     return Card(
       margin: const EdgeInsetsDirectional.only(top: 0, bottom: 12),
@@ -1098,64 +1099,179 @@ class _VideoAnalysisCard extends StatelessWidget {
                 t.t('videoAnalysis.processing'),
                 textAlign: TextAlign.start,
               ),
-            ] else if (evidence != null) ...[
-              const SizedBox(height: 14),
-              _detectionRow(
-                context,
-                label: t.t('videoAnalysis.aiGenerated'),
-                detected: evidence.aiGeneratedDetected,
-              ),
-              if (evidence.maxAiGeneratedScore != null) ...[
-                const SizedBox(height: 6),
-                _valueRow(
-                  context,
-                  t.t('videoAnalysis.maxScore'),
-                  _formatScore(evidence.maxAiGeneratedScore!),
-                ),
-              ],
-              const SizedBox(height: 14),
-              const Divider(),
-              const SizedBox(height: 12),
-              _detectionRow(
-                context,
-                label: t.t('videoAnalysis.deepfake'),
-                detected: evidence.deepfakeDetected,
-              ),
-              if (evidence.maxDeepfakeScore != null) ...[
-                const SizedBox(height: 6),
-                _valueRow(
-                  context,
-                  t.t('videoAnalysis.maxScore'),
-                  _formatScore(evidence.maxDeepfakeScore!),
-                ),
-              ],
-              if (evidence.topGenerator != null) ...[
-                const SizedBox(height: 14),
-                _valueRow(
-                  context,
-                  t.t('videoAnalysis.topGenerator'),
-                  '${evidence.topGenerator!.name} '
-                  '(${_formatScore(evidence.topGenerator!.score)})',
-                ),
-              ],
-              if (evidence.suspiciousTimestamps.isNotEmpty) ...[
+            ] else ...[
+              if (analysis != null) ...[
                 const SizedBox(height: 14),
                 Text(
-                  t.t('videoAnalysis.suspiciousMoments'),
-                  style: Theme.of(context).textTheme.labelLarge,
+                  t.t('mediaAnalysis.fraud.title'),
+                  style: Theme.of(context).textTheme.titleMedium,
                   textAlign: TextAlign.start,
+                ),
+                const SizedBox(height: 8),
+                _riskRow(
+                  context,
+                  t.t('result.riskScore'),
+                  '${analysis.riskScore}/100',
+                  analysis.category,
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  evidence.suspiciousTimestamps
-                      .map(_formatTimestamp)
-                      .join(', '),
-                  textAlign: TextAlign.start,
+                _riskRow(
+                  context,
+                  t.t('result.category'),
+                  t.t('categories.${analysis.category}'),
+                  analysis.category,
                 ),
+                const SizedBox(height: 6),
+                _riskRow(
+                  context,
+                  t.t('result.threatType'),
+                  t.t('threatTypes.${analysis.threatType}'),
+                  analysis.category,
+                ),
+                if (analysis.reasons.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    t.t('result.reasons'),
+                    style: Theme.of(context).textTheme.labelLarge,
+                    textAlign: TextAlign.start,
+                  ),
+                  const SizedBox(height: 4),
+                  ...analysis.reasons.map(_bullet),
+                ],
+                if (analysis.explanation.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  Text(
+                    t.t('mediaAnalysis.explanation'),
+                    style: Theme.of(context).textTheme.labelLarge,
+                    textAlign: TextAlign.start,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    analysis.explanation,
+                    textAlign: TextAlign.start,
+                  ),
+                ],
+              ],
+              if (analysis != null && evidence != null) ...[
+                const SizedBox(height: 16),
+                const Divider(),
+                const SizedBox(height: 12),
+              ],
+              if (evidence != null) ...[
+                _detectionRow(
+                  context,
+                  label: t.t('videoAnalysis.aiGenerated'),
+                  detected: evidence.aiGeneratedDetected,
+                ),
+                if (evidence.maxAiGeneratedScore != null) ...[
+                  const SizedBox(height: 6),
+                  _valueRow(
+                    context,
+                    t.t('videoAnalysis.maxScore'),
+                    _formatScore(evidence.maxAiGeneratedScore!),
+                  ),
+                ],
+                const SizedBox(height: 14),
+                const Divider(),
+                const SizedBox(height: 12),
+                _detectionRow(
+                  context,
+                  label: t.t('videoAnalysis.deepfake'),
+                  detected: evidence.deepfakeDetected,
+                ),
+                if (evidence.maxDeepfakeScore != null) ...[
+                  const SizedBox(height: 6),
+                  _valueRow(
+                    context,
+                    t.t('videoAnalysis.maxScore'),
+                    _formatScore(evidence.maxDeepfakeScore!),
+                  ),
+                ],
+                if (evidence.topGenerator != null) ...[
+                  const SizedBox(height: 14),
+                  _valueRow(
+                    context,
+                    t.t('videoAnalysis.topGenerator'),
+                    '${evidence.topGenerator!.name} '
+                    '(${_formatScore(evidence.topGenerator!.score)})',
+                  ),
+                ],
+                if (evidence.suspiciousTimestamps.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  Text(
+                    t.t('videoAnalysis.suspiciousMoments'),
+                    style: Theme.of(context).textTheme.labelLarge,
+                    textAlign: TextAlign.start,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    evidence.suspiciousTimestamps
+                        .map(_formatTimestamp)
+                        .join(', '),
+                    textAlign: TextAlign.start,
+                  ),
+                ],
               ],
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _riskRow(
+    BuildContext context,
+    String label,
+    String value,
+    String category,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final Color color = switch (category) {
+      'low_risk' => Colors.green.shade700,
+      'medium_risk' => Colors.amber.shade800,
+      'high_risk' => colorScheme.error,
+      _ => Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black,
+    };
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                ),
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _bullet(String text) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• '),
+          Expanded(
+            child: Text(
+              text,
+              textAlign: TextAlign.start,
+            ),
+          ),
+        ],
       ),
     );
   }
