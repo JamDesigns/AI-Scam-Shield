@@ -1,6 +1,10 @@
 import "dotenv/config";
+import { randomUUID } from "node:crypto";
+import { createReadStream } from "node:fs";
+import { stat } from "node:fs/promises";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import multipart from "@fastify/multipart";
 import { z } from "zod";
 import { inferClassicThreatType } from "./threat-type.js";
 
@@ -16,12 +20,18 @@ import {
   insertScanEvent,
   getScanStats,
   getScanActivity,
+  createMediaAnalysisJob,
+  markMediaAnalysisJobProcessing,
+  completeMediaAnalysisJob,
+  failMediaAnalysisJob,
+  getMediaAnalysisJob,
 } from "./db.js";
 import { getDefaultRules, scoreInput } from "./rules.js";
 import { translateWithDeepL } from "./translate.js";
 import {
   analyzeImageAuthenticityWithAI,
   analyzeMediaWithAI,
+  analyzeVideoWithAI,
   analyzeWithAI,
   type AiAnalysis,
   type ImageAuthenticityAnalysis,
@@ -29,6 +39,11 @@ import {
   type ThreatType,
 } from "./ai.js";
 import { createAiProvider } from "./ai/ai-provider-factory.js";
+import { createMediaForensicsProvider } from "./forensics/media-forensics-provider-factory.js";
+import { buildMediaForensicsEvidence } from "./forensics/media-forensics-evidence.js";
+import { createMediaTranscriptionProvider } from "./transcription/media-transcription-provider-factory.js";
+import { extractVideoFrames } from "./video/video-frame-extractor.js";
+import { runMigrations } from "./migrations.js";
 
 function getIsoWeekKey(date: Date): { yearWeek: string; resetAt: string } {
   const d = new Date(
@@ -78,6 +93,10 @@ function withTimeout<T>(
 
 function createEventId(): string {
   return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 14)}`;
+}
+
+function createMediaAnalysisId(): string {
+  return randomUUID();
 }
 
 function buildInputPreview(input: string): string {
@@ -278,6 +297,18 @@ const envSchema = z.object({
   AI_BASE_URL: z.string().optional(),
   AI_MODEL: z.string().default("llava:latest"),
   AI_API_KEY: z.string().optional(),
+
+  FORENSICS_PROVIDER: z.string().min(1).default("hive"),
+  FORENSICS_BASE_URL: z.string().optional(),
+  FORENSICS_MODEL: z
+    .string()
+    .default("hive/ai-generated-and-deepfake-content-detection"),
+  FORENSICS_API_KEY: z.string().optional(),
+
+  TRANSCRIPTION_PROVIDER: z.string().min(1).default("deepgram"),
+  TRANSCRIPTION_BASE_URL: z.string().optional(),
+  TRANSCRIPTION_MODEL: z.string().default("nova-3"),
+  TRANSCRIPTION_API_KEY: z.string().optional(),
 });
 
 const env = envSchema.parse({
@@ -300,6 +331,16 @@ const env = envSchema.parse({
   AI_BASE_URL: process.env.AI_BASE_URL,
   AI_MODEL: process.env.AI_MODEL,
   AI_API_KEY: process.env.AI_API_KEY,
+
+  FORENSICS_PROVIDER: process.env.FORENSICS_PROVIDER,
+  FORENSICS_BASE_URL: process.env.FORENSICS_BASE_URL,
+  FORENSICS_MODEL: process.env.FORENSICS_MODEL,
+  FORENSICS_API_KEY: process.env.FORENSICS_API_KEY,
+
+  TRANSCRIPTION_PROVIDER: process.env.TRANSCRIPTION_PROVIDER,
+  TRANSCRIPTION_BASE_URL: process.env.TRANSCRIPTION_BASE_URL,
+  TRANSCRIPTION_MODEL: process.env.TRANSCRIPTION_MODEL,
+  TRANSCRIPTION_API_KEY: process.env.TRANSCRIPTION_API_KEY,
 });
 
 const aiProvider = createAiProvider({
@@ -308,6 +349,20 @@ const aiProvider = createAiProvider({
   baseUrl: env.AI_BASE_URL,
   model: env.AI_MODEL,
   apiKey: env.AI_API_KEY,
+});
+
+const mediaForensicsProvider = createMediaForensicsProvider({
+  provider: env.FORENSICS_PROVIDER,
+  baseUrl: env.FORENSICS_BASE_URL,
+  model: env.FORENSICS_MODEL,
+  apiKey: env.FORENSICS_API_KEY,
+});
+
+const mediaTranscriptionProvider = createMediaTranscriptionProvider({
+  provider: env.TRANSCRIPTION_PROVIDER,
+  baseUrl: env.TRANSCRIPTION_BASE_URL,
+  model: env.TRANSCRIPTION_MODEL,
+  apiKey: env.TRANSCRIPTION_API_KEY,
 });
 
 const app = Fastify({
@@ -319,7 +374,11 @@ await app.register(cors, {
   origin: env.CORS_ORIGIN === "*" ? true : env.CORS_ORIGIN,
 });
 
+await app.register(multipart);
+
 const pool = createPool(env.DATABASE_URL);
+
+await runMigrations(pool);
 
 app.addHook("preHandler", async (req) => {
   const deviceId = req.headers["x-device-id"];
@@ -673,6 +732,520 @@ app.post("/scan", async (req, reply) => {
   };
 });
 
+const MAX_VIDEO_UPLOAD_BYTES = 100 * 1024 * 1024;
+
+const SUPPORTED_VIDEO_MIME_TYPES = new Set([
+  "video/mp4",
+  "video/webm",
+  "video/x-m4v",
+  "video/m4v",
+]);
+
+app.post(
+  "/video-analysis",
+  async (req, reply) => {
+    const deviceId = req.headers["x-device-id"];
+
+    if (typeof deviceId !== "string" || deviceId.length === 0) {
+      return reply.code(400).send({
+        error: "missing_device_id",
+      });
+    }
+
+    if (!req.isMultipart()) {
+      return reply.code(415).send({
+        error: "multipart_required",
+      });
+    }
+
+    const now = Date.now();
+    const lastScanAt = lastScanAtByDevice.get(deviceId);
+
+    if (
+      typeof lastScanAt === "number" &&
+      now - lastScanAt < SCAN_RATE_LIMIT_WINDOW_MS
+    ) {
+      return reply.code(429).send({
+        error: "rate_limited",
+        retryAfterMs:
+          SCAN_RATE_LIMIT_WINDOW_MS - (now - lastScanAt),
+      });
+    }
+
+    const { yearWeek, resetAt } = getIsoWeekKey(new Date());
+    const isPremium = await getPremiumStatus(pool, deviceId);
+
+    if (!isPremium) {
+      const totalWeeklyUsed = await getWeeklyUsage(
+        pool,
+        deviceId,
+        yearWeek,
+      );
+
+      if (totalWeeklyUsed >= env.FREE_WEEKLY_LIMIT) {
+        return reply.code(402).send({
+          error: "quota_exceeded",
+          limit: env.FREE_WEEKLY_LIMIT,
+          remaining: 0,
+          resetAt,
+        });
+      }
+
+      const currentAi = await getWeeklyAiUsage(
+        pool,
+        deviceId,
+        yearWeek,
+      );
+
+      if (currentAi >= env.FREE_WEEKLY_AI_LIMIT) {
+        return reply.code(402).send({
+          error: "ai_quota_exceeded",
+          limit: env.FREE_WEEKLY_AI_LIMIT,
+          remaining: 0,
+          resetAt,
+        });
+      }
+    }
+
+    if (!mediaForensicsProvider) {
+      return reply.code(503).send({
+        error: "forensics_unavailable",
+        message: "Media forensics analysis is not configured",
+      });
+    }
+
+    if (!mediaTranscriptionProvider) {
+      return reply.code(503).send({
+        error: "transcription_unavailable",
+        message: "Media transcription is not configured",
+      });
+    }
+
+    if (!aiProvider) {
+      return reply.code(503).send({
+        error: "ai_unavailable",
+        message: "Semantic AI analysis is not configured",
+      });
+    }
+
+    lastScanAtByDevice.set(deviceId, now);
+
+    let analysisId: string | null = null;
+
+    try {
+      const upload = await req.saveRequestFiles({
+        limits: {
+          fileSize: MAX_VIDEO_UPLOAD_BYTES,
+          files: 1,
+          fields: 1,
+          parts: 2,
+          fieldSize: 32,
+        },
+      });
+
+      if (upload.files.length !== 1) {
+        return reply.code(400).send({
+          error: "video_required",
+        });
+      }
+
+      const file = upload.files[0];
+
+      if (file.fieldname !== "media") {
+        return reply.code(400).send({
+          error: "invalid_file_field",
+          expected: "media",
+        });
+      }
+
+      const mimeType = file.mimetype.toLowerCase();
+
+      if (!SUPPORTED_VIDEO_MIME_TYPES.has(mimeType)) {
+        return reply.code(415).send({
+          error: "unsupported_media_type",
+          mimeType: file.mimetype,
+        });
+      }
+
+      const fileStats = await stat(file.filepath);
+
+      if (
+        fileStats.size <= 0 ||
+        fileStats.size > MAX_VIDEO_UPLOAD_BYTES
+      ) {
+        return reply.code(413).send({
+          error: "video_too_large",
+          maxBytes: MAX_VIDEO_UPLOAD_BYTES,
+        });
+      }
+
+      const values = upload.values as Record<string, unknown>;
+      const outputLanguageValue = values.outputLanguage;
+
+      let outputLanguage = "en";
+
+      if (
+        typeof outputLanguageValue === "object" &&
+        outputLanguageValue !== null &&
+        "value" in outputLanguageValue
+      ) {
+        const value = (
+          outputLanguageValue as { value?: unknown }
+        ).value;
+
+        if (typeof value === "string") {
+          outputLanguage = value;
+        }
+      } else if (typeof outputLanguageValue === "string") {
+        outputLanguage = outputLanguageValue;
+      }
+
+      const outputLanguageResult = z
+        .string()
+        .min(2)
+        .max(5)
+        .safeParse(outputLanguage);
+
+      if (!outputLanguageResult.success) {
+        return reply.code(400).send({
+          error: "invalid_output_language",
+        });
+      }
+
+      analysisId = createMediaAnalysisId();
+
+      await createMediaAnalysisJob(pool, {
+        id: analysisId,
+        deviceId,
+        provider: mediaForensicsProvider.name,
+        filename: file.filename,
+        mimeType,
+        sizeBytes: fileStats.size,
+        outputLanguage: outputLanguageResult.data,
+      });
+
+      const providerResult =
+        await mediaForensicsProvider.analyze({
+          filename: file.filename,
+          mimeType,
+          sizeBytes: fileStats.size,
+          createReadStream: () =>
+            createReadStream(file.filepath),
+        });
+
+      if (providerResult.status === "failed") {
+        await failMediaAnalysisJob(pool, {
+          id: analysisId,
+          deviceId,
+          providerSubmissionId:
+            providerResult.submissionId,
+          errorMessage:
+            providerResult.error ??
+            "Media forensics provider failed",
+        });
+
+        return reply.code(503).send({
+          error: "forensics_failed",
+          analysisId,
+        });
+      }
+
+      if (providerResult.status === "processing") {
+        await markMediaAnalysisJobProcessing(
+          pool,
+          analysisId,
+          deviceId,
+          providerResult.submissionId,
+        );
+
+        if (!isPremium) {
+          await incrementWeeklyUsage(
+            pool,
+            deviceId,
+            yearWeek,
+          );
+          await incrementWeeklyAiUsage(
+            pool,
+            deviceId,
+            yearWeek,
+          );
+        }
+
+        return reply.code(202).send({
+          analysisId,
+          status: "processing",
+        });
+      }
+
+      const evidence = buildMediaForensicsEvidence({
+        provider: mediaForensicsProvider.name,
+        mimeType,
+        result: providerResult,
+      });
+
+      let transcriptionResult;
+
+      try {
+        transcriptionResult =
+          await mediaTranscriptionProvider.transcribe({
+            filename: file.filename,
+            mimeType,
+            sizeBytes: fileStats.size,
+            createReadStream: () =>
+              createReadStream(file.filepath),
+          });
+      } catch (error) {
+        await failMediaAnalysisJob(pool, {
+          id: analysisId,
+          deviceId,
+          providerSubmissionId:
+            providerResult.submissionId,
+          errorMessage:
+            error instanceof Error
+              ? error.message
+              : "Media transcription failed",
+        });
+
+        req.log.warn(
+          { err: error, analysisId },
+          "Video transcription failed",
+        );
+
+        return reply.code(503).send({
+          error: "transcription_unavailable",
+          analysisId,
+        });
+      }
+
+      const transcription = {
+        provider: mediaTranscriptionProvider.name,
+        hasSpeech: transcriptionResult.transcript.length > 0,
+        ...(typeof transcriptionResult.confidence === "number"
+          ? { confidence: transcriptionResult.confidence }
+          : {}),
+        languages: transcriptionResult.languages,
+      };
+
+      let frames;
+
+      try {
+        frames = await extractVideoFrames({
+          filePath: file.filepath,
+        });
+      } catch (error) {
+        await failMediaAnalysisJob(pool, {
+          id: analysisId,
+          deviceId,
+          providerSubmissionId:
+            providerResult.submissionId,
+          errorMessage:
+            error instanceof Error
+              ? error.message
+              : "Video frame extraction failed",
+        });
+
+        req.log.warn(
+          { err: error, analysisId },
+          "Video frame extraction failed",
+        );
+
+        return reply.code(503).send({
+          error: "video_processing_failed",
+          analysisId,
+        });
+      }
+
+      let analysis: AiAnalysis;
+
+      try {
+        analysis = await analyzeVideoWithAI({
+          provider: aiProvider,
+          transcript: transcriptionResult.transcript,
+          frames,
+          forensics: evidence,
+          outputLanguage: outputLanguageResult.data,
+        });
+      } catch (error) {
+        await failMediaAnalysisJob(pool, {
+          id: analysisId,
+          deviceId,
+          providerSubmissionId:
+            providerResult.submissionId,
+          errorMessage:
+            error instanceof Error
+              ? error.message
+              : "Video semantic analysis failed",
+        });
+
+        req.log.warn(
+          { err: error, analysisId },
+          "Video semantic analysis failed",
+        );
+
+        return reply.code(503).send({
+          error: "ai_unavailable",
+          analysisId,
+        });
+      }
+
+      await completeMediaAnalysisJob(pool, {
+        id: analysisId,
+        deviceId,
+        providerSubmissionId:
+          providerResult.submissionId,
+        result: {
+          forensics: evidence,
+          transcription,
+          analysis,
+        },
+      });
+
+      if (!isPremium) {
+        await incrementWeeklyUsage(
+          pool,
+          deviceId,
+          yearWeek,
+        );
+        await incrementWeeklyAiUsage(
+          pool,
+          deviceId,
+          yearWeek,
+        );
+      }
+
+      return {
+        analysisId,
+        status: "completed",
+        forensics: evidence,
+        transcription,
+        analysis,
+      };
+    } catch (error) {
+      if (
+        error instanceof
+        app.multipartErrors.RequestFileTooLargeError
+      ) {
+        return reply.code(413).send({
+          error: "video_too_large",
+          maxBytes: MAX_VIDEO_UPLOAD_BYTES,
+        });
+      }
+
+      if (analysisId) {
+        try {
+          await failMediaAnalysisJob(pool, {
+            id: analysisId,
+            deviceId,
+            errorMessage:
+              error instanceof Error
+                ? error.message
+                : "Unknown media analysis error",
+          });
+        } catch (databaseError) {
+          req.log.error(
+            { err: databaseError, analysisId },
+            "Failed to mark media analysis job as failed",
+          );
+        }
+      }
+
+      req.log.warn(
+        { err: error, analysisId },
+        "Video forensics analysis failed",
+      );
+
+      return reply.code(503).send({
+        error: "forensics_unavailable",
+        analysisId,
+      });
+    }
+  },
+);
+
+app.get("/video-analysis/:analysisId", async (req, reply) => {
+  const deviceId = req.headers["x-device-id"];
+
+  if (typeof deviceId !== "string" || deviceId.length === 0) {
+    return reply.code(400).send({
+      error: "missing_device_id",
+    });
+  }
+
+  const paramsSchema = z.object({
+    analysisId: z.string().uuid(),
+  });
+
+  const parsedParams = paramsSchema.safeParse(req.params);
+
+  if (!parsedParams.success) {
+    return reply.code(400).send({
+      error: "invalid_analysis_id",
+    });
+  }
+
+  const job = await getMediaAnalysisJob(
+    pool,
+    parsedParams.data.analysisId,
+    deviceId,
+  );
+
+  if (!job) {
+    return reply.code(404).send({
+      error: "analysis_not_found",
+    });
+  }
+
+  if (job.status === "completed") {
+    const storedResult =
+      job.result &&
+      typeof job.result === "object" &&
+      !Array.isArray(job.result)
+        ? (job.result as Record<string, unknown>)
+        : null;
+
+    const hasStructuredResult =
+      storedResult !== null &&
+      "forensics" in storedResult;
+
+    return {
+      analysisId: job.id,
+      status: job.status,
+      result: hasStructuredResult
+        ? storedResult.forensics
+        : job.result,
+      ...(hasStructuredResult &&
+      "transcription" in storedResult
+        ? { transcription: storedResult.transcription }
+        : {}),
+      ...(hasStructuredResult &&
+      "analysis" in storedResult
+        ? { analysis: storedResult.analysis }
+        : {}),
+      createdAt: job.createdAt,
+      updatedAt: job.updatedAt,
+      completedAt: job.completedAt,
+    };
+  }
+
+  if (job.status === "failed") {
+    return {
+      analysisId: job.id,
+      status: job.status,
+      error: "media_analysis_failed",
+      createdAt: job.createdAt,
+      updatedAt: job.updatedAt,
+      completedAt: job.completedAt,
+    };
+  }
+
+  return {
+    analysisId: job.id,
+    status: job.status,
+    createdAt: job.createdAt,
+    updatedAt: job.updatedAt,
+  };
+});
+
 app.post("/media-analysis", async (req, reply) => {
   const deviceId = req.headers["x-device-id"];
 
@@ -969,4 +1542,8 @@ app.setErrorHandler((err, _req, reply) => {
   reply.code(status).send({ error: "server_error" });
 });
 
-await app.listen({ port: env.PORT, host: "0.0.0.0" });
+export { app };
+
+if (process.env.NODE_ENV !== "test") {
+  await app.listen({ port: env.PORT, host: "0.0.0.0" });
+}

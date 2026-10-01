@@ -288,3 +288,132 @@ class MediaAnalysisResult {
     );
   }
 }
+
+class VideoAnalysisResult {
+  VideoAnalysisResult({
+    required this.analysisId,
+    required this.status,
+    required this.forensics,
+    required this.analysis,
+  });
+
+  final String analysisId;
+  final String status;
+  final MediaForensicsEvidence? forensics;
+  final VideoSemanticAnalysis? analysis;
+
+  bool get isCompleted => status == 'completed';
+  bool get isProcessing => status == 'processing';
+  bool get isFailed => status == 'failed';
+
+  factory VideoAnalysisResult.fromJson(Map<String, dynamic> json) {
+    final rawForensics = json['forensics'] ?? json['result'];
+    final rawAnalysis = json['analysis'];
+
+    return VideoAnalysisResult(
+      analysisId: json['analysisId'] as String? ?? '',
+      status: json['status'] as String? ?? '',
+      forensics: rawForensics is Map<String, dynamic>
+          ? MediaForensicsEvidence.fromJson(rawForensics)
+          : null,
+      analysis: rawAnalysis is Map<String, dynamic>
+          ? VideoSemanticAnalysis.fromJson(rawAnalysis)
+          : null,
+    );
+  }
+}
+
+class VideoSemanticAnalysis {
+  VideoSemanticAnalysis({
+    required this.riskScore,
+    required this.category,
+    required this.threatType,
+    required this.reasons,
+    required this.explanation,
+  });
+
+  final int riskScore;
+  final String category;
+  final String threatType;
+  final List<String> reasons;
+  final String explanation;
+
+  factory VideoSemanticAnalysis.fromJson(Map<String, dynamic> json) {
+    return VideoSemanticAnalysis(
+      riskScore: (json['riskScore'] as num?)?.toInt() ?? 0,
+      category: json['category'] as String? ?? 'low_risk',
+      threatType: json['threatType'] as String? ?? 'none',
+      reasons: (json['reasons'] as List<dynamic>? ?? const [])
+          .whereType<String>()
+          .toList(),
+      explanation: json['explanation'] as String? ?? '',
+    );
+  }
+}
+
+class MediaForensicsEvidence {
+  MediaForensicsEvidence({
+    required this.provider,
+    required this.aiGeneratedDetected,
+    required this.deepfakeDetected,
+    required this.maxAiGeneratedScore,
+    required this.maxDeepfakeScore,
+    required this.maxAiGeneratedAudioScore,
+    required this.topGenerator,
+    required this.suspiciousTimestamps,
+  });
+
+  final String provider;
+  final bool aiGeneratedDetected;
+  final bool deepfakeDetected;
+  final double? maxAiGeneratedScore;
+  final double? maxDeepfakeScore;
+  final double? maxAiGeneratedAudioScore;
+  final MediaForensicsTopGenerator? topGenerator;
+  final List<double> suspiciousTimestamps;
+
+  factory MediaForensicsEvidence.fromJson(Map<String, dynamic> json) {
+    final rawTopGenerator = json['topGenerator'];
+
+    return MediaForensicsEvidence(
+      provider: json['provider'] as String? ?? '',
+      aiGeneratedDetected:
+          json['aiGeneratedDetected'] as bool? ?? false,
+      deepfakeDetected:
+          json['deepfakeDetected'] as bool? ?? false,
+      maxAiGeneratedScore:
+          (json['maxAiGeneratedScore'] as num?)?.toDouble(),
+      maxDeepfakeScore:
+          (json['maxDeepfakeScore'] as num?)?.toDouble(),
+      maxAiGeneratedAudioScore:
+          (json['maxAiGeneratedAudioScore'] as num?)?.toDouble(),
+      topGenerator: rawTopGenerator is Map<String, dynamic>
+          ? MediaForensicsTopGenerator.fromJson(rawTopGenerator)
+          : null,
+      suspiciousTimestamps:
+          (json['suspiciousTimestamps'] as List<dynamic>? ?? const [])
+              .whereType<num>()
+              .map((value) => value.toDouble())
+              .toList(),
+    );
+  }
+}
+
+class MediaForensicsTopGenerator {
+  MediaForensicsTopGenerator({
+    required this.name,
+    required this.score,
+  });
+
+  final String name;
+  final double score;
+
+  factory MediaForensicsTopGenerator.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return MediaForensicsTopGenerator(
+      name: json['name'] as String? ?? '',
+      score: (json['score'] as num?)?.toDouble() ?? 0,
+    );
+  }
+}

@@ -53,10 +53,12 @@ class _ScanPageState extends State<ScanPage> {
   String? _deviceId;
   bool _loading = false;
   bool _imageScanLoading = false;
+  bool _videoScanLoading = false;
   bool _isPremium = false;
   bool _hasInput = false;
   ScanResult? _lastResult;
   MediaAnalysisResult? _mediaAnalysisResult;
+  VideoAnalysisResult? _videoAnalysisResult;
   ScanResult? _restoredLastResult;
   String? _lastScannedInput;
   String? _lastScannedFingerprint;
@@ -71,7 +73,7 @@ class _ScanPageState extends State<ScanPage> {
   late ScanService _scanService;
   late PremiumService _premiumService;
 
-  bool get _isBusy => _loading || _imageScanLoading;
+  bool get _isBusy => _loading || _imageScanLoading || _videoScanLoading;
 
   bool get _isWeeklyScanLimitReached {
     if (_isPremium) return false;
@@ -258,9 +260,8 @@ class _ScanPageState extends State<ScanPage> {
         return;
       }
 
-      if (call.method == 'onSharedImage') {
-        final sharedImagePath = call.arguments as String?;
-        await _applySharedImageAndScan(sharedImagePath);
+      if (call.method == 'onSharedMedia') {
+        await _applySharedMediaAndScan(call.arguments);
       }
     });
 
@@ -270,15 +271,57 @@ class _ScanPageState extends State<ScanPage> {
 
     await _applySharedTextAndScan(initialSharedText);
 
-    final initialSharedImagePath =
-        await _shareIntentChannel.invokeMethod<String>(
-      'getInitialSharedImagePath',
+    final initialSharedMedia =
+        await _shareIntentChannel.invokeMapMethod<String, dynamic>(
+      'getInitialSharedMedia',
     );
 
-    await _applySharedImageAndScan(initialSharedImagePath);
+    await _applySharedMediaAndScan(initialSharedMedia);
 
     await _shareIntentChannel.invokeMethod<void>('clearInitialSharedText');
-    await _shareIntentChannel.invokeMethod<void>('clearInitialSharedImagePath');
+    await _shareIntentChannel.invokeMethod<void>('clearInitialSharedMedia');
+  }
+
+  Future<void> _applySharedMediaAndScan(Object? sharedMedia) async {
+    if (sharedMedia is! Map) {
+      return;
+    }
+
+    final path = sharedMedia['path'];
+    final mimeType = sharedMedia['mimeType'];
+
+    if (path is! String || mimeType is! String) {
+      return;
+    }
+
+    final normalizedMimeType = mimeType.trim().toLowerCase();
+
+    if (normalizedMimeType.startsWith('image/')) {
+      await _applySharedImageAndScan(path);
+      return;
+    }
+
+    if (normalizedMimeType.startsWith('video/')) {
+      final supportedMimeType = _videoMimeType(
+        path: path,
+        reportedMimeType: normalizedMimeType,
+      );
+
+      if (supportedMimeType == null) {
+        if (!mounted) return;
+
+        setState(() {
+          _errorKey = 'errors.videoScanFailed';
+          _errorMessage = null;
+        });
+        return;
+      }
+
+      await _applyVideoAndScan(
+        videoPath: path,
+        mimeType: supportedMimeType,
+      );
+    }
   }
 
   Future<void> _applySharedTextAndScan(String? sharedText) async {
@@ -330,6 +373,8 @@ class _ScanPageState extends State<ScanPage> {
     setState(() {
       _hasInput = false;
       _lastResult = null;
+      _mediaAnalysisResult = null;
+      _videoAnalysisResult = null;
       _errorKey = null;
       _errorMessage = null;
       _noticeKey = null;
@@ -344,6 +389,8 @@ class _ScanPageState extends State<ScanPage> {
     setState(() {
       _hasInput = false;
       _lastResult = null;
+      _mediaAnalysisResult = null;
+      _videoAnalysisResult = null;
       _errorKey = null;
       _errorMessage = null;
       _noticeKey = null;
@@ -375,6 +422,182 @@ class _ScanPageState extends State<ScanPage> {
     } catch (_) {
       // Keep silent for MVP.
     }
+  }
+
+  Future<void> _chooseMediaToAnalyze() async {
+    if (_isBusy || _isWeeklyScanLimitReached) {
+      return;
+    }
+
+    final t = AppLocalizations.of(context);
+
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                title: Text(
+                  t.t('scan.media.choose'),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.image_outlined),
+                title: Text(t.t('scan.media.image')),
+                onTap: () => Navigator.of(context).pop('image'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.video_library_outlined),
+                title: Text(t.t('scan.media.video')),
+                onTap: () => Navigator.of(context).pop('video'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (!mounted || selected == null) {
+      return;
+    }
+
+    if (selected == 'image') {
+      await _analyzeImage();
+      return;
+    }
+
+    if (selected == 'video') {
+      await _analyzeVideo();
+    }
+  }
+
+  Future<void> _analyzeVideo() async {
+    if (_isBusy) return;
+    if (_isWeeklyScanLimitReached) return;
+
+    final video = await _imagePicker.pickVideo(
+      source: ImageSource.gallery,
+    );
+
+    if (video == null) {
+      return;
+    }
+
+    final mimeType = _videoMimeType(
+      path: video.path,
+      reportedMimeType: video.mimeType,
+    );
+
+    if (mimeType == null) {
+      if (!mounted) return;
+
+      setState(() {
+        _errorKey = 'errors.videoScanFailed';
+        _errorMessage = null;
+      });
+      return;
+    }
+
+    await _applyVideoAndScan(
+      videoPath: video.path,
+      mimeType: mimeType,
+    );
+  }
+
+  Future<void> _applyVideoAndScan({
+    required String videoPath,
+    required String mimeType,
+  }) async {
+    final path = videoPath.trim();
+    if (path.isEmpty) {
+      return;
+    }
+
+    HomePage.globalKey.currentState?.openScanTab();
+
+    await _bootstrapFuture;
+    if (!mounted) return;
+
+    if (_isBusy) return;
+    if (_isWeeklyScanLimitReached) return;
+
+    setState(() {
+      _videoScanLoading = true;
+      _lastResult = null;
+      _mediaAnalysisResult = null;
+      _videoAnalysisResult = null;
+      _errorKey = null;
+      _errorMessage = null;
+      _noticeKey = null;
+    });
+
+    try {
+      final result = await _scanService.analyzeVideo(
+        filePath: path,
+        mimeType: mimeType,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _lastResult = null;
+        _mediaAnalysisResult = null;
+        _videoAnalysisResult = result;
+        _errorKey = null;
+        _errorMessage = null;
+        _noticeKey = null;
+      });
+
+      await _refreshAiQuota();
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _lastResult = null;
+        _mediaAnalysisResult = null;
+        _videoAnalysisResult = null;
+        _errorKey = kDebugMode ? null : 'errors.videoScanFailed';
+        _errorMessage = kDebugMode ? e.toString() : null;
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _videoScanLoading = false;
+        });
+      }
+    }
+  }
+
+  String? _videoMimeType({
+    required String path,
+    String? reportedMimeType,
+  }) {
+    final reported = reportedMimeType?.trim().toLowerCase();
+
+    if (reported == 'video/mp4' ||
+        reported == 'video/webm' ||
+        reported == 'video/m4v' ||
+        reported == 'video/x-m4v') {
+      return reported;
+    }
+
+    final lowerPath = path.toLowerCase();
+
+    if (lowerPath.endsWith('.mp4')) {
+      return 'video/mp4';
+    }
+
+    if (lowerPath.endsWith('.webm')) {
+      return 'video/webm';
+    }
+
+    if (lowerPath.endsWith('.m4v')) {
+      return 'video/x-m4v';
+    }
+
+    return null;
   }
 
   Future<void> _analyzeImage() async {
@@ -412,6 +635,7 @@ class _ScanPageState extends State<ScanPage> {
       _imageScanLoading = true;
       _lastResult = null;
       _mediaAnalysisResult = null;
+      _videoAnalysisResult = null;
       _errorKey = null;
       _errorMessage = null;
       _noticeKey = null;
@@ -499,6 +723,8 @@ class _ScanPageState extends State<ScanPage> {
 
     setState(() {
       _loading = true;
+      _mediaAnalysisResult = null;
+      _videoAnalysisResult = null;
       _errorKey = null;
       _errorMessage = null;
       _noticeKey = null;
@@ -734,19 +960,22 @@ class _ScanPageState extends State<ScanPage> {
             ),
             const SizedBox(height: 12),
             OutlinedButton.icon(
-              onPressed:
-                  (_isBusy || _isWeeklyScanLimitReached) ? null : _analyzeImage,
-              icon: _imageScanLoading
+              onPressed: (_isBusy || _isWeeklyScanLimitReached)
+                  ? null
+                  : _chooseMediaToAnalyze,
+              icon: (_imageScanLoading || _videoScanLoading)
                   ? const SizedBox(
                       height: 18,
                       width: 18,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Icon(Icons.image_search),
+                  : const Icon(Icons.perm_media_outlined),
               label: Text(
                 _imageScanLoading
                     ? t.t('scan.image.extracting')
-                    : t.t('scan.image.button'),
+                    : _videoScanLoading
+                        ? t.t('scan.video.analyzing')
+                        : t.t('scan.media.button'),
               ),
             ),
             const SizedBox(height: 12),
@@ -827,6 +1056,8 @@ class _ScanPageState extends State<ScanPage> {
                 ),
               ),
             const SizedBox(height: 6),
+            if (_videoAnalysisResult != null)
+              _VideoAnalysisCard(result: _videoAnalysisResult!),
             if (_mediaAnalysisResult != null)
               _MediaAnalysisCard(result: _mediaAnalysisResult!),
             if (_lastResult != null) _ResultCard(result: _lastResult!),
@@ -834,6 +1065,298 @@ class _ScanPageState extends State<ScanPage> {
         ),
       ),
     );
+  }
+}
+
+class _VideoAnalysisCard extends StatelessWidget {
+  const _VideoAnalysisCard({required this.result});
+
+  final VideoAnalysisResult result;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final evidence = result.forensics;
+    final analysis = result.analysis;
+
+    return Card(
+      margin: const EdgeInsetsDirectional.only(top: 0, bottom: 12),
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(16, 14, 16, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              t.t('videoAnalysis.title'),
+              style: Theme.of(context).textTheme.titleLarge,
+              textAlign: TextAlign.start,
+            ),
+            if (result.isProcessing) ...[
+              const SizedBox(height: 14),
+              const LinearProgressIndicator(),
+              const SizedBox(height: 10),
+              Text(
+                t.t('videoAnalysis.processing'),
+                textAlign: TextAlign.start,
+              ),
+            ] else ...[
+              if (analysis != null) ...[
+                const SizedBox(height: 14),
+                Text(
+                  t.t('mediaAnalysis.fraud.title'),
+                  style: Theme.of(context).textTheme.titleMedium,
+                  textAlign: TextAlign.start,
+                ),
+                const SizedBox(height: 8),
+                _riskRow(
+                  context,
+                  t.t('result.riskScore'),
+                  '${analysis.riskScore}/100',
+                  analysis.category,
+                ),
+                const SizedBox(height: 6),
+                _riskRow(
+                  context,
+                  t.t('result.category'),
+                  t.t('categories.${analysis.category}'),
+                  analysis.category,
+                ),
+                const SizedBox(height: 6),
+                _riskRow(
+                  context,
+                  t.t('result.threatType'),
+                  t.t('threatTypes.${analysis.threatType}'),
+                  analysis.category,
+                ),
+                if (analysis.reasons.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    t.t('result.reasons'),
+                    style: Theme.of(context).textTheme.labelLarge,
+                    textAlign: TextAlign.start,
+                  ),
+                  const SizedBox(height: 4),
+                  ...analysis.reasons.map(_bullet),
+                ],
+                if (analysis.explanation.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  Text(
+                    t.t('mediaAnalysis.explanation'),
+                    style: Theme.of(context).textTheme.labelLarge,
+                    textAlign: TextAlign.start,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    analysis.explanation,
+                    textAlign: TextAlign.start,
+                  ),
+                ],
+              ],
+              if (analysis != null && evidence != null) ...[
+                const SizedBox(height: 16),
+                const Divider(),
+                const SizedBox(height: 12),
+              ],
+              if (evidence != null) ...[
+                _detectionRow(
+                  context,
+                  label: t.t('videoAnalysis.aiGenerated'),
+                  detected: evidence.aiGeneratedDetected,
+                ),
+                if (evidence.maxAiGeneratedScore != null) ...[
+                  const SizedBox(height: 6),
+                  _valueRow(
+                    context,
+                    t.t('videoAnalysis.maxScore'),
+                    _formatScore(evidence.maxAiGeneratedScore!),
+                  ),
+                ],
+                const SizedBox(height: 14),
+                const Divider(),
+                const SizedBox(height: 12),
+                _detectionRow(
+                  context,
+                  label: t.t('videoAnalysis.deepfake'),
+                  detected: evidence.deepfakeDetected,
+                ),
+                if (evidence.maxDeepfakeScore != null) ...[
+                  const SizedBox(height: 6),
+                  _valueRow(
+                    context,
+                    t.t('videoAnalysis.maxScore'),
+                    _formatScore(evidence.maxDeepfakeScore!),
+                  ),
+                ],
+                if (evidence.topGenerator != null) ...[
+                  const SizedBox(height: 14),
+                  _valueRow(
+                    context,
+                    t.t('videoAnalysis.topGenerator'),
+                    '${evidence.topGenerator!.name} '
+                    '(${_formatScore(evidence.topGenerator!.score)})',
+                  ),
+                ],
+                if (evidence.suspiciousTimestamps.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  Text(
+                    t.t('videoAnalysis.suspiciousMoments'),
+                    style: Theme.of(context).textTheme.labelLarge,
+                    textAlign: TextAlign.start,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    evidence.suspiciousTimestamps
+                        .map(_formatTimestamp)
+                        .join(', '),
+                    textAlign: TextAlign.start,
+                  ),
+                ],
+              ],
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _riskRow(
+    BuildContext context,
+    String label,
+    String value,
+    String category,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final Color color = switch (category) {
+      'low_risk' => Colors.green.shade700,
+      'medium_risk' => Colors.amber.shade800,
+      'high_risk' => colorScheme.error,
+      _ => Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black,
+    };
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                ),
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _bullet(String text) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• '),
+          Expanded(
+            child: Text(
+              text,
+              textAlign: TextAlign.start,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _detectionRow(
+    BuildContext context, {
+    required String label,
+    required bool detected,
+  }) {
+    final t = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final backgroundColor =
+        detected ? colorScheme.error : Colors.green.shade700;
+    final foregroundColor =
+        detected ? colorScheme.onError : Colors.white;
+
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Container(
+          padding: const EdgeInsetsDirectional.fromSTEB(10, 4, 10, 4),
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            detected
+                ? t.t('videoAnalysis.detected')
+                : t.t('videoAnalysis.notDetected'),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: foregroundColor,
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _valueRow(
+    BuildContext context,
+    String label,
+    String value,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatScore(double score) {
+    return '${(score * 100).toStringAsFixed(1)}%';
+  }
+
+  String _formatTimestamp(double seconds) {
+    final wholeSeconds = seconds.floor();
+    final minutes = wholeSeconds ~/ 60;
+    final remainingSeconds = wholeSeconds % 60;
+
+    return '${minutes.toString().padLeft(2, '0')}:'
+        '${remainingSeconds.toString().padLeft(2, '0')}';
   }
 }
 

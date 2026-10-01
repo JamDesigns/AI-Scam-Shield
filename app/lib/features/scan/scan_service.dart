@@ -48,6 +48,33 @@ class ScanService {
     return MediaAnalysisResult.fromJson(json);
   }
 
+  Future<VideoAnalysisResult> analyzeVideo({
+    required String filePath,
+    required String mimeType,
+  }) async {
+    final json = await _api.postMultipartFile(
+      path: '/video-analysis',
+      fieldName: 'media',
+      filePath: filePath,
+      mimeType: mimeType,
+      fields: {
+        'outputLanguage': _api.localeLanguageCode,
+      },
+    );
+
+    return VideoAnalysisResult.fromJson(json);
+  }
+
+  Future<VideoAnalysisResult> fetchVideoAnalysis(
+    String analysisId,
+  ) async {
+    final json = await _api.getJson(
+      '/video-analysis/${Uri.encodeComponent(analysisId)}',
+    );
+
+    return VideoAnalysisResult.fromJson(json);
+  }
+
   Future<AiQuotaStatus> fetchAiQuotaWeek() async {
     final json = await _api.getJson('/usage/week');
     return AiQuotaStatus.fromJson(json);

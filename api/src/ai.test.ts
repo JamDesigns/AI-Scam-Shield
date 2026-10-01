@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   analyzeImageAuthenticityWithAI,
   analyzeMediaWithAI,
+  analyzeVideoWithAI,
   analyzeWithAI,
 } from "./ai.js";
 import type {
@@ -866,5 +867,187 @@ describe("analyzeMediaWithAI", () => {
       disclaimer:
         "This is an automated estimate and cannot prove authenticity or fraudulent intent with certainty.",
     });
+  });
+});
+
+describe("analyzeVideoWithAI", () => {
+  it("analyzes transcript, sampled frames and forensic evidence together", async () => {
+    const provider = new TestAiProvider([{
+      riskScore: 82,
+      category: "high_risk",
+      threatType: "bank_phishing",
+      reasons: [
+        "Requests banking credentials",
+        "Uses urgent account-blocking language",
+      ],
+      explanation:
+        "The video uses urgent banking impersonation to request sensitive account information.",
+    }]);
+
+    const result = await analyzeVideoWithAI({
+      provider,
+      transcript:
+        "Your bank account will be blocked. Send your password now.",
+      frames: [
+        {
+          timestampSeconds: 1,
+          dataBase64: "frame-one-base64",
+          mimeType: "image/jpeg",
+        },
+        {
+          timestampSeconds: 3,
+          dataBase64: "frame-two-base64",
+          mimeType: "image/jpeg",
+        },
+      ],
+      forensics: {
+        aiGeneratedDetected: true,
+        deepfakeDetected: false,
+        maxAiGeneratedScore: 0.96,
+        maxDeepfakeScore: 0.12,
+        maxAiGeneratedAudioScore: null,
+        suspiciousTimestamps: [1],
+      },
+      outputLanguage: "en",
+    });
+
+    expect(result).toEqual({
+      riskScore: 82,
+      category: "high_risk",
+      threatType: "bank_phishing",
+      reasons: [
+        "Requests banking credentials",
+        "Uses urgent account-blocking language",
+      ],
+      explanation:
+        "The video uses urgent banking impersonation to request sensitive account information.",
+    });
+
+    expect(provider.requests).toHaveLength(1);
+
+    const request = provider.requests[0];
+
+    expect(request.mode).toBe("conversation");
+    expect(request.temperature).toBe(0.1);
+
+    expect(request.system).toContain(
+      "All user-facing text in reasons and explanation MUST be written exclusively in",
+    );
+    expect(request.system).toContain(
+      "When referring to the overall supplied media, always call it a video, never an image, photo, picture, or frame.",
+    );
+    expect(request.system).toContain(
+      "If the supplied transcript contains recognizable speech, do not state or imply that the video has no audio, no speech, or an absence of audio.",
+    );
+    expect(request.system).toContain(
+      "If the transcript is empty, you may only state that no recognizable speech was transcribed; do not conclude that the video contains no audio.",
+    );
+
+    expect(request.media).toEqual([
+      {
+        dataBase64: "frame-one-base64",
+        mimeType: "image/jpeg",
+        filename: "video-frame-1.jpg",
+      },
+      {
+        dataBase64: "frame-two-base64",
+        mimeType: "image/jpeg",
+        filename: "video-frame-2.jpg",
+      },
+    ]);
+
+    expect(request.prompt).toContain(
+      "Your bank account will be blocked. Send your password now.",
+    );
+    expect(request.prompt).toContain("Frame 1: 1s");
+    expect(request.prompt).toContain("Frame 2: 3s");
+    expect(request.prompt).toContain("AI-generated detected: true");
+    expect(request.prompt).toContain("Deepfake detected: false");
+    expect(request.prompt).toContain(
+      "Maximum AI-generated score: 0.96",
+    );
+    expect(request.prompt).toContain(
+      "Suspicious timestamps: 1s",
+    );
+
+    expect(request.schema.required).toEqual([
+      "riskScore",
+      "category",
+      "threatType",
+      "reasons",
+      "explanation",
+    ]);
+  });
+
+  it("normalizes missing spaces between video explanation sentences", async () => {
+    const provider = new TestAiProvider([{
+      riskScore: 10,
+      category: "low_risk",
+      threatType: "none",
+      reasons: ["No scam indicators"],
+      explanation:
+        "No se detectan señales de estafa.Se recomienda mantener precaución.",
+    }]);
+
+    const result = await analyzeVideoWithAI({
+      provider,
+      transcript: "Vídeo de prueba.",
+      frames: [],
+      forensics: {
+        aiGeneratedDetected: false,
+        deepfakeDetected: false,
+        maxAiGeneratedScore: null,
+        maxDeepfakeScore: null,
+        maxAiGeneratedAudioScore: null,
+        suspiciousTimestamps: [],
+      },
+      outputLanguage: "es",
+    });
+
+    expect(result.explanation).toBe(
+      "No se detectan señales de estafa. Se recomienda mantener precaución.",
+    );
+  });
+
+  it("normalizes invalid video AI response values safely", async () => {
+    const provider = new TestAiProvider([{
+      riskScore: 999,
+      category: "critical",
+      threatType: "unexpected",
+      reasons: ["  ", "Suspicious request"],
+      explanation: "",
+    }]);
+
+    const result = await analyzeVideoWithAI({
+      provider,
+      transcript: "",
+      frames: [],
+      forensics: {
+        aiGeneratedDetected: false,
+        deepfakeDetected: false,
+        maxAiGeneratedScore: null,
+        maxDeepfakeScore: null,
+        maxAiGeneratedAudioScore: null,
+        suspiciousTimestamps: [],
+      },
+      outputLanguage: "es",
+    });
+
+    expect(result).toEqual({
+      riskScore: 100,
+      category: "low_risk",
+      threatType: "none",
+      reasons: ["Suspicious request"],
+      explanation: "No explanation provided.",
+    });
+
+    expect(provider.requests).toHaveLength(1);
+    expect(provider.requests[0].media).toEqual([]);
+    expect(provider.requests[0].prompt).toContain(
+      "(no recognizable speech)",
+    );
+    expect(provider.requests[0].prompt).toContain(
+      "Suspicious timestamps: none",
+    );
   });
 });
