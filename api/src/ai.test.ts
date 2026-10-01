@@ -936,6 +936,12 @@ describe("analyzeVideoWithAI", () => {
     expect(request.system).toContain(
       "When referring to the overall supplied media, always call it a video, never an image, photo, picture, or frame.",
     );
+    expect(request.system).toContain(
+      "If the supplied transcript contains recognizable speech, do not state or imply that the video has no audio, no speech, or an absence of audio.",
+    );
+    expect(request.system).toContain(
+      "If the transcript is empty, you may only state that no recognizable speech was transcribed; do not conclude that the video contains no audio.",
+    );
 
     expect(request.media).toEqual([
       {

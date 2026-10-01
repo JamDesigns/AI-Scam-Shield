@@ -1156,6 +1156,8 @@ export async function analyzeVideoWithAI(
     "Only increase fraud risk from synthetic or manipulated media when it meaningfully supports impersonation, deception, misleading claims, or another scam pattern.",
     "Do not claim that a person, organization, brand, institution, or public figure is present unless that identity is clearly supported by visible or spoken evidence.",
     "Do not invent dialogue, text, actions, URLs, payment requests, identities, or events that are not observable in the supplied evidence.",
+    "If the supplied transcript contains recognizable speech, do not state or imply that the video has no audio, no speech, or an absence of audio.",
+    "If the transcript is empty, you may only state that no recognizable speech was transcribed; do not conclude that the video contains no audio.",
     "If evidence is insufficient, reflect that uncertainty in the risk score and category.",
     "Return ONLY valid JSON matching the required schema.",
     "Do not include markdown or extra commentary.",
