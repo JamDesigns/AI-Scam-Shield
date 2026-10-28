@@ -274,6 +274,56 @@ async function translateMediaAnalysis(params: {
   };
 }
 
+async function translateVideoAnalysis(params: {
+  analysis: AiAnalysis;
+  outputLanguage: string;
+  authKey?: string;
+  apiBase: string;
+}): Promise<AiAnalysis> {
+  const targetLang = getDeepLTargetLanguage(params.outputLanguage);
+
+  if (!targetLang || !params.authKey || params.authKey.trim().length === 0) {
+    return params.analysis;
+  }
+
+  const [reasonsTranslation, explanationTranslation] =
+    await Promise.all([
+      params.analysis.reasons.length > 0
+        ? translateWithDeepL({
+            text: params.analysis.reasons.join("\n"),
+            authKey: params.authKey,
+            apiBase: params.apiBase,
+            targetLang,
+          })
+        : Promise.resolve({ text: "" }),
+
+      params.analysis.explanation.trim().length > 0
+        ? translateWithDeepL({
+            text: params.analysis.explanation,
+            authKey: params.authKey,
+            apiBase: params.apiBase,
+            targetLang,
+          })
+        : Promise.resolve({ text: "" }),
+    ]);
+
+  const translatedReasons = reasonsTranslation.text
+    .split("\n")
+    .map((reason) => reason.trim())
+    .filter((reason) => reason.length > 0);
+
+  return {
+    ...params.analysis,
+    reasons:
+      translatedReasons.length > 0
+        ? translatedReasons
+        : params.analysis.reasons,
+    explanation:
+      explanationTranslation.text.trim() ||
+      params.analysis.explanation,
+  };
+}
+
 const SCAN_RATE_LIMIT_WINDOW_MS = 3000;
 const lastScanAtByDevice = new Map<string, number>();
 
@@ -1065,6 +1115,20 @@ app.post(
           forensics: evidence,
           outputLanguage: outputLanguageResult.data,
         });
+
+        try {
+          analysis = await translateVideoAnalysis({
+            analysis,
+            outputLanguage: outputLanguageResult.data,
+            authKey: env.DEEPL_AUTH_KEY,
+            apiBase: env.DEEPL_API_BASE,
+          });
+        } catch (error) {
+          req.log.warn(
+            { err: error, analysisId },
+            "DeepL video analysis response translation failed",
+          );
+        }
       } catch (error) {
         await failMediaAnalysisJob(pool, {
           id: analysisId,

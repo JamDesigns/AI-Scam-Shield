@@ -1154,6 +1154,10 @@ export async function analyzeVideoWithAI(
     "The sampled images are ordered chronologically and correspond to the timestamps listed in the prompt.",
     "AI-generated or deepfake evidence describes media authenticity. It is not by itself proof of fraudulent intent.",
     "Only increase fraud risk from synthetic or manipulated media when it meaningfully supports impersonation, deception, misleading claims, or another scam pattern.",
+    "Before assigning risk, determine whether the video is itself trying to deceive the viewer or is instead describing, reporting, reenacting, warning about, or educating about a scam.",
+    "Educational, awareness, news, documentary, or anti-scam content that quotes or reenacts scam language is not itself fraudulent unless the video also contains a real deceptive solicitation or manipulation directed at the viewer.",
+    "Do not raise risk merely because a video mentions money, urgency, impersonation, credentials, or other scam tactics when those elements are presented as examples or warnings.",
+    "Threat type must describe the threat posed by the video itself, not merely the scam scenario being discussed or reenacted.",
     "Do not claim that a person, organization, brand, institution, or public figure is present unless that identity is clearly supported by visible or spoken evidence.",
     "Do not invent dialogue, text, actions, URLs, payment requests, identities, or events that are not observable in the supplied evidence.",
     "If the supplied transcript contains recognizable speech, do not state or imply that the video has no audio, no speech, or an absence of audio.",
@@ -1202,10 +1206,11 @@ export async function analyzeVideoWithAI(
     "Analyze this video for scam risk.",
     "",
     "Return a JSON object with this exact schema:",
-    '{ "riskScore": number(0..100), "category": "low_risk"|"medium_risk"|"high_risk", "threatType": "bank_phishing"|"malware"|"investment_scam"|"fake_support"|"account_takeover"|"delivery_scam"|"crypto_scam"|"unknown_suspicious"|"none", "reasons": string[], "explanation": string }',
+    '{ "riskScore": number(0..100), "category": "low_risk"|"medium_risk"|"high_risk", "threatType": "bank_phishing"|"malware"|"investment_scam"|"fake_support"|"account_takeover"|"delivery_scam"|"crypto_scam"|"unknown_suspicious"|"none", "contentContext": "direct_scam_attempt"|"educational_or_reporting"|"uncertain", "deceptiveSolicitation": boolean, "financialInstitutionImpersonation": boolean, "reasons": string[], "explanation": string }',
     "",
     "Threat type definitions:",
     "- bank_phishing: impersonates a bank, payment provider, or financial institution to steal credentials or payment details.",
+    "- A request for money alone is not bank_phishing; bank, payment-provider, or financial-institution impersonation must be present.",
     "- malware: tries to make the user download, install, open, or execute a suspicious file, app, attachment, or update.",
     "- investment_scam: promises unrealistic profits, trading returns, passive income, or fake investment opportunities.",
     "- fake_support: impersonates customer support, technical support, or a service agent to manipulate the user.",
@@ -1219,8 +1224,13 @@ export async function analyzeVideoWithAI(
     "- riskScore must reflect the overall scam or fraud risk supported by the supplied evidence.",
     "- category must align with riskScore (>=70 high_risk, >=35 medium_risk).",
     "- threatType must not be none when category is medium_risk or high_risk.",
+    "- contentContext must classify the purpose of the video itself: direct_scam_attempt when the video is actually trying to deceive the viewer, educational_or_reporting when it warns about, reports on, documents, or reenacts a scam for awareness, otherwise uncertain.",
+    "- deceptiveSolicitation must be true only when the video itself contains a real deceptive request or manipulation directed at the viewer; quoted, reported, or reenacted scam dialogue alone must be false.",
+    "- financialInstitutionImpersonation must be true only when the deceptive actor actually impersonates a bank, payment provider, or financial institution.",
     "- Synthetic or deepfake evidence alone must not cause medium_risk or high_risk.",
+    "- If the video clearly warns about, reports on, reenacts, or explains a scam and contains no separate deceptive solicitation or malicious action directed at the viewer, keep the overall risk low and use threatType none.",
     "- reasons must describe concrete observable scam indicators.",
+    "- Every string in reasons must use the requested output language; translate or paraphrase source-language evidence instead of returning reasons in another language.",
     "- explanation must include practical guidance for the user.",
     "",
     "Spoken transcript:",
@@ -1269,6 +1279,20 @@ export async function analyzeVideoWithAI(
             "none",
           ],
         },
+        contentContext: {
+          type: "string",
+          enum: [
+            "direct_scam_attempt",
+            "educational_or_reporting",
+            "uncertain",
+          ],
+        },
+        deceptiveSolicitation: {
+          type: "boolean",
+        },
+        financialInstitutionImpersonation: {
+          type: "boolean",
+        },
         reasons: {
           type: "array",
           items: { type: "string" },
@@ -1281,18 +1305,55 @@ export async function analyzeVideoWithAI(
         "riskScore",
         "category",
         "threatType",
+        "contentContext",
+        "deceptiveSolicitation",
+        "financialInstitutionImpersonation",
         "reasons",
         "explanation",
       ],
     },
   });
 
-  const riskScore = clampInt(parsed?.riskScore, 0, 100);
-  const category = normalizeCategory(parsed?.category);
-  const threatType = normalizeThreatType(
+  let riskScore = clampInt(parsed?.riskScore, 0, 100);
+  let category = normalizeCategory(parsed?.category);
+  let threatType = normalizeThreatType(
     parsed?.threatType,
     category,
   );
+
+  const contentContext =
+    parsed?.contentContext === "direct_scam_attempt" ||
+    parsed?.contentContext === "educational_or_reporting"
+      ? parsed.contentContext
+      : "uncertain";
+
+  const hasDeceptiveSolicitationSignal =
+    typeof parsed?.deceptiveSolicitation === "boolean";
+  const deceptiveSolicitation =
+    parsed?.deceptiveSolicitation === true;
+
+  const hasFinancialInstitutionImpersonationSignal =
+    typeof parsed?.financialInstitutionImpersonation === "boolean";
+  const financialInstitutionImpersonation =
+    parsed?.financialInstitutionImpersonation === true;
+
+  if (
+    contentContext === "educational_or_reporting" &&
+    hasDeceptiveSolicitationSignal &&
+    !deceptiveSolicitation
+  ) {
+    riskScore = Math.min(riskScore, 20);
+    category = "low_risk";
+    threatType = "none";
+  } else if (
+    threatType === "bank_phishing" &&
+    hasFinancialInstitutionImpersonationSignal &&
+    !financialInstitutionImpersonation
+  ) {
+    threatType =
+      category === "low_risk" ? "none" : "unknown_suspicious";
+  }
+
   const reasons = normalizeStringList(parsed?.reasons);
 
   const explanation =

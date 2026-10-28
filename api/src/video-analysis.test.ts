@@ -5,12 +5,16 @@ const mocks = vi.hoisted(() => {
   const transcribe = vi.fn();
   const requestJson = vi.fn();
   const extractVideoFrames = vi.fn();
+  const translateWithDeepL = vi.fn(
+    async (params: { text: string }) => ({ text: params.text }),
+  );
 
   return {
     analyze,
     transcribe,
     requestJson,
     extractVideoFrames,
+    translateWithDeepL,
     createPool: vi.fn(() => ({})),
     ensureDevice: vi.fn(async () => undefined),
     getPremiumStatus: vi.fn(async () => true),
@@ -79,6 +83,10 @@ vi.mock("./video/video-frame-extractor.js", () => ({
   extractVideoFrames: mocks.extractVideoFrames,
 }));
 
+vi.mock("./translate.js", () => ({
+  translateWithDeepL: mocks.translateWithDeepL,
+}));
+
 process.env.NODE_ENV = "test";
 process.env.DATABASE_URL =
   "postgres://test:test@localhost:5432/scam_shield_test";
@@ -91,6 +99,8 @@ process.env.FORENSICS_API_KEY = "test-forensics-key";
 process.env.TRANSCRIPTION_PROVIDER = "deepgram";
 process.env.TRANSCRIPTION_MODEL = "nova-3";
 process.env.TRANSCRIPTION_API_KEY = "test-transcription-key";
+process.env.DEEPL_AUTH_KEY = "test-deepl-key";
+process.env.DEEPL_API_BASE = "https://api-free.deepl.com";
 
 const { app } = await import("./index.js");
 
@@ -293,6 +303,67 @@ describe("POST /video-analysis", () => {
     ).not.toHaveBeenCalled();
 
     expect(mocks.failMediaAnalysisJob).not.toHaveBeenCalled();
+  });
+
+  it("translates completed video analysis user-facing text to the requested language", async () => {
+    mocks.requestJson.mockResolvedValueOnce({
+      riskScore: 12,
+      category: "low_risk",
+      threatType: "none",
+      contentContext: "educational_or_reporting",
+      deceptiveSolicitation: false,
+      financialInstitutionImpersonation: false,
+      reasons: ["No clear scam indicators"],
+      explanation: "No clear scam pattern was detected.",
+    });
+
+    mocks.translateWithDeepL
+      .mockResolvedValueOnce({
+        text: "No se detectan señales claras de estafa",
+      })
+      .mockResolvedValueOnce({
+        text: "No se detectó un patrón claro de estafa.",
+      });
+
+    const { boundary, body } = createMultipartVideoPayload();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/video-analysis",
+      headers: {
+        "x-device-id": "video-test-device-translation",
+        "content-type": `multipart/form-data; boundary=${boundary}`,
+        "content-length": String(body.length),
+      },
+      payload: body,
+    });
+
+    expect(response.statusCode).toBe(200);
+
+    expect(response.json().analysis).toEqual({
+      riskScore: 12,
+      category: "low_risk",
+      threatType: "none",
+      reasons: ["No se detectan señales claras de estafa"],
+      explanation: "No se detectó un patrón claro de estafa.",
+    });
+
+    expect(mocks.translateWithDeepL).toHaveBeenCalledTimes(2);
+
+    expect(mocks.completeMediaAnalysisJob).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        result: expect.objectContaining({
+          analysis: {
+            riskScore: 12,
+            category: "low_risk",
+            threatType: "none",
+            reasons: ["No se detectan señales claras de estafa"],
+            explanation: "No se detectó un patrón claro de estafa.",
+          },
+        }),
+      }),
+    );
   });
 
   it("stores and returns completed forensic evidence", async () => {
