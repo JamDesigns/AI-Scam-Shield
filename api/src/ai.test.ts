@@ -876,6 +876,9 @@ describe("analyzeVideoWithAI", () => {
       riskScore: 82,
       category: "high_risk",
       threatType: "bank_phishing",
+      contentContext: "direct_scam_attempt",
+      deceptiveSolicitation: true,
+      financialInstitutionImpersonation: true,
       reasons: [
         "Requests banking credentials",
         "Uses urgent account-blocking language",
@@ -942,6 +945,24 @@ describe("analyzeVideoWithAI", () => {
     expect(request.system).toContain(
       "If the transcript is empty, you may only state that no recognizable speech was transcribed; do not conclude that the video contains no audio.",
     );
+    expect(request.system).toContain(
+      "Before assigning risk, determine whether the video is itself trying to deceive the viewer",
+    );
+    expect(request.system).toContain(
+      "Educational, awareness, news, documentary, or anti-scam content",
+    );
+    expect(request.system).toContain(
+      "Threat type must describe the threat posed by the video itself",
+    );
+    expect(request.prompt).toContain(
+      "A request for money alone is not bank_phishing",
+    );
+    expect(request.prompt).toContain(
+      "If the video clearly warns about, reports on, reenacts, or explains a scam",
+    );
+    expect(request.prompt).toContain(
+      "Every string in reasons must use the requested output language",
+    );
 
     expect(request.media).toEqual([
       {
@@ -974,9 +995,84 @@ describe("analyzeVideoWithAI", () => {
       "riskScore",
       "category",
       "threatType",
+      "contentContext",
+      "deceptiveSolicitation",
+      "financialInstitutionImpersonation",
       "reasons",
       "explanation",
     ]);
+  });
+
+  it("keeps educational scam-awareness content low risk when there is no deceptive solicitation", async () => {
+    const provider = new TestAiProvider([{
+      riskScore: 95,
+      category: "high_risk",
+      threatType: "bank_phishing",
+      contentContext: "educational_or_reporting",
+      deceptiveSolicitation: false,
+      financialInstitutionImpersonation: false,
+      reasons: [
+        "The video reenacts an emergency scam to warn viewers.",
+      ],
+      explanation:
+        "The video explains how an impersonation scam works.",
+    }]);
+
+    const result = await analyzeVideoWithAI({
+      provider,
+      transcript:
+        "This is a warning about scammers pretending to be a family member and asking for bail money.",
+      frames: [],
+      forensics: {
+        aiGeneratedDetected: false,
+        deepfakeDetected: false,
+        maxAiGeneratedScore: 0.07,
+        maxDeepfakeScore: 0,
+        maxAiGeneratedAudioScore: 0,
+        suspiciousTimestamps: [],
+      },
+      outputLanguage: "en",
+    });
+
+    expect(result.riskScore).toBeLessThan(35);
+    expect(result.category).toBe("low_risk");
+    expect(result.threatType).toBe("none");
+  });
+
+  it("does not classify a money request as bank phishing without financial institution impersonation", async () => {
+    const provider = new TestAiProvider([{
+      riskScore: 90,
+      category: "high_risk",
+      threatType: "bank_phishing",
+      contentContext: "direct_scam_attempt",
+      deceptiveSolicitation: true,
+      financialInstitutionImpersonation: false,
+      reasons: [
+        "An impersonator urgently requests money.",
+      ],
+      explanation:
+        "The video presents a direct impersonation scam requesting money.",
+    }]);
+
+    const result = await analyzeVideoWithAI({
+      provider,
+      transcript:
+        "I'm your grandson. I need money for bail right now.",
+      frames: [],
+      forensics: {
+        aiGeneratedDetected: false,
+        deepfakeDetected: false,
+        maxAiGeneratedScore: null,
+        maxDeepfakeScore: null,
+        maxAiGeneratedAudioScore: null,
+        suspiciousTimestamps: [],
+      },
+      outputLanguage: "en",
+    });
+
+    expect(result.riskScore).toBe(90);
+    expect(result.category).toBe("high_risk");
+    expect(result.threatType).toBe("unknown_suspicious");
   });
 
   it("normalizes missing spaces between video explanation sentences", async () => {
