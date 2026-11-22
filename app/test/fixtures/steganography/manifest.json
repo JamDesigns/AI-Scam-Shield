@@ -1,0 +1,112 @@
+[
+  {
+    "id": "01-red-phishing",
+    "file": "STEG-01-red-phishing.png",
+    "text": "Tu banco necesita tu contraseña y el código SMS. https://banco-validar.example",
+    "channels": [
+      0
+    ],
+    "depth": 1,
+    "bitOffset": 0,
+    "expected": "recovered_candidate",
+    "pixelStart": 0,
+    "synthetic": true
+  },
+  {
+    "id": "02-rgb-benign",
+    "file": "STEG-02-rgb-benign.png",
+    "text": "Esta receta secreta lleva tomates frescos y aceite de oliva para toda la familia.",
+    "channels": [
+      0,
+      1,
+      2
+    ],
+    "depth": 1,
+    "bitOffset": 0,
+    "expected": "recovered_candidate",
+    "pixelStart": 0,
+    "synthetic": true
+  },
+  {
+    "id": "03-blue-two-bits",
+    "file": "STEG-03-blue-two-bits.bmp",
+    "text": "Envia tu contraseña y codigo SMS para recuperar tu cuenta bancaria ahora.",
+    "channels": [
+      2
+    ],
+    "depth": 2,
+    "bitOffset": 0,
+    "expected": "recovered_candidate",
+    "pixelStart": 0,
+    "synthetic": true
+  },
+  {
+    "id": "04-offset-url",
+    "file": "STEG-04-offset-url.png",
+    "text": "https://banco-validar.example/recuperar-cuenta",
+    "channels": [
+      0,
+      1,
+      2
+    ],
+    "depth": 1,
+    "bitOffset": 3,
+    "expected": "recovered_candidate",
+    "pixelStart": 0,
+    "synthetic": true
+  },
+  {
+    "id": "05-bgr-multilingual",
+    "file": "STEG-05-bgr-multilingual.png",
+    "text": "Ποτέ μην στέλνετε τον κωδικό σας σε τρίτους. Никога не изпращайте паролата си.",
+    "channels": [
+      2,
+      1,
+      0
+    ],
+    "depth": 1,
+    "bitOffset": 0,
+    "expected": "recovered_candidate",
+    "pixelStart": 0,
+    "synthetic": true
+  },
+  {
+    "id": "06-clean",
+    "file": "STEG-06-clean.png",
+    "text": null,
+    "channels": [
+      0
+    ],
+    "depth": 1,
+    "bitOffset": 0,
+    "expected": "no_candidate",
+    "pixelStart": 0,
+    "synthetic": true
+  },
+  {
+    "id": "07-noise",
+    "file": "STEG-07-noise.png",
+    "text": null,
+    "channels": [
+      0
+    ],
+    "depth": 1,
+    "bitOffset": 0,
+    "expected": "no_candidate",
+    "pixelStart": 0,
+    "synthetic": true
+  },
+  {
+    "id": "08-outside-prefix",
+    "file": "STEG-08-outside-prefix.png",
+    "text": "Tu banco necesita tu contraseña y codigo SMS para desbloquear la cuenta.",
+    "channels": [
+      0
+    ],
+    "depth": 1,
+    "bitOffset": 0,
+    "expected": "outside_prefix",
+    "pixelStart": 140000,
+    "synthetic": true
+  }
+]

@@ -60,4 +60,10 @@ describe("createMediaTranscriptionProvider", () => {
       'Unsupported media transcription provider "unknown"',
     );
   });
+  it("selects Gemini independently of the semantic provider", () => {
+    expect(createMediaTranscriptionProvider({ provider: "gemini", model: "gemini-3.5-flash-lite", apiKey: "synthetic-key" })?.name).toBe("gemini");
+  });
+  it("does not silently reuse missing Gemini transcription credentials", () => {
+    expect(createMediaTranscriptionProvider({ provider: "gemini", model: "gemini-3.5-flash-lite" })).toBeNull();
+  });
 });

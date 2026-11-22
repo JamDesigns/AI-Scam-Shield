@@ -1,0 +1,146 @@
+{
+  "locale": "fi",
+  "htmlLang": "fi",
+  "languageName": "Suomi",
+  "updatedLabel": "Päivitetty viimeksi",
+  "languageLabel": "Kieli",
+  "contactTitle": "Yhteystiedot",
+  "privacy": {
+    "title": "Tietosuojakäytäntö – AI Scam Shield",
+    "intro": "AI Scam Shield analysoi tekstiä, URL-osoitteita, kuvia ja lyhyitä videoita tunnistaakseen mahdollisia huijauksia ja merkkejä manipuloinnista. Tässä käytännössä kuvataan sovelluksen ja sen palvelujen käsittelemät tiedot.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Käsiteltävät tiedot",
+        "paragraphs": [
+          "Valitset lähetettävän sisällön liittämällä sen, valitsemalla tiedoston tai jakamalla sisältöä sovellukseen. Lähetetty aineisto voi sisältää sinua tai muita henkilöitä koskevia henkilötietoja; vältä tarpeettomia arkaluonteisia tietoja."
+        ],
+        "items": [
+          "Teksti, URL-osoitteet, kuvat, videot, ääni, poimittu teksti, QR-sisältö ja mahdollinen analyysiin tarvittava saateteksti.",
+          "Pseudonyymi istuntotunniste, laitteeseen turvallisesti tallennettu todennustunnus, tunnuksen tiiviste palvelimella, rekisteröity aikavyöhyke ja sovelluksen kieli.",
+          "Käyttölaskurit, aikaleimat, riskiarviot, enintään 160 merkin tekstiesikatselut, analyysitulokset ja median käsittelyn metatiedot.",
+          "Tilaustunnisteet, käyttöoikeuden tila sekä ostojen vahvistamiseen tarvittavat tuote-, ympäristö- ja päättymistiedot.",
+          "Tekniset pyyntötiedot ja tietoturvalokit. Firebase Analytics käsittelee nykyisessä sovelluksessa myös sovellus- ja laitetietoja sekä käyttötapahtumia."
+        ]
+      },
+      {
+        "id": "purposes",
+        "title": "Tietojen käyttö",
+        "paragraphs": [
+          "Tietoja käytetään pyydetyn analyysin suorittamiseen, tulosten palauttamiseen sovelluksen kielellä, historian ja tilastojen tarjoamiseen, käyttörajojen soveltamiseen, tilausten vahvistamiseen sekä palvelun suojaamiseen väärinkäytöltä.",
+          "OCR säilyttää tekstin alkuperäisen kielen. Analyysin selitykset pyydetään sovelluksen kielellä. Toiminnosta ja määrityksistä riippuen sisältöä voidaan lähettää tekoäly-, mediaforensiikka-, puheen litterointi- tai käännöspalvelujen tarjoajille, myös käännettäväksi tarkistuksessa, jossa ei käytetä tekoälyä."
+        ]
+      },
+      {
+        "id": "providers",
+        "title": "Kolmansien osapuolten palvelut",
+        "paragraphs": [
+          "Google Play hoitaa Android-ostot, ja RevenueCat tukee tilausten hallintaa ja vahvistamista. Sovellukseen on integroitu myös Firebase Analytics. Analyysi-, litterointi-, forensiikka- ja käännöspalvelujen tarjoajat saavat valitun toiminnon tarvitseman sisällön.",
+          "Palveluntarjoajien säilytysajat, käsittelypaikat ja suojatoimet riippuvat käyttöönottoa varten määritetyistä palveluista ja niiden ehdoista. Älä oleta, että jokainen toiminto pysyy laitteessa tai Euroopan unionin alueella. JamDesigns ei myy eikä vuokraa tietojasi mainontaa varten."
+        ]
+      },
+      {
+        "id": "storage",
+        "title": "Säilyttäminen ja poistaminen",
+        "paragraphs": [
+          "Palvelin tallentaa istunto- ja tilaustiedot, laskurit, analyysien esikatselut ja tulokset historiaa, tilastoja sekä luotettavia uudelleenyrityksiä varten. Ladattua mediaa voidaan käsitellä väliaikaisten tiedostojen kautta; ulkoiset palveluntarjoajat soveltavat omia säilytyskäytäntöjään.",
+          "Nykyisessä versiossa analyysihistoria ei vanhene automaattisesti. Sovelluksen poistaminen ei poista palvelimen tietueita. Ota meihin yhteyttä pyytääksesi tietoja tai poistamista; tietojen varmentaminen voi olla tarpeen, jotta toisen henkilön tietueita ei paljasteta. Istunnon tunnistetietojen menettäminen voi estää pääsyn aiempaan historiaan."
+        ]
+      },
+      {
+        "id": "security",
+        "title": "Tietoturva",
+        "paragraphs": [
+          "Sovellus käyttää suojattuja istunnon tunnistetietoja, palvelinpuolen todennusta ja pääsynhallintaa. Nämä toimet vähentävät riskiä mutta eivät voi taata täydellistä tietoturvaa. Lähetä vain sisältöä, jonka jakamiseen sinulla on oikeus."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "Oikeutesi",
+        "paragraphs": [
+          "Jos sovellettava laki antaa nämä oikeudet, voit pyytää pääsyä henkilötietoihisi, niiden oikaisua, poistamista, käsittelyn rajoittamista tai siirtämistä, vastustaa käsittelyä ja tehdä valituksen toimivaltaiselle tietosuojaviranomaiselle. Tee pyyntö alla olevaan yhteysosoitteeseen."
+        ]
+      },
+      {
+        "id": "children",
+        "title": "Lapset ja arkaluonteiset tiedot",
+        "paragraphs": [
+          "Älä lähetä tarpeettomia lasten henkilötietoja tai muuta arkaluonteista aineistoa. Jos tällaisia tietoja lähetettiin tahattomasti, ota meihin yhteyttä, jotta tilanne voidaan arvioida."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Tämän käytännön muutokset",
+        "paragraphs": [
+          "Päivitykset julkaistaan sovelluksessa ja tällä sivulla uuden päiväyksen kanssa. AI Scam Shieldin yhteystaho on JamDesigns alla olevassa osoitteessa."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Käyttöehdot – AI Scam Shield",
+    "intro": "Nämä ehdot koskevat AI Scam Shieldin käyttöä tekstin, URL-osoitteiden, kuvien ja lyhyiden videoiden analysointiin. Palvelu tarjoaa riski-indikaattoreita ja ohjeita; se ei voi taata kaikkien huijausten, manipulointien tai piilotettujen elementtien tunnistamista.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Palvelun käyttö",
+        "paragraphs": [
+          "Käytä palvelua lainmukaisesti ja lähetä vain sisältöä, jonka jakamiseen sinulla on oikeus. Syötteen voi liittää tai jakaa; kuvia ja videoita voi myös valita laitteesta."
+        ]
+      },
+      {
+        "id": "free-premium",
+        "title": "Free- ja Premium-analyysit",
+        "paragraphs": [
+          "Free-paketti sallii 3 valmistunutta analyysiä viikossa. Ensimmäinen käyttää tekoälyä ja voi analysoida tekstiä, URL-osoitteen, kuvan tai videon. Muut 2 analysoivat tekstiä tai URL-osoitteita ilman tekoälyä; kuvat ja videot eivät ole käytettävissä näillä kahdella analyysikerralla.",
+          "Yksi kokonainen analyysi lasketaan yhdeksi yksiköksi sisällön tyypistä tai sisäisten käsittelyvaiheiden määrästä riippumatta. Kelvollinen tulos, josta ei voida tehdä varmaa johtopäätöstä, lasketaan mukaan; virhettä ilman kelvollista tulosta ei lasketa. Viikkolaskenta nollautuu maanantaina klo 00:00 istunnolle rekisteröidyllä aikavyöhykkeellä.",
+          "Premium tarjoaa rajattomasti tekoälyanalyysejä niin kauan kuin vahvistettu tilaus on voimassa. Tiedostoja, videoiden kestoa, samanaikaisia toimintoja ja palveluntarjoajien saatavuutta koskevat tekniset rajat ovat edelleen voimassa."
+        ]
+      },
+      {
+        "id": "media",
+        "title": "Media ja kielet",
+        "paragraphs": [
+          "Videoiden kesto saa olla enintään 180 sekuntia ja koko enintään 100 MiB. Tuetut tiedostomuodot ja käsittelyominaisuudet riippuvat sovelluksesta ja palveluntarjoajista. OCR säilyttää tekstin alkuperäisen kielen, ja analyysin selityksissä käytetään sovelluksen kieltä. Käännetty käyttöliittymä ei takaa kattavaa OCR- tai äänitukea kaikilla kielillä."
+        ]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Tilaukset ja ostot",
+        "paragraphs": [
+          "Google Play näyttää hinnan, laskutuskauden ja uusimisehdot ennen ostoa. Laskutus, peruutukset ja hyvityspyynnöt käsitellään Google Playn käytäntöjen ja sovellettavan lain mukaisesti; RevenueCat tukee käyttöoikeuksien vahvistamista.",
+          "Hallinnoi tilausta tai peruuta se Google Play -tilisi kautta. Premium-käyttöoikeus edellyttää palvelimen vahvistusta; keskeneräinen tai epäonnistunut vahvistus ei anna vahvistettua käyttöoikeutta. Oston palauttaminen ei automaattisesti palauta menetetyn istunnon historiaa."
+        ]
+      },
+      {
+        "id": "results",
+        "title": "Analyysin rajoitukset",
+        "paragraphs": [
+          "Automaattiset ja tekoälyavusteiset tulokset voivat olla epätarkkoja, puutteellisia tai vanhentuneita, ja ne voivat sisältää vääriä hälytyksiä ja huomaamatta jääneitä uhkia. Videoruutujen otanta, QR-luku ja piilotetun sisällön tarkistukset ovat rajallisia eivätkä voi todistaa sisällön olevan turvallista tai aitoa.",
+          "Älä luota pelkästään sovellukseen turvallisuutta, taloutta, lakiasioita tai henkilökohtaisia asioita koskevissa päätöksissä. Tarkastele näyttöä ja hae tarvittaessa sopivaa apua. Palveluntarjoajan häiriö ei ole vähäisen riskin tulos."
+        ]
+      },
+      {
+        "id": "third-parties",
+        "title": "Kolmansien osapuolten palvelut ja tietosuoja",
+        "paragraphs": [
+          "Palvelu on riippuvainen ulkoisista palveluntarjoajista ja verkkoyhteyden saatavuudesta. Sisältöä ja palvelutietoja voidaan käsitellä tietosuojakäytännössä kuvatulla tavalla. Keskeytykset tai puuttuvat toiminnot voivat estää analyysin valmistumisen."
+        ]
+      },
+      {
+        "id": "liability",
+        "title": "Vastuu ja lakisääteiset oikeutesi",
+        "paragraphs": [
+          "Palvelu tarjotaan sen saatavuuden ja ilmoitettujen rajoitusten puitteissa. Vastaat edelleen päätöksistä, jotka teet sen indikaattorien perusteella. Mikään näissä ehdoissa ei sulje pois vastuuta eikä rajoita kuluttajan tai tietosuojan oikeuksia, joita ei lain mukaan voida sulkea pois tai rajoittaa."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Palvelun ja ehtojen muutokset",
+        "paragraphs": [
+          "Toimintoja ja näitä ehtoja voidaan päivittää. Olennaisista muutoksista ilmoitetaan sovellettavan lain edellyttämällä tavalla; ostoehdot ja pakottavat oikeudet ovat edelleen voimassa. Päivitetyissä ehdoissa on uusi päiväys. Jos sinulla on kysyttävää, ota yhteyttä JamDesignsiin alla olevassa osoitteessa."
+        ]
+      }
+    ]
+  }
+}

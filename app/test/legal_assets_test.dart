@@ -1,11 +1,18 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:scam_shield_mvp/i18n/app_localizations.dart';
 
 void main() {
-  test('privacy policy markdown files exist for supported locales', () {
-    const locales = ['en', 'es', 'fr', 'de', 'it'];
+  TestWidgetsFlutterBinding.ensureInitialized();
+  final locales = AppLocalizations.supportedLocales
+      .map((locale) => locale.languageCode)
+      .toSet()
+      .toList()
+    ..sort();
 
+  test('privacy policy markdown files exist for supported locales', () {
     for (final locale in locales) {
       final file = File('assets/legal/privacy-policy.$locale.md');
 
@@ -23,6 +30,20 @@ void main() {
     }
   });
 
+  test('privacy policies load from the real bundle in every app language',
+      () async {
+    for (final locale in locales) {
+      final content = await rootBundle.loadString(
+        'assets/legal/privacy-policy.$locale.md',
+      );
+      expect(content, contains('AI Scam Shield'), reason: locale);
+      expect(content, contains('2026-11-02'), reason: locale);
+      expect(content, contains('Firebase Analytics'), reason: locale);
+      expect(content, contains('mailto:joseangel.mosquera@gmail.com'),
+          reason: locale);
+    }
+  });
+
   test('legacy non-localized privacy policy markdown is not used', () {
     final file = File('assets/legal/privacy-policy.md');
 
@@ -30,7 +51,6 @@ void main() {
   });
 
   test('public legal HTML files exist for supported locales', () {
-    const locales = ['en', 'es', 'fr', 'de', 'it'];
     const documents = [
       'privacy-policy',
       'terms-of-service',
@@ -49,7 +69,8 @@ void main() {
         expect(
           file.readAsStringSync().trim(),
           isNotEmpty,
-          reason: 'Public legal document must not be empty: $document.$locale.html',
+          reason:
+              'Public legal document must not be empty: $document.$locale.html',
         );
       }
     }

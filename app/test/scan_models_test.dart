@@ -152,4 +152,57 @@ void main() {
     expect(result.forensics!.suspiciousTimestamps, [1.0, 3.0]);
     expect(result.analysis, isNull);
   });
+
+  test('missing forensics is inconclusive instead of a negative detection', () {
+    final result = VideoAnalysisResult.fromJson({
+      'status': 'completed',
+      'forensics': {
+        'provider': 'test',
+        'aiGeneratedDetected': null,
+        'deepfakeDetected': null,
+        'audioAiGeneratedStatus': 'unavailable'
+      },
+    });
+    expect(result.forensics!.aiGeneratedStatus, 'inconclusive');
+    expect(result.forensics!.deepfakeStatus, 'inconclusive');
+    expect(result.forensics!.audioAiGeneratedStatus, 'unavailable');
+    expect(result.forensics!.aiGeneratedDetected, isNull);
+  });
+
+  test('explicit evidence status takes precedence over legacy defaults', () {
+    final result = VideoAnalysisResult.fromJson({
+      'status': 'completed',
+      'forensics': {
+        'aiGeneratedDetected': false,
+        'aiGeneratedStatus': 'unavailable',
+        'deepfakeStatus': 'not_detected'
+      },
+    });
+    expect(result.forensics!.aiGeneratedStatus, 'unavailable');
+    expect(result.forensics!.deepfakeStatus, 'not_detected');
+  });
+
+  test('inconclusive activity retains a null score instead of zero risk', () {
+    final item = ScanActivityItem.fromJson({
+      'finalCategory': 'inconclusive',
+      'finalRiskScore': null,
+    });
+    expect(item.finalCategory, 'inconclusive');
+    expect(item.finalRiskScore, isNull);
+  });
+  test(
+      'video preserves unreadable encrypted-content status without claiming contents',
+      () {
+    final result = VideoAnalysisResult.fromJson({
+      'analysisId': 'video-with-encrypted-attachment',
+      'status': 'completed',
+      'hiddenContent': {'encryptedEntriesDeclared': 1},
+    });
+    expect(result.hasUnreadableHiddenContent, isTrue);
+    expect(result.analysis, isNull);
+    expect(
+        VideoAnalysisResult.fromJson({'status': 'completed'})
+            .hasUnreadableHiddenContent,
+        isFalse);
+  });
 }

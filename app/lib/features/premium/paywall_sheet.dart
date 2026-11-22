@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design/shield_design.dart';
 
 import '../../i18n/app_localizations.dart';
 import '../../core/revenuecat_service.dart';
@@ -14,12 +15,14 @@ class PaywallSheet extends StatelessWidget {
     final messenger = ScaffoldMessenger.of(context);
 
     return SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsetsDirectional.fromSTEB(20, 20, 20, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Center(child: ShieldMark()),
+            const SizedBox(height: 16),
             Text(
               t.t('premium.cta'),
               style: Theme.of(context).textTheme.headlineSmall,

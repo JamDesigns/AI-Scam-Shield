@@ -1,0 +1,146 @@
+{
+  "locale": "ro",
+  "htmlLang": "ro",
+  "languageName": "Română",
+  "updatedLabel": "Ultima actualizare",
+  "languageLabel": "Limbă",
+  "contactTitle": "Contact",
+  "privacy": {
+    "title": "Politica de confidențialitate – AI Scam Shield",
+    "intro": "AI Scam Shield analizează texte, URL-uri, imagini și videoclipuri scurte pentru a identifica posibile înșelătorii și semne de manipulare. Această politică descrie informațiile prelucrate de aplicație și de serviciile sale.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Informații prelucrate",
+        "paragraphs": [
+          "Alegeți conținutul de trimis prin lipire, selectarea unui fișier sau partajare cu aplicația. Materialul trimis poate conține date cu caracter personal despre dumneavoastră sau alte persoane; evitați informațiile sensibile care nu sunt necesare."
+        ],
+        "items": [
+          "Texte, URL-uri, imagini, videoclipuri, conținut audio, text extras, conținut QR și orice mesaj însoțitor necesar pentru analiză.",
+          "Un identificator pseudonim al sesiunii, un token de autentificare stocat în siguranță pe dispozitiv, un hash al tokenului pe server, fusul orar înregistrat și limba aplicației.",
+          "Contoare de utilizare, marcaje temporale, evaluări ale riscului, previzualizări de text de până la 160 de caractere, rezultate ale analizelor și metadate de prelucrare a conținutului media.",
+          "Identificatori ai abonamentului, starea dreptului de acces și informații despre produs, mediu și expirare necesare verificării achizițiilor.",
+          "Date tehnice ale solicitărilor și jurnale de securitate. În aplicația actuală, Firebase Analytics prelucrează și informații despre aplicație/dispozitiv și evenimente de utilizare."
+        ]
+      },
+      {
+        "id": "purposes",
+        "title": "Cum sunt utilizate informațiile",
+        "paragraphs": [
+          "Informațiile sunt utilizate pentru efectuarea analizei solicitate, returnarea rezultatelor în limba aplicației, furnizarea istoricului și a statisticilor, aplicarea limitelor de utilizare, verificarea abonamentelor și protejarea serviciului împotriva abuzurilor.",
+          "OCR păstrează limba originală a textului. Explicațiile analizei sunt solicitate în limba aplicației. În funcție de funcție și configurație, conținutul poate fi trimis unor furnizori de servicii de inteligență artificială, analiză criminalistică a conținutului media, transcriere a vorbirii sau traducere, inclusiv pentru traducere în cadrul unei scanări fără IA."
+        ]
+      },
+      {
+        "id": "providers",
+        "title": "Servicii terțe",
+        "paragraphs": [
+          "Google Play gestionează achizițiile pentru Android, iar RevenueCat sprijină gestionarea și verificarea abonamentelor. Aplicația integrează și Firebase Analytics. Furnizorii de analiză, transcriere, analiză criminalistică și traducere primesc conținutul necesar operațiunii selectate.",
+          "Păstrarea datelor de către furnizori, locurile de prelucrare și măsurile de protecție depind de serviciile configurate pentru punerea în funcțiune și de condițiile acestora. Nu presupuneți că fiecare operațiune rămâne pe dispozitiv sau în Uniunea Europeană. JamDesigns nu vinde și nu închiriază datele dumneavoastră în scopuri publicitare."
+        ]
+      },
+      {
+        "id": "storage",
+        "title": "Stocare și ștergere",
+        "paragraphs": [
+          "Serverul stochează înregistrări privind sesiunile și abonamentele, contoare, previzualizări ale analizelor și rezultate pentru istoric, statistici și reîncercări fiabile ale solicitărilor. Conținutul media încărcat poate fi prelucrat prin fișiere temporare; furnizorii externi aplică propriile reguli de păstrare.",
+          "În versiunea actuală, istoricul analizelor nu este șters automat după o anumită perioadă. Dezinstalarea aplicației nu șterge înregistrările de pe server. Contactați-ne pentru a solicita informații sau ștergerea datelor; poate fi necesară o verificare pentru a evita dezvăluirea înregistrărilor altei persoane. Pierderea datelor de autentificare ale sesiunii poate împiedica accesul la istoricul anterior."
+        ]
+      },
+      {
+        "id": "security",
+        "title": "Securitate",
+        "paragraphs": [
+          "Aplicația utilizează date de autentificare protejate pentru sesiune, autentificare pe server și controale de acces. Aceste măsuri reduc riscul, dar nu pot garanta securitatea absolută. Trimiteți numai conținut pe care aveți dreptul să îl partajați."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "Drepturile dumneavoastră",
+        "paragraphs": [
+          "În măsura în care legislația aplicabilă prevede aceste drepturi, puteți solicita accesul la datele dumneavoastră cu caracter personal, rectificarea, ștergerea, restricționarea prelucrării sau portabilitatea acestora, vă puteți opune prelucrării și puteți depune o plângere la autoritatea competentă pentru protecția datelor. Utilizați adresa de contact de mai jos pentru a depune o solicitare."
+        ]
+      },
+      {
+        "id": "children",
+        "title": "Copii și informații sensibile",
+        "paragraphs": [
+          "Nu trimiteți informații personale despre copii care nu sunt necesare sau alte materiale sensibile. Dacă astfel de informații au fost trimise neintenționat, contactați-ne pentru a putea evalua situația."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Modificări ale acestei politici",
+        "paragraphs": [
+          "Actualizările vor fi publicate în aplicație și pe această pagină cu o dată revizuită. Pentru AI Scam Shield, persoana de contact este JamDesigns, la adresa de mai jos."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Condiții de utilizare – AI Scam Shield",
+    "intro": "Aceste condiții reglementează utilizarea AI Scam Shield pentru analiza textelor, URL-urilor, imaginilor și videoclipurilor scurte. Serviciul oferă indicatori de risc și îndrumări; nu poate garanta detectarea fiecărei înșelătorii, manipulări sau a fiecărui element ascuns.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Utilizarea serviciului",
+        "paragraphs": [
+          "Utilizați serviciul în mod legal și trimiteți numai conținut pe care aveți dreptul să îl partajați. Datele de intrare pot fi lipite sau partajate; imaginile și videoclipurile pot fi selectate și de pe dispozitiv."
+        ]
+      },
+      {
+        "id": "free-premium",
+        "title": "Analize Free și Premium",
+        "paragraphs": [
+          "Planul Free permite 3 analize finalizate pe săptămână. Prima utilizează IA și poate analiza text, un URL, o imagine sau un videoclip. Celelalte 2 analizează text sau URL-uri fără IA; imaginile și videoclipurile nu sunt disponibile pentru aceste două analize.",
+          "O analiză finalizată se contabilizează ca o unitate, indiferent de tipul conținutului sau de numărul etapelor interne de prelucrare. Un rezultat valid, dar neconcludent, se contabilizează; o eroare fără un rezultat valid nu se contabilizează. Limita săptămânală se resetează luni la 00:00 în fusul orar înregistrat pentru sesiune.",
+          "Premium oferă analize nelimitate cu IA cât timp abonamentul verificat este activ. Limitele tehnice privind fișierele, durata videoclipurilor, operațiunile simultane și disponibilitatea furnizorilor continuă să se aplice."
+        ]
+      },
+      {
+        "id": "media",
+        "title": "Conținut media și limbi",
+        "paragraphs": [
+          "Videoclipurile pot avea o durată de până la 180 de secunde inclusiv și o dimensiune de până la 100 MiB. Formatele acceptate și capacitățile de prelucrare depind de aplicație și de furnizori. OCR păstrează limba originală a textului, iar explicațiile analizei folosesc limba aplicației. O interfață tradusă nu garantează suport complet pentru OCR sau conținut audio în fiecare limbă."
+        ]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Abonamente și achiziții",
+        "paragraphs": [
+          "Google Play afișează prețul, perioada de facturare și condițiile de reînnoire înainte de achiziție. Facturarea, anularea și solicitările de rambursare sunt gestionate conform politicilor Google Play și legislației aplicabile; RevenueCat sprijină verificarea dreptului de acces.",
+          "Gestionați sau anulați abonamentul prin contul dumneavoastră Google Play. Accesul Premium necesită verificare pe server; o verificare în așteptare sau nereușită nu creează un drept de acces confirmat. Restabilirea unei achiziții nu restabilește automat istoricul unei sesiuni pierdute."
+        ]
+      },
+      {
+        "id": "results",
+        "title": "Limitările analizei",
+        "paragraphs": [
+          "Rezultatele automate și cele asistate de IA pot fi inexacte, incomplete sau depășite, inclusiv rezultate fals pozitive și amenințări nedetectate. Eșantionarea cadrelor, citirea codurilor QR și verificările conținutului ascuns au un domeniu limitat și nu pot dovedi că un conținut este sigur sau autentic.",
+          "Nu vă bazați numai pe aplicație pentru decizii de securitate, financiare, juridice sau personale. Examinați dovezile și solicitați ajutor adecvat atunci când este necesar. O defecțiune la un furnizor nu reprezintă un rezultat cu risc scăzut."
+        ]
+      },
+      {
+        "id": "third-parties",
+        "title": "Servicii terțe și confidențialitate",
+        "paragraphs": [
+          "Serviciul depinde de furnizori externi și de disponibilitatea rețelei. Conținutul și datele serviciului pot fi prelucrate conform descrierii din Politica de confidențialitate. Întreruperile sau capacitățile indisponibile pot împiedica finalizarea unei analize."
+        ]
+      },
+      {
+        "id": "liability",
+        "title": "Răspunderea și drepturile dumneavoastră legale",
+        "paragraphs": [
+          "Serviciul este furnizat în funcție de disponibilitatea sa și de limitările declarate. Rămâneți responsabil pentru deciziile luate folosind indicatorii săi. Nicio prevedere a acestor condiții nu exclude răspunderea și nu limitează drepturile consumatorilor sau drepturile privind protecția datelor care nu pot fi excluse sau limitate în mod legal."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Modificări ale serviciului și condițiilor",
+        "paragraphs": [
+          "Funcțiile și aceste condiții pot fi actualizate. Modificările semnificative vor fi comunicate conform cerințelor legislației aplicabile; condițiile de achiziție și drepturile imperative continuă să se aplice. Condițiile actualizate vor avea o dată revizuită. Pentru întrebări, contactați JamDesigns la adresa de mai jos."
+        ]
+      }
+    ]
+  }
+}

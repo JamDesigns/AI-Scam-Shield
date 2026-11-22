@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design/shield_design.dart';
 
 import '../../i18n/app_localizations.dart';
 import '../scan/scan_page.dart';
@@ -40,35 +41,42 @@ class HomePageState extends State<HomePage> {
         index: _currentIndex,
         children: pages,
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+      bottomNavigationBar: DecoratedBox(
+          decoration: BoxDecoration(
+            color: ShieldDesign.navy,
+            border: Border(
+                top:
+                    BorderSide(color: ShieldDesign.cyan.withValues(alpha: .3))),
+          ),
+          child: NavigationBar(
+            selectedIndex: _currentIndex,
+            onDestinationSelected: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
 
-          if (index == 1) {
-            StatsPage.globalKey.currentState?.refresh();
-          }
-        },
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.shield_outlined),
-            selectedIcon: const Icon(Icons.shield),
-            label: t.t('nav.scan'),
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.bar_chart_outlined),
-            selectedIcon: const Icon(Icons.bar_chart),
-            label: t.t('nav.stats'),
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.info_outline),
-            selectedIcon: const Icon(Icons.info),
-            label: t.t('nav.about'),
-          ),
-        ],
-      ),
+              if (index == 1) {
+                StatsPage.globalKey.currentState?.refresh();
+              }
+            },
+            destinations: [
+              NavigationDestination(
+                icon: const Icon(Icons.shield_outlined),
+                selectedIcon: const Icon(Icons.shield),
+                label: t.t('nav.scan'),
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.bar_chart_outlined),
+                selectedIcon: const Icon(Icons.bar_chart),
+                label: t.t('nav.stats'),
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.info_outline),
+                selectedIcon: const Icon(Icons.info),
+                label: t.t('nav.about'),
+              ),
+            ],
+          )),
     );
   }
 }

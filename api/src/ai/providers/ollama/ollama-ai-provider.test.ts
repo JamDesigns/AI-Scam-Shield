@@ -195,7 +195,7 @@ describe("OllamaAiProvider", () => {
         },
       }),
     ).rejects.toThrow(
-      "Ollama request failed (503): Service unavailable",
+      "Ollama request failed (503)",
     );
   });
 

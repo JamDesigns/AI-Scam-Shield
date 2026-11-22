@@ -1,61 +1,54 @@
 # Politique de confidentialité – AI Scam Shield
 
-Dernière mise à jour : 2026
+Dernière mise à jour: 2026-11-02
 
-AI Scam Shield est conçue pour aider les utilisateurs à détecter d’éventuels messages frauduleux à l’aide de l’intelligence artificielle.
+AI Scam Shield analyse des textes, des URL, des images et de courtes vidéos afin de repérer d'éventuelles escroqueries et des signes de manipulation. Cette politique décrit les informations traitées par l'application et ses services.
 
-## Informations que nous collectons
+## Informations traitées
 
-L’application peut traiter les informations suivantes :
+Vous choisissez le contenu à envoyer en le collant, en sélectionnant un fichier ou en le partageant avec l'application. Les éléments envoyés peuvent contenir des données personnelles vous concernant ou concernant d'autres personnes ; évitez les informations sensibles inutiles.
 
-- Texte saisi par l’utilisateur pour l’analyse d’arnaques
-- Identifiant anonyme de l’appareil utilisé pour gérer les limites d’utilisation et les abonnements
-- Statut de l’abonnement (premium ou gratuit)
-
-Nous ne **collectons pas d’informations d’identité personnelle** telles que le nom, l’adresse e-mail, les contacts ou la localisation.
+- Textes, URL, images, vidéos, audio, texte extrait, contenu des codes QR et tout message joint nécessaire à l'analyse.
+- Un identifiant de session pseudonyme, un jeton d'authentification stocké de manière sécurisée sur l'appareil, une empreinte du jeton sur le serveur, le fuseau horaire enregistré et la langue de l'application.
+- Compteurs d'utilisation, horodatages, évaluations des risques, aperçus de texte de 160 caractères maximum, résultats d'analyse et métadonnées de traitement des médias.
+- Identifiants d'abonnement, état des droits d'accès, produit, environnement et informations d'expiration nécessaires à la vérification des achats.
+- Données techniques des requêtes et journaux de sécurité. Firebase Analytics traite également des informations sur l'application et l'appareil ainsi que des événements d'utilisation dans l'application actuelle.
 
 ## Utilisation des informations
 
-Les informations collectées sont utilisées exclusivement pour :
+Les informations servent à effectuer l'analyse demandée, à fournir les résultats dans la langue de l'application, à proposer un historique et des statistiques, à appliquer les limites d'utilisation, à vérifier les abonnements et à protéger le service contre les abus.
 
-- Analyser d’éventuels messages frauduleux
-- Appliquer les limites d’utilisation de la version gratuite
-- Gérer les abonnements premium
-- Améliorer la précision de la détection des arnaques
-
-Le texte soumis par l’utilisateur est envoyé à un service externe d’analyse par IA afin de générer une évaluation du risque d’arnaque.  
-Le texte est traité uniquement à des fins d’analyse et n’est pas stocké de façon permanente par AI Scam Shield.
+La reconnaissance optique de caractères (OCR) conserve la langue d'origine du texte. Les explications de l'analyse sont demandées dans la langue de l'application. Selon la fonctionnalité et la configuration, le contenu peut être envoyé à des prestataires d'IA, d'analyse forensique des médias, de transcription vocale ou de traduction, y compris pour une traduction lors d'une analyse sans IA.
 
 ## Services tiers
 
-AI Scam Shield peut utiliser des services tiers, notamment :
+Google Play gère les achats Android et RevenueCat facilite la gestion et la vérification des abonnements. L'application intègre également Firebase Analytics. Les prestataires d'analyse, de transcription, d'analyse forensique et de traduction reçoivent le contenu nécessaire à l'opération choisie.
 
-- Services d’analyse par IA utilisés pour détecter d’éventuels messages frauduleux
-- RevenueCat pour la gestion des abonnements
+La conservation des données par les prestataires, les lieux de traitement et les garanties dépendent des services configurés pour le déploiement et de leurs conditions. Ne présumez pas que toutes les opérations restent sur l'appareil ou au sein de l'Union européenne. JamDesigns ne vend ni ne loue vos données à des fins publicitaires.
 
-Ces services peuvent traiter des données limitées nécessaires à leur fonctionnement.
+## Stockage et suppression
 
-## Stockage des données
+Le serveur stocke les enregistrements de session et d'abonnement, les compteurs, les aperçus et les résultats d'analyse pour l'historique, les statistiques et la fiabilité des nouvelles tentatives. Les médias téléversés peuvent être traités au moyen de fichiers temporaires ; les prestataires externes appliquent leurs propres modalités de conservation.
 
-Les identifiants anonymes d’appareil et les compteurs d’utilisation peuvent être stockés de manière sécurisée sur nos serveurs pendant la durée nécessaire au fonctionnement du service.
-
-Nous ne vendons, ne louons ni ne partageons les données des utilisateurs à des fins publicitaires.
+La version actuelle ne supprime pas automatiquement l'historique des analyses après un délai donné. Désinstaller l'application ne supprime pas les enregistrements du serveur. Contactez-nous pour demander des informations ou une suppression ; une vérification peut être nécessaire pour éviter de divulguer les enregistrements d'une autre personne. La perte des identifiants de session peut empêcher l'accès à l'historique précédent.
 
 ## Sécurité
 
-Nous appliquons des mesures techniques et organisationnelles raisonnables pour protéger les informations traitées par l’application.
+L'application utilise des identifiants de session protégés, une authentification côté serveur et des contrôles d'accès. Ces mesures réduisent les risques, mais ne peuvent pas garantir une sécurité absolue. N'envoyez que du contenu que vous êtes en droit de partager.
 
-## Confidentialité des mineurs
+## Vos droits
 
-AI Scam Shield convient au grand public.
+Lorsque la loi applicable prévoit ces droits, vous pouvez demander l'accès, la rectification, la suppression, la limitation du traitement ou la portabilité de vos données personnelles, vous opposer au traitement et déposer une réclamation auprès de l'autorité de protection des données compétente. Utilisez l'adresse de contact ci-dessous pour présenter une demande.
 
-L’application ne collecte pas sciemment d’informations personnelles auprès d’utilisateurs de quelque âge que ce soit.
+## Enfants et informations sensibles
 
-Si vous pensez que des données sensibles ont été fournies involontairement, veuillez nous contacter afin que nous prenions les mesures appropriées.
+N'envoyez pas d'informations personnelles inutiles concernant des enfants ni d'autres éléments sensibles. Si de telles informations ont été envoyées involontairement, contactez-nous afin que la situation puisse être évaluée.
+
+## Modifications de cette politique
+
+Les mises à jour seront publiées dans l'application et sur cette page avec une date révisée. Le contact pour AI Scam Shield est JamDesigns, à l'adresse ci-dessous.
 
 ## Contact
-
-Pour toute question concernant cette Politique de confidentialité, vous pouvez contacter :
 
 JamDesigns  
 [joseangel.mosquera@gmail.com](mailto:joseangel.mosquera@gmail.com)

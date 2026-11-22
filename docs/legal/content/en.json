@@ -1,0 +1,101 @@
+{
+  "locale": "en",
+  "htmlLang": "en-GB",
+  "languageName": "English (UK)",
+  "updatedLabel": "Last updated",
+  "languageLabel": "Language",
+  "contactTitle": "Contact",
+  "privacy": {
+    "title": "Privacy Policy – AI Scam Shield",
+    "intro": "AI Scam Shield analyses text, URLs, images and short videos to identify possible scams and signs of manipulation. This policy describes the information processed by the app and its services.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Information processed",
+        "paragraphs": ["You choose the content to submit by pasting, selecting a file or sharing with the app. Submitted material can contain personal data about you or other people; avoid unnecessary sensitive information."],
+        "items": ["Text, URLs, images, videos, audio, extracted text, QR content and any accompanying message needed for analysis.", "A pseudonymous session identifier, an authentication token stored securely on the device, a token hash on the server, the registered time zone and the app language.", "Usage counters, timestamps, risk assessments, text previews of up to 160 characters, analysis results and media-processing metadata.", "Subscription identifiers, entitlement status, product, environment and expiry information needed to verify purchases.", "Technical request data and security logs. Firebase Analytics also processes app/device information and usage events in the current app."]
+      },
+      {
+        "id": "purposes",
+        "title": "How information is used",
+        "paragraphs": ["Information is used to perform the requested analysis, return results in the app language, provide history and statistics, apply usage limits, verify subscriptions and protect the service against abuse.", "OCR preserves the original text language. Analysis explanations are requested in the app language. Depending on the feature and configuration, content may be sent to AI, media-forensics, speech-transcription or translation providers, including for translation in a non-AI scan."]
+      },
+      {
+        "id": "providers",
+        "title": "Third-party services",
+        "paragraphs": ["Google Play handles Android purchases and RevenueCat supports subscription management and verification. The app also integrates Firebase Analytics. Analysis, transcription, forensic and translation providers receive the content needed for the selected operation.", "Provider retention, processing locations and safeguards depend on the services configured for deployment and their terms. Do not assume that every operation stays on the device or within the European Union. JamDesigns does not sell or rent your data for advertising."]
+      },
+      {
+        "id": "storage",
+        "title": "Storage and deletion",
+        "paragraphs": ["The server stores session and subscription records, counters, analysis previews and results for history, statistics and reliable retries. Uploaded media may be processed through temporary files; external providers apply their own retention arrangements.", "The current release does not automatically expire analysis history. Uninstalling the app does not delete server records. Contact us to request information or deletion; verification may be needed to avoid exposing another person's records. Losing the session credentials can prevent access to previous history."]
+      },
+      {
+        "id": "security",
+        "title": "Security",
+        "paragraphs": ["The app uses protected session credentials, server-side authentication and access controls. These measures reduce risk but cannot guarantee absolute security. Only submit content you are entitled to share."]
+      },
+      {
+        "id": "rights",
+        "title": "Your rights",
+        "paragraphs": ["Where applicable law provides these rights, you may request access, correction, deletion, restriction or portability of your personal data, object to processing, and complain to the competent data protection authority. Use the contact address below to make a request."]
+      },
+      {
+        "id": "children",
+        "title": "Children and sensitive information",
+        "paragraphs": ["Do not submit unnecessary personal information about children or other sensitive material. If such information was submitted unintentionally, contact us so that the situation can be assessed."]
+      },
+      {
+        "id": "changes",
+        "title": "Changes to this policy",
+        "paragraphs": ["Updates will be published in the app and on this page with a revised date. The contact for AI Scam Shield is JamDesigns at the address below."]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Terms of Service – AI Scam Shield",
+    "intro": "These terms cover the use of AI Scam Shield for text, URL, image and short-video analysis. The service provides risk indicators and guidance; it cannot guarantee detection of every scam, manipulation or hidden element.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Use of the service",
+        "paragraphs": ["Use the service lawfully and submit only content you are entitled to share. Input can be pasted or shared; images and videos can also be selected from the device."]
+      },
+      {
+        "id": "free-premium",
+        "title": "Free and Premium analysis",
+        "paragraphs": ["The Free plan allows 3 completed analyses per week. The first uses AI and may analyse text, a URL, an image or a video. The other 2 analyse text or URLs without AI; images and videos are unavailable for those two slots.", "One complete analysis counts as one unit regardless of the content type or number of internal processing steps. A valid inconclusive result counts; an error without a valid result does not. The week resets on Monday at 00:00 in the time zone registered for the session.", "Premium provides unlimited analyses with AI while the verified subscription is active. Technical limits on files, video duration, concurrent operations and provider availability still apply."]
+      },
+      {
+        "id": "media",
+        "title": "Media and languages",
+        "paragraphs": ["Videos may be up to 180 seconds inclusive and 100 MiB. Supported formats and processing capabilities depend on the app and providers. OCR keeps the original text language and analysis explanations use the app language. A translated interface does not guarantee complete OCR or audio coverage in every language."]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Subscriptions and purchases",
+        "paragraphs": ["Google Play displays the price, billing period and renewal conditions before purchase. Billing, cancellation and refund requests are handled according to Google Play policies and applicable law; RevenueCat supports entitlement verification.", "Manage or cancel a subscription through your Google Play account. Premium access requires server verification; a pending or failed verification does not create a confirmed entitlement. Restoring a purchase does not automatically restore history from a lost session."]
+      },
+      {
+        "id": "results",
+        "title": "Analysis limitations",
+        "paragraphs": ["Automated and AI-assisted results may be inaccurate, incomplete or outdated, including false positives and missed threats. Frame sampling, QR reading and hidden-content checks are bounded and cannot prove that content is safe or authentic.", "Do not rely only on the app for security, financial, legal or personal decisions. Review the evidence and seek suitable help when needed. A provider failure is not a low-risk result."]
+      },
+      {
+        "id": "third-parties",
+        "title": "Third-party services and privacy",
+        "paragraphs": ["The service depends on external providers and network availability. Content and service data may be processed as described in the Privacy Policy. Interruptions or unavailable capabilities can prevent an analysis from completing."]
+      },
+      {
+        "id": "liability",
+        "title": "Responsibility and your statutory rights",
+        "paragraphs": ["The service is provided subject to its availability and stated limitations. You remain responsible for decisions made using its indicators. Nothing in these terms excludes liability or limits consumer or data protection rights that cannot lawfully be excluded or limited."]
+      },
+      {
+        "id": "changes",
+        "title": "Changes to the service and terms",
+        "paragraphs": ["Features and these terms may be updated. Material changes will be communicated as required by applicable law; purchase conditions and mandatory rights continue to apply. Updated terms will carry a revised date. Contact JamDesigns at the address below with questions."]
+      }
+    ]
+  }
+}

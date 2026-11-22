@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design/shield_design.dart';
 import 'package:flutter/services.dart'
     show Clipboard, ClipboardData, rootBundle;
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -18,25 +19,29 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
   bool _loading = true;
   bool _hasError = false;
 
-  bool _contentLoaded = false;
+  String? _contentLocale;
+  int _loadGeneration = 0;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    if (_contentLoaded) {
+    final locale = Localizations.localeOf(context).languageCode;
+    if (_contentLocale == locale) {
       return;
     }
 
-    _contentLoaded = true;
-    _loadContent(Localizations.localeOf(context).languageCode);
+    _contentLocale = locale;
+    _loading = true;
+    _hasError = false;
+    _loadContent(locale, ++_loadGeneration);
   }
 
-  Future<void> _loadContent(String locale) async {
+  Future<void> _loadContent(String locale, int generation) async {
     try {
       final content = await _loadLocalizedPrivacyPolicy(locale);
 
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
 
       setState(() {
         _content = content;
@@ -44,7 +49,7 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
         _hasError = false;
       });
     } catch (_) {
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
 
       setState(() {
         _loading = false;
@@ -68,9 +73,7 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
     final t = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.t('about.privacyTitle')),
-      ),
+      appBar: readableAppBar(context, t.t('about.privacyTitle')),
       body: SafeArea(
         child: _loading
             ? const Center(child: CircularProgressIndicator())
@@ -78,6 +81,24 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
                 ? Center(child: Text(t.t('errors.network')))
                 : Markdown(
                     data: _content ?? '',
+                    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                        .copyWith(
+                      p: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(height: 1.7),
+                      a: const TextStyle(
+                          color: ShieldDesign.cyan,
+                          decoration: TextDecoration.underline),
+                      blockquoteDecoration: BoxDecoration(
+                          color: ShieldDesign.panel,
+                          borderRadius: BorderRadius.circular(12)),
+                      horizontalRuleDecoration: BoxDecoration(
+                          border: Border(
+                              top: BorderSide(
+                                  color: ShieldDesign.cyan
+                                      .withValues(alpha: .25)))),
+                    ),
                     padding: const EdgeInsets.all(16),
                     selectable: true,
                     onTapLink: (text, href, title) async {

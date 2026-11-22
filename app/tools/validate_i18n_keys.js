@@ -4,6 +4,22 @@ const path = require("path");
 
 const I18N_DIR = path.join(process.cwd(), "assets", "i18n");
 const BASELINE_FILE = path.join(I18N_DIR, "en.json");
+const EXPECTED_LOCALES = [
+  "bg", "ca", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "ga", "hr",
+  "hu", "it", "lt", "lv", "mt", "nl", "pl", "pt", "ro", "sk", "sl", "sv",
+];
+
+function placeholders(value) {
+  return [...value.matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g)]
+    .map((match) => match[1]).sort().join(",");
+}
+
+function dartFiles(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const file = path.join(directory, entry.name);
+    return entry.isDirectory() ? dartFiles(file) : entry.name.endsWith(".dart") ? [file] : [];
+  });
+}
 
 function readJson(filePath) {
   const raw = fs.readFileSync(filePath, "utf8");
@@ -94,6 +110,24 @@ function main() {
 
   let hasErrors = false;
 
+  for (const locale of EXPECTED_LOCALES) {
+    if (!files.includes(`${locale}.json`)) {
+      console.error(`[i18n] Missing required catalogue: ${locale}.json`);
+      hasErrors = true;
+    }
+  }
+  // Key parity alone misses keys absent from every catalogue.
+  for (const file of dartFiles(path.join(process.cwd(), "lib"))) {
+    const source = fs.readFileSync(file, "utf8");
+    for (const match of source.matchAll(/\.t\(\s*(['"])([^'"\r\n]+)\1/g)) {
+      const key = match[2];
+      if (!key.includes("$") && !Object.hasOwn(baselineJson, key)) {
+        console.error(`[i18n] Missing literal key "${key}" used in ${path.relative(process.cwd(), file)}.`);
+        hasErrors = true;
+      }
+    }
+  }
+
   for (const file of targetFiles) {
     const filePath = path.join(I18N_DIR, file);
 
@@ -107,6 +141,17 @@ function main() {
     const keys = getSortedKeys(json);
 
     const { missing, extra } = diffKeys(baselineKeys, keys);
+
+    for (const key of keys) {
+      const value = json[key];
+      if (typeof value !== "string" || value.trim().length === 0) {
+        console.error(`[i18n] ${file}: "${key}" must be a non-empty string.`);
+        hasErrors = true;
+      } else if (typeof baselineJson[key] === "string" && placeholders(value) !== placeholders(baselineJson[key])) {
+        console.error(`[i18n] ${file}: placeholders differ for "${key}".`);
+        hasErrors = true;
+      }
+    }
 
     if (missing.length === 0 && extra.length === 0) {
       console.log(

@@ -91,391 +91,45 @@ describe("analyzeWithAI", () => {
     ).toContain("German");
   });
 
-  it("normalizes invalid text AI response values safely", async () => {
-    const provider = new TestAiProvider([{
-      riskScore: 999,
-      category: "critical",
-      threatType: "unknown",
-      reasons: ["  "],
-      explanation: "",
-    }]);
-
-    const result = await analyzeWithAI({
-      provider,
-      input: "Suspicious message",
-      outputLanguage: "it",
-    });
-
-    expect(result.riskScore).toBe(100);
-    expect(result.category).toBe("low_risk");
-    expect(result.threatType).toBe("none");
-    expect(result.reasons).toEqual([]);
-    expect(result.explanation).toBe("No explanation provided.");
+  it("rejects invalid text responses instead of inventing a low-risk result", async () => {
+    await expect(analyzeWithAI({ provider: new TestAiProvider([{
+      riskScore: 999, category: "critical", threatType: "unknown", reasons: [" "], explanation: "",
+    }]), input: "Suspicious message", outputLanguage: "it" })).rejects.toThrow("Invalid text analysis response");
   });
 });
+
+const validImageResponse = {
+  category: "inconclusive", confidence: "low", visualStyle: "photographic", subjectType: "human",
+  contextWarningLevel: "none", manipulationLikelihood: "none", generationLikelihood: "none",
+  ordinarySceneLikelihood: "low", artificialSubjectEvidence: "none", roleContextMismatchLevel: "none",
+  sensitiveOrFraudContextLevel: "none", reasons: ["Insufficient image-level evidence"],
+  explanation: "The image cannot be authenticated from this evidence.", disclaimer: "This is only an estimate.",
+};
 
 describe("analyzeImageAuthenticityWithAI", () => {
-  it("requests structured image analysis through the configured provider", async () => {
-    const provider = new TestAiProvider([{
-      category: "likely_ai_generated",
-      confidence: "medium",
-      reasons: ["Synthetic-looking details"],
-      explanation:
-        "This image shows some signs that may be AI-generated.",
-      disclaimer:
-        "This is only an estimate and cannot prove whether the image is authentic.",
-    }]);
-
-    const result = await analyzeImageAuthenticityWithAI({
-      provider,
-      imageSignals: "File name: test-image.jpg",
-      imageBase64: "base64-image-content",
-      outputLanguage: "en",
-    });
-
+  it("requests and validates all structured image fields", async () => {
+    const provider = new TestAiProvider([{ ...validImageResponse, category: "likely_ai_generated", generationLikelihood: "high", confidence: "medium" }]);
+    const result = await analyzeImageAuthenticityWithAI({ provider, imageSignals: "File name: test.jpg", imageBase64: "image", outputLanguage: "de" });
     expect(result.category).toBe("likely_ai_generated");
-    expect(result.confidence).toBe("medium");
-    expect(result.reasons).toEqual(["Synthetic-looking details"]);
-
-    expect(provider.requests).toHaveLength(1);
-
-    const request = provider.requests[0];
-
-    expect(request.mode).toBe("conversation");
-    expect(request.temperature).toBe(0.1);
-    expect(request.media).toEqual([
-      {
-        dataBase64: "base64-image-content",
-        mimeType: "image/jpeg",
-      },
-    ]);
-    expect(request.prompt).toContain("File name: test-image.jpg");
-    expect(request.schema.required).toContain("disclaimer");
-    expect(request.schema.required).toContain("visualStyle");
-    expect(request.schema.required).toContain("contextWarningLevel");
-    expect(request.schema.required).toContain("ordinarySceneLikelihood");
-    expect(request.schema.required).toContain("artificialSubjectEvidence");
-    expect(request.schema.required).toContain("roleContextMismatchLevel");
-    expect(request.schema.required).toContain(
-      "sensitiveOrFraudContextLevel",
-    );
-
-    const properties = request.schema.properties as Record<
-      string,
-      { enum?: string[] }
-    >;
-
-    expect(properties.subjectType.enum).toContain("animal");
-    expect(properties.subjectType.enum).toContain(
-      "artificial_non_human",
-    );
-  });
-
-  it("asks for German image output when outputLanguage is de", async () => {
-    const provider = new TestAiProvider([{
-      category: "inconclusive",
-      confidence: "low",
-      reasons: ["Nicht genügend Hinweise"],
-      explanation:
-        "Es gibt nicht genügend Hinweise für eine klare Einschätzung.",
-      disclaimer:
-        "Dies ist nur eine Schätzung und kann die Echtheit nicht beweisen.",
-    }]);
-
-    await analyzeImageAuthenticityWithAI({
-      provider,
-      imageSignals: "File name: test-image.jpg",
-      imageBase64: "base64-image-content",
-      outputLanguage: "de",
-    });
-
-    expect(provider.requests).toHaveLength(1);
+    expect(provider.requests[0].mode).toBe("conversation");
+    expect(provider.requests[0].media).toEqual([{ dataBase64: "image", mimeType: "image/jpeg" }]);
     expect(JSON.stringify(provider.requests[0])).toContain("German");
   });
-
-  it("normalizes invalid image AI response values safely", async () => {
-    const provider = new TestAiProvider([{
-      category: "definitely_fake",
-      confidence: "certain",
-      reasons: ["  "],
-      explanation: "",
-      disclaimer: "",
-    }]);
-
-    const result = await analyzeImageAuthenticityWithAI({
-      provider,
-      imageSignals: "File name: test-image.jpg",
-      imageBase64: "base64-image-content",
-      outputLanguage: "it",
-    });
-
+  it("does not convert context-only warnings into image manipulation", async () => {
+    const provider = new TestAiProvider([{ ...validImageResponse, contextWarningLevel: "high", roleContextMismatchLevel: "high" }]);
+    const result = await analyzeImageAuthenticityWithAI({ provider, imageSignals: "A person in unusual clothes", outputLanguage: "en" });
     expect(result.category).toBe("inconclusive");
-    expect(result.confidence).toBe("low");
-    expect(result.reasons).toEqual([]);
-    expect(result.explanation).toBe(
-      "The analysis could not provide a clear explanation.",
-    );
-    expect(result.disclaimer).toContain("This is only an estimate");
   });
-
-  it("prefers manipulated when structured signals describe a photographic contextual mismatch", async () => {
-    const provider = new TestAiProvider([{
-      category: "likely_ai_generated",
-      confidence: "high",
-      visualStyle: "photographic",
-      subjectType: "human",
-      contextWarningLevel: "high",
-      manipulationLikelihood: "medium",
-      generationLikelihood: "low",
-      reasons: [
-        "Unusual clothing for the visible context",
-        "Meme-like staging",
-      ],
-      explanation:
-        "The image looks photographic, but the scene appears staged or out of context.",
-      disclaimer:
-        "This is only an estimate and cannot prove authenticity.",
-    }]);
-
-    const result = await analyzeImageAuthenticityWithAI({
-      provider,
-      imageSignals: "File name: contextual-mismatch.jpg",
-      imageBase64: "base64-image-content",
-      outputLanguage: "en",
-    });
-
-    expect(result.category).toBe("likely_manipulated");
-    expect(result.confidence).toBe("medium");
+  it("does not suppress generation evidence just because the subject is an animal", async () => {
+    const provider = new TestAiProvider([{ ...validImageResponse, subjectType: "animal", generationLikelihood: "high", category: "likely_ai_generated" }]);
+    expect((await analyzeImageAuthenticityWithAI({ provider, imageSignals: "Animal", outputLanguage: "en" })).category).toBe("likely_ai_generated");
   });
-
-  it("does not classify a real animal scene as AI-generated from weak signals", async () => {
-    const provider = new TestAiProvider([{
-      category: "likely_ai_generated",
-      confidence: "high",
-      visualStyle: "synthetic",
-      subjectType: "animal",
-      contextWarningLevel: "none",
-      manipulationLikelihood: "none",
-      generationLikelihood: "high",
-      reasons: [
-        "Low detail due to distance",
-        "Small animal subject in an outdoor scene",
-      ],
-      explanation:
-        "The image shows an animal in an ordinary outdoor scene without contextual warning signals.",
-      disclaimer:
-        "This is only an estimate and cannot prove authenticity.",
-    }]);
-
-    const result = await analyzeImageAuthenticityWithAI({
-      provider,
-      imageSignals: "File name: real-cat.jpg",
-      imageBase64: "base64-image-content",
-      outputLanguage: "en",
-    });
-
-    expect(result.category).toBe("likely_authentic");
-    expect(result.confidence).toBe("low");
-  });
-
-  it("keeps artificial non-human subjects as likely AI-generated", async () => {
-    const provider = new TestAiProvider([{
-      category: "likely_ai_generated",
-      confidence: "high",
-      visualStyle: "synthetic",
-      subjectType: "artificial_non_human",
-      contextWarningLevel: "medium",
-      manipulationLikelihood: "low",
-      generationLikelihood: "high",
-      reasons: [
-        "Artificial non-human subject",
-        "Synthetic-looking scene",
-      ],
-      explanation:
-        "The image shows an artificial non-human subject in a synthetic-looking scene.",
-      disclaimer:
-        "This is only an estimate and cannot prove authenticity.",
-    }]);
-
-    const result = await analyzeImageAuthenticityWithAI({
-      provider,
-      imageSignals: "File name: robot.jpg",
-      imageBase64: "base64-image-content",
-      outputLanguage: "en",
-    });
-
-    expect(result.category).toBe("likely_ai_generated");
-    expect(result.confidence).toBe("high");
-  });
-
-  it("keeps ordinary animal scenes as low alert even when the model overstates generation", async () => {
-    const provider = new TestAiProvider([{
-      category: "likely_ai_generated",
-      confidence: "high",
-      visualStyle: "synthetic",
-      subjectType: "animal",
-      contextWarningLevel: "none",
-      manipulationLikelihood: "none",
-      generationLikelihood: "high",
-      ordinarySceneLikelihood: "high",
-      artificialSubjectEvidence: "low",
-      roleContextMismatchLevel: "none",
-      sensitiveOrFraudContextLevel: "none",
-      reasons: [
-        "Low detail due to distance",
-        "Small animal subject in an ordinary outdoor scene",
-      ],
-      explanation:
-        "The image shows an animal in an ordinary outdoor scene without fraud, sensitive items, or role mismatch.",
-      disclaimer:
-        "This is only an estimate and cannot prove authenticity.",
-    }]);
-
-    const result = await analyzeImageAuthenticityWithAI({
-      provider,
-      imageSignals: "File name: real-cat.jpg",
-      imageBase64: "base64-image-content",
-      outputLanguage: "en",
-    });
-
-    expect(result.category).toBe("likely_authentic");
-    expect(result.confidence).toBe("low");
-  });
-
-  it("normalizes human role-context mismatch to manipulated", async () => {
-    const provider = new TestAiProvider([{
-      category: "likely_authentic",
-      confidence: "high",
-      visualStyle: "photographic",
-      subjectType: "human",
-      contextWarningLevel: "low",
-      manipulationLikelihood: "none",
-      generationLikelihood: "none",
-      ordinarySceneLikelihood: "low",
-      artificialSubjectEvidence: "none",
-      roleContextMismatchLevel: "high",
-      sensitiveOrFraudContextLevel: "none",
-      reasons: [
-        "Role-inconsistent clothing",
-        "Implausible public context",
-      ],
-      explanation:
-        "The image looks photographic, but the human subject appears in a role-inconsistent public context.",
-      disclaimer:
-        "This is only an estimate and cannot prove authenticity.",
-    }]);
-
-    const result = await analyzeImageAuthenticityWithAI({
-      provider,
-      imageSignals: "File name: public-figure-context.jpg",
-      imageBase64: "base64-image-content",
-      outputLanguage: "en",
-    });
-
-    expect(result.category).toBe("likely_manipulated");
-    expect(result.confidence).toBe("medium");
-  });
-
-  it("normalizes weak AI-generated decisions with no warning signals to low alert", async () => {
-    const provider = new TestAiProvider([{
-      category: "likely_ai_generated",
-      confidence: "low",
-      visualStyle: "photographic",
-      subjectType: "human",
-      contextWarningLevel: "none",
-      manipulationLikelihood: "none",
-      generationLikelihood: "none",
-      ordinarySceneLikelihood: "none",
-      artificialSubjectEvidence: "none",
-      roleContextMismatchLevel: "none",
-      sensitiveOrFraudContextLevel: "none",
-      reasons: ["No clear visual warning signals"],
-      explanation:
-        "The image does not show clear visual or contextual warning signals.",
-      disclaimer:
-        "This is only an estimate and cannot prove authenticity.",
-    }]);
-
-    const result = await analyzeImageAuthenticityWithAI({
-      provider,
-      imageSignals: "File name: ordinary-scene.jpg",
-      imageBase64: "base64-image-content",
-      outputLanguage: "en",
-    });
-
-    expect(result.category).toBe("likely_authentic");
-    expect(result.confidence).toBe("low");
-  });
-
-  it("rewrites the narrative when a weak AI decision is normalized to authentic", async () => {
-    const provider = new TestAiProvider([{
-      category: "likely_ai_generated",
-      confidence: "low",
-      visualStyle: "photographic",
-      subjectType: "human",
-      contextWarningLevel: "none",
-      manipulationLikelihood: "none",
-      generationLikelihood: "none",
-      ordinarySceneLikelihood: "none",
-      artificialSubjectEvidence: "none",
-      roleContextMismatchLevel: "none",
-      sensitiveOrFraudContextLevel: "none",
-      reasons: ["The image could have been generated by AI."],
-      explanation:
-        "The image could have been generated by AI or digitally manipulated.",
-      disclaimer:
-        "This is only an estimate and cannot prove authenticity.",
-    }]);
-
-    const result = await analyzeImageAuthenticityWithAI({
-      provider,
-      imageSignals: "File name: ordinary-scene.jpg",
-      imageBase64: "base64-image-content",
-      outputLanguage: "es",
-    });
-
-    expect(result.category).toBe("likely_authentic");
-    expect(result.confidence).toBe("low");
-    expect(result.reasons.join(" ")).toContain("No se");
-    expect(result.explanation).toContain("baja alerta");
-  });
-
-  it("keeps ordinary photographic object scenes as low alert when only medium manipulation is reported", async () => {
-    const provider = new TestAiProvider([{
-      category: "likely_manipulated",
-      confidence: "medium",
-      visualStyle: "photographic",
-      subjectType: "object",
-      contextWarningLevel: "low",
-      manipulationLikelihood: "medium",
-      generationLikelihood: "none",
-      ordinarySceneLikelihood: "none",
-      artificialSubjectEvidence: "none",
-      roleContextMismatchLevel: "none",
-      sensitiveOrFraudContextLevel: "none",
-      reasons: [
-        "Perspective looks unusual",
-        "Lighting and shadows are not perfectly balanced",
-      ],
-      explanation:
-        "The image may have unusual perspective or lighting, but it shows an ordinary real-world scene without clear manipulation indicators.",
-      disclaimer:
-        "This is only an estimate and cannot prove authenticity.",
-    }]);
-
-    const result = await analyzeImageAuthenticityWithAI({
-      provider,
-      imageSignals: "File name: ordinary-yard.jpg",
-      imageBase64: "base64-image-content",
-      outputLanguage: "en",
-    });
-
-    expect(result.category).toBe("likely_authentic");
-    expect(result.confidence).toBe("low");
+  it.each([{}, { ...validImageResponse, confidence: "certain" }, { ...validImageResponse, reasons: [5] }, { ...validImageResponse, category: "likely_manipulated" }, { ...validImageResponse, category: "likely_authentic", generationLikelihood: "high" }])("rejects incomplete or contradictory image evidence %#", async (response) => {
+    await expect(analyzeImageAuthenticityWithAI({ provider: new TestAiProvider([response]), imageSignals: "Image", outputLanguage: "en" })).rejects.toThrow("Invalid image authenticity analysis response");
   });
 });
 
-it("forces manipulated_or_synthetic when image forensics is positive even if the visual model says authentic", async () => {
+it("does not let an unverified client boolean override the visual assessment", async () => {
   const provider = new TestAiProvider([
     {
       authenticity: "likely_authentic",
@@ -504,11 +158,9 @@ it("forces manipulated_or_synthetic when image forensics is positive even if the
     outputLanguage: "en",
   });
 
-  expect(result.authenticity).toBe("manipulated_or_synthetic");
-  expect(result.authenticityConfidence).toBe("medium");
-  expect(result.authenticityReasons).toEqual([
-    "An independent on-device forensic detector found a strong signal consistent with AI-generated imagery.",
-  ]);
+  expect(result.authenticity).toBe("likely_authentic");
+  expect(result.authenticityConfidence).toBe("high");
+  expect(provider.requests[0].prompt).toContain("unverified client report");
   expect(result.fraudAssessment).toBe("no_clear_signals");
   expect(result.fraudConfidence).toBe("low");
 
@@ -744,6 +396,20 @@ describe("analyzeMediaWithAI", () => {
     expect(result.fraudConfidence).toBe("medium");
   });
 
+  for (const [assessment, expected] of [
+    ["no_clear_signals", "inconclusive"],
+    ["strong_fraud_signals", "strong_fraud_signals"],
+  ]) it(`unreadable encrypted contents preserve coverage limits for ${assessment}`, async () => {
+    const provider = new TestAiProvider([
+      { authenticity: "likely_authentic", confidence: "medium", reasons: ["Simple visible graphic"], explanation: "The visible graphic is plausible." },
+      { fraudAssessment: assessment, confidence: "high", reasons: ["Assessment of visible content only"], explanation: "Only the visible content could be evaluated." },
+    ]);
+    const result = await analyzeMediaWithAI({ provider, imageBase64: "test-image", extractedText: "Community event",
+      mediaSignals: "ZIP declares encryption; contents unreadable", hiddenContent: { source: "client_report", encryptedEntriesDeclared: 1 }, outputLanguage: "en" });
+    expect(result.fraudAssessment).toBe(expected);
+    if (expected === "inconclusive") expect(result.fraudConfidence).toBe("low");
+  });
+
   it("can report strong fraud signals in visually authentic media", async () => {
     const provider = new TestAiProvider([
       {
@@ -827,46 +493,12 @@ describe("analyzeMediaWithAI", () => {
         mimeType: "image/jpeg",
       },
     ]);
-    expect(fraudRequest.prompt).toContain("Extracted text:\n(none)");
+    expect(fraudRequest.prompt).toContain("Extracted text (original language):\n(none)");
     expect(JSON.stringify(fraudRequest)).toContain("Spanish");
   });
 
-  it("normalizes invalid media analysis values safely without decision overrides", async () => {
-    const provider = new TestAiProvider([
-      {
-        authenticity: "definitely_fake",
-        confidence: "certain",
-        reasons: ["  "],
-        explanation: "",
-      },
-      {
-        fraudAssessment: "guaranteed_scam",
-        confidence: "certain",
-        reasons: null,
-        explanation: "",
-      },
-    ]);
-
-    const result = await analyzeMediaWithAI({
-      provider,
-      imageBase64: "base64-image-content",
-      extractedText: "",
-      mediaSignals: "",
-      outputLanguage: "it",
-    });
-
-    expect(result).toEqual({
-      authenticity: "inconclusive",
-      authenticityConfidence: "low",
-      fraudAssessment: "no_clear_signals",
-      fraudConfidence: "low",
-      authenticityReasons: [],
-      fraudReasons: [],
-      explanation:
-        "The authenticity assessment could not provide a clear explanation.\n\nThe fraud assessment could not provide a clear explanation.",
-      disclaimer:
-        "This is an automated estimate and cannot prove authenticity or fraudulent intent with certainty.",
-    });
+  it("rejects invalid media output instead of returning no_clear_signals", async () => {
+    await expect(analyzeMediaWithAI({ provider: new TestAiProvider([{}, {}]), imageBase64: "image", extractedText: "", mediaSignals: "", outputLanguage: "en" })).rejects.toThrow("Invalid media authenticity analysis response");
   });
 });
 
@@ -982,8 +614,8 @@ describe("analyzeVideoWithAI", () => {
     );
     expect(request.prompt).toContain("Frame 1: 1s");
     expect(request.prompt).toContain("Frame 2: 3s");
-    expect(request.prompt).toContain("AI-generated detected: true");
-    expect(request.prompt).toContain("Deepfake detected: false");
+    expect(request.prompt).toContain("AI-generated state: detected");
+    expect(request.prompt).toContain("Deepfake state: not_detected");
     expect(request.prompt).toContain(
       "Maximum AI-generated score: 0.96",
     );
@@ -1079,6 +711,9 @@ describe("analyzeVideoWithAI", () => {
     const provider = new TestAiProvider([{
       riskScore: 10,
       category: "low_risk",
+      contentContext: "uncertain",
+      deceptiveSolicitation: false,
+      financialInstitutionImpersonation: false,
       threatType: "none",
       reasons: ["No scam indicators"],
       explanation:
@@ -1105,45 +740,7 @@ describe("analyzeVideoWithAI", () => {
     );
   });
 
-  it("normalizes invalid video AI response values safely", async () => {
-    const provider = new TestAiProvider([{
-      riskScore: 999,
-      category: "critical",
-      threatType: "unexpected",
-      reasons: ["  ", "Suspicious request"],
-      explanation: "",
-    }]);
-
-    const result = await analyzeVideoWithAI({
-      provider,
-      transcript: "",
-      frames: [],
-      forensics: {
-        aiGeneratedDetected: false,
-        deepfakeDetected: false,
-        maxAiGeneratedScore: null,
-        maxDeepfakeScore: null,
-        maxAiGeneratedAudioScore: null,
-        suspiciousTimestamps: [],
-      },
-      outputLanguage: "es",
-    });
-
-    expect(result).toEqual({
-      riskScore: 100,
-      category: "low_risk",
-      threatType: "none",
-      reasons: ["Suspicious request"],
-      explanation: "No explanation provided.",
-    });
-
-    expect(provider.requests).toHaveLength(1);
-    expect(provider.requests[0].media).toEqual([]);
-    expect(provider.requests[0].prompt).toContain(
-      "(no recognizable speech)",
-    );
-    expect(provider.requests[0].prompt).toContain(
-      "Suspicious timestamps: none",
-    );
+  it("rejects invalid video output instead of inventing low risk", async () => {
+    await expect(analyzeVideoWithAI({ provider: new TestAiProvider([{}]), transcript: "", frames: [], forensics: { aiGeneratedDetected: null, deepfakeDetected: null, maxAiGeneratedScore: null, maxDeepfakeScore: null, maxAiGeneratedAudioScore: null, suspiciousTimestamps: [] }, outputLanguage: "en" })).rejects.toThrow("Invalid video analysis response");
   });
 });

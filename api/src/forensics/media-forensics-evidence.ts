@@ -2,6 +2,7 @@ import type {
   MediaForensicsCompletedResult,
   MediaForensicsObservation,
 } from "./media-forensics-provider.js";
+import type { LocalForensicsSignals } from "../local-forensics.js";
 
 const HIVE_AI_GENERATED_THRESHOLD = 0.9;
 const HIVE_DEEPFAKE_IMAGE_THRESHOLD = 0.9;
@@ -14,15 +15,39 @@ export type MediaForensicsTopGenerator = {
 };
 
 export type MediaForensicsEvidence = {
+  localSignals?: LocalForensicsSignals;
   provider: string;
-  aiGeneratedDetected: boolean;
-  deepfakeDetected: boolean;
+  aiGeneratedDetected: boolean | null;
+  deepfakeDetected: boolean | null;
+  aiGeneratedStatus: ForensicsDetectionStatus;
+  deepfakeStatus: ForensicsDetectionStatus;
+  audioAiGeneratedStatus: ForensicsDetectionStatus;
   maxAiGeneratedScore: number | null;
   maxDeepfakeScore: number | null;
   maxAiGeneratedAudioScore: number | null;
   topGenerator: MediaForensicsTopGenerator | null;
   suspiciousTimestamps: number[];
 };
+
+export type ForensicsDetectionStatus = "detected" | "not_detected" | "inconclusive" | "unavailable";
+
+function validScore(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 1;
+}
+
+function detectionStatus(
+  observations: MediaForensicsObservation[],
+  field: "aiGeneratedScore" | "deepfakeScore" | "aiGeneratedAudioScore",
+  detected: boolean,
+): ForensicsDetectionStatus {
+  if (detected) return "detected";
+  if (observations.some((item) => item.inconclusive || (field === "aiGeneratedAudioScore" ? item.audioInconclusive : item.videoInconclusive))) return "inconclusive";
+  return observations.some((item) => validScore(item[field])) ? "not_detected" : "unavailable";
+}
+
+function legacyDetection(status: ForensicsDetectionStatus): boolean | null {
+  return status === "detected" ? true : status === "not_detected" ? false : null;
+}
 
 export type BuildMediaForensicsEvidenceParams = {
   provider: string;
@@ -67,34 +92,35 @@ function buildHiveEvidence(
     (isImage || isVideo) &&
     observations.some(
       (item) =>
-        typeof item.aiGeneratedScore === "number" &&
+        !item.inconclusive && !item.videoInconclusive && validScore(item.aiGeneratedScore) &&
         item.aiGeneratedScore >= HIVE_AI_GENERATED_THRESHOLD,
     );
 
   const deepfakeDetected = isImage
     ? observations.some(
         (item) =>
-          typeof item.deepfakeScore === "number" &&
+          !item.inconclusive && !item.videoInconclusive && validScore(item.deepfakeScore) &&
           item.deepfakeScore >= HIVE_DEEPFAKE_IMAGE_THRESHOLD,
       )
     : isVideo
-      ? hasHiveVideoDeepfake(observations)
+      ? hasHiveVideoDeepfake(observations.filter((item) => !item.inconclusive && !item.videoInconclusive && validScore(item.deepfakeScore)))
       : false;
 
   const suspiciousTimestamps = Array.from(
     new Set(
       observations
         .filter((item) => {
+          if (item.inconclusive || item.videoInconclusive) return false;
           const aiGenerated =
-            typeof item.aiGeneratedScore === "number" &&
+            validScore(item.aiGeneratedScore) &&
             item.aiGeneratedScore >= HIVE_AI_GENERATED_THRESHOLD;
 
           const deepfake =
             isImage
-              ? typeof item.deepfakeScore === "number" &&
+              ? validScore(item.deepfakeScore) &&
                 item.deepfakeScore >= HIVE_DEEPFAKE_IMAGE_THRESHOLD
               : isVideo &&
-                typeof item.deepfakeScore === "number" &&
+                validScore(item.deepfakeScore) &&
                 item.deepfakeScore >= HIVE_DEEPFAKE_VIDEO_THRESHOLD;
 
           return aiGenerated || deepfake;
@@ -102,15 +128,24 @@ function buildHiveEvidence(
         .map((item) => item.timestampSeconds)
         .filter(
           (value): value is number =>
-            typeof value === "number",
+            typeof value === "number" && Number.isFinite(value) && value >= 0,
         ),
     ),
   ).sort((left, right) => left - right);
 
+  const aiGeneratedStatus = detectionStatus(observations, "aiGeneratedScore", aiGeneratedDetected);
+  const deepfakeStatus = detectionStatus(observations, "deepfakeScore", deepfakeDetected);
+  const audioAiGeneratedStatus = detectionStatus(observations, "aiGeneratedAudioScore",
+    observations.some((item) => !item.inconclusive && !item.audioInconclusive
+      && validScore(item.aiGeneratedAudioScore) && item.aiGeneratedAudioScore >= HIVE_AI_GENERATED_THRESHOLD));
+
   return {
     provider: "hive",
-    aiGeneratedDetected,
-    deepfakeDetected,
+    aiGeneratedDetected: legacyDetection(aiGeneratedStatus),
+    deepfakeDetected: legacyDetection(deepfakeStatus),
+    aiGeneratedStatus,
+    deepfakeStatus,
+    audioAiGeneratedStatus,
     maxAiGeneratedScore,
     maxDeepfakeScore,
     maxAiGeneratedAudioScore,
@@ -176,7 +211,8 @@ function areConsecutive(
     return current.frameIndex === previous.frameIndex + 1;
   }
 
-  return true;
+  // Sorted observations without explicit frame indices do not prove adjacent frames.
+  return false;
 }
 
 function compareObservations(
@@ -204,7 +240,7 @@ function maxDefined(
   values: Array<number | undefined>,
 ): number | null {
   const defined = values.filter(
-    (value): value is number => typeof value === "number",
+    (value): value is number => validScore(value),
   );
 
   return defined.length > 0 ? Math.max(...defined) : null;

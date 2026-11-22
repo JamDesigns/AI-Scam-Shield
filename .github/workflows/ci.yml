@@ -8,6 +8,25 @@ on:
   workflow_dispatch:
 
 jobs:
+  docs:
+    name: Legal documentation languages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check generated legal documents
+        run: node docs/generate-legal.mjs --check
+
+      - name: Check legal language coverage and routing
+        run: node --test docs/legal-documents.test.mjs
+
   api:
     name: API build
     runs-on: ubuntu-latest
@@ -35,6 +54,19 @@ jobs:
 
       - name: Build API
         run: npm run build
+
+  local-narratives:
+    name: Offline narrative contracts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check translation bounds, literal preservation and model integrity contracts
+        run: python -m unittest discover -s api/local-forensics -p test_translation_engine.py
 
   app:
     name: Flutter tests

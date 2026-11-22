@@ -284,7 +284,7 @@ describe("OpenAiProvider", () => {
         },
       }),
     ).rejects.toThrow(
-      "OpenAI request failed (429): Insufficient quota",
+      "OpenAI request failed (429)",
     );
   });
 
@@ -324,6 +324,6 @@ describe("OpenAiProvider", () => {
           required: [],
         },
       }),
-    ).rejects.toThrow("OpenAI refused the request: Request refused");
+    ).rejects.toThrow("OpenAI refused the request");
   });
 });

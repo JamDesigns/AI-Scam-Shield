@@ -6,33 +6,67 @@ import 'package:scam_shield_mvp/features/scan/image_qr_decoder.dart';
 import 'package:zxing2/qrcode.dart';
 
 void main() {
-  test('decodeQrContentsFromImageFile extracts QR content from image file', () async {
-    const url = 'https://secure-login-paypaI.com';
-    final file = await _createQrFixture(url);
+  test(
+    'decodeQrContentsFromImageFile extracts QR content from image file',
+    () async {
+      const url = 'https://secure-login-paypaI.com';
+      final file = await _createQrFixture(url);
 
-    final contents = await decodeQrContentsFromImageFile(file.path);
+      final contents = await decodeQrContentsFromImageFile(file.path);
 
-    expect(contents, [url]);
+      expect(contents, [url]);
 
-    await file.delete();
+      await file.delete();
 
-    final fixturesDirectory = file.parent;
-    if (await fixturesDirectory.exists() &&
-        fixturesDirectory.listSync().isEmpty) {
-      await fixturesDirectory.delete();
-    }
-  });
+      final fixturesDirectory = file.parent;
+      if (await fixturesDirectory.exists() &&
+          fixturesDirectory.listSync().isEmpty) {
+        await fixturesDirectory.delete();
+      }
+    },
+  );
 
-  test('decodeQrContentsFromImageFile returns empty list for missing file', () async {
-    final contents = await decodeQrContentsFromImageFile(
-      'test/fixtures/missing.png',
+  test(
+    'decodeQrContentsFromImageFile returns empty list for missing file',
+    () async {
+      final contents = await decodeQrContentsFromImageFile(
+        'test/fixtures/missing.png',
+      );
+
+      expect(contents, isEmpty);
+    },
+  );
+
+  test('finds two different QR URLs in the same image', () async {
+    const first = 'https://bank.example/login';
+    const second = 'https://other.example/pay';
+    final left = _qrImage(first);
+    final right = _qrImage(second);
+    final height = left.height > right.height ? left.height : right.height;
+    final combined = img.Image(
+      width: left.width + right.width + 80,
+      height: height + 80,
     );
-
-    expect(contents, isEmpty);
+    img.fill(combined, color: img.ColorRgb8(255, 255, 255));
+    img.compositeImage(combined, left, dstX: 20, dstY: 20);
+    img.compositeImage(combined, right, dstX: left.width + 60, dstY: 20);
+    final directory = await Directory.systemTemp.createTemp('aiss_qr_');
+    final file = File('${directory.path}/two-codes.png');
+    addTearDown(() async {
+      if (await file.exists()) {
+        await file.delete();
+      }
+      await directory.delete();
+    });
+    await file.writeAsBytes(img.encodePng(combined));
+    expect(
+      await decodeQrContentsFromImageFile(file.path),
+      unorderedEquals([first, second]),
+    );
   });
 }
 
-Future<File> _createQrFixture(String content) async {
+img.Image _qrImage(String content) {
   final qrCode = Encoder.encode(content, ErrorCorrectionLevel.m);
   final matrix = qrCode.matrix!;
 
@@ -60,9 +94,13 @@ Future<File> _createQrFixture(String content) async {
     }
   }
 
+  return image;
+}
+
+Future<File> _createQrFixture(String content) async {
   final file = File('test/fixtures/generated-qr-scam-test.png');
   await file.parent.create(recursive: true);
-  await file.writeAsBytes(img.encodePng(image));
+  await file.writeAsBytes(img.encodePng(_qrImage(content)));
 
   return file;
 }

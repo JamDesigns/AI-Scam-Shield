@@ -1,6 +1,7 @@
 import type { AiProvider } from "./ai-provider.js";
 import { OllamaAiProvider } from "./providers/ollama/ollama-ai-provider.js";
 import { OpenAiProvider } from "./providers/openai/openai-ai-provider.js";
+import { GeminiAiProvider } from "./providers/gemini/gemini-ai-provider.js";
 
 export type AiProviderConfig = {
   provider: string;
@@ -8,6 +9,9 @@ export type AiProviderConfig = {
   baseUrl?: string;
   model: string;
   apiKey?: string;
+  maxOutputTokens?: number;
+  /** Disable for models that reject temperature; do not guess from model names. */
+  sendTemperature?: boolean;
 };
 
 type AiProviderBuilder = (config: AiProviderConfig) => AiProvider | null;
@@ -42,6 +46,8 @@ const providerBuilders: Record<string, AiProviderBuilder> = {
       baseUrl,
       model,
       apiKey: mode === "cloud" ? apiKey : undefined,
+      maxOutputTokens: config.maxOutputTokens,
+      sendTemperature: config.sendTemperature,
     });
   },
   openai: (config) => {
@@ -56,6 +62,17 @@ const providerBuilders: Record<string, AiProviderBuilder> = {
       baseUrl: config.baseUrl?.trim() || "https://api.openai.com/v1",
       model,
       apiKey,
+      maxOutputTokens: config.maxOutputTokens,
+      sendTemperature: config.sendTemperature,
+    });
+  },
+  gemini: (config) => {
+    const model = config.model.trim();
+    const apiKey = config.apiKey?.trim();
+    if (!model || !apiKey) return null;
+    return new GeminiAiProvider({
+      baseUrl: config.baseUrl?.trim() || "https://generativelanguage.googleapis.com/v1beta",
+      model, apiKey, maxOutputTokens: config.maxOutputTokens, sendTemperature: config.sendTemperature,
     });
   },
 };

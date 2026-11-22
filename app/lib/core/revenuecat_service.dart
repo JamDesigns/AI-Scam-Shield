@@ -10,11 +10,18 @@ class RevenueCatService {
   RevenueCatService._();
 
   static bool _configured = false;
+  static String? _configuredUserId;
 
   static bool _isTestKey(String key) => key.startsWith('test_');
 
   static Future<void> initialize({required String appUserId}) async {
-    if (_configured) return;
+    if (_configured) {
+      if (_configuredUserId != appUserId) {
+        await Purchases.logIn(appUserId);
+        _configuredUserId = appUserId;
+      }
+      return;
+    }
 
     if (Platform.isAndroid) {
       const apiKey = AppConfig.revenueCatAndroidApiKey;
@@ -34,6 +41,7 @@ class RevenueCatService {
     }
 
     _configured = true;
+    _configuredUserId = appUserId;
   }
 
   static Future<void> openManageSubscriptions() async {
@@ -63,7 +71,7 @@ class RevenueCatService {
     }
   }
 
-  static Future<void> restorePurchases() async {
+  static Future<CustomerInfo> restorePurchases() async {
     try {
       if (Platform.isAndroid) {
         const apiKey = AppConfig.revenueCatAndroidApiKey;
@@ -73,7 +81,7 @@ class RevenueCatService {
         }
       }
 
-      await Purchases.restorePurchases();
+      return await Purchases.restorePurchases();
     } catch (e, st) {
       debugPrint('Restore purchases error: $e');
       debugPrintStack(stackTrace: st);

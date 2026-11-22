@@ -1,0 +1,101 @@
+{
+  "locale": "mt",
+  "htmlLang": "mt",
+  "languageName": "Malti",
+  "updatedLabel": "Aġġornat l-aħħar",
+  "languageLabel": "Lingwa",
+  "contactTitle": "Kuntatt",
+  "privacy": {
+    "title": "Politika tal-Privatezza – AI Scam Shield",
+    "intro": "AI Scam Shield janalizza test, URLs, stampi u vidjows qosra biex jidentifika frodi possibbli u sinjali ta' manipulazzjoni. Din il-politika tiddeskrivi l-informazzjoni pproċessata mill-app u mis-servizzi tagħha.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Informazzjoni pproċessata",
+        "paragraphs": ["Int tagħżel il-kontenut li tibgħat billi tippejstjah, tagħżel fajl jew taqsmu mal-app. Il-materjal mibgħut jista' jkun fih dejta personali dwarek jew dwar persuni oħra; evita informazzjoni sensittiva mhux meħtieġa."],
+        "items": ["Test, URLs, stampi, vidjows, awdjo, test estratt, kontenut tal-kodiċijiet QR u kwalunkwe messaġġ mehmuż meħtieġ għall-analiżi.", "Identifikatur psewdonimu tas-sessjoni, token tal-awtentikazzjoni maħżun b'mod sigur fuq l-apparat, valur hash tat-token fuq is-server, iż-żona tal-ħin irreġistrata u l-lingwa tal-app.", "Kontaturi tal-użu, marki tal-ħin, valutazzjonijiet tar-riskju, previżwalizzazzjonijiet tat-test sa 160 karattru, riżultati tal-analiżi u metadejta tal-ipproċessar tal-midja.", "Identifikaturi tal-abbonament, l-istat tal-intitolament, il-prodott, l-ambjent u informazzjoni dwar l-iskadenza meħtieġa biex jiġi vverifikat ix-xiri.", "Dejta teknika tat-talbiet u reġistri tas-sigurtà. Firebase Analytics jipproċessa wkoll informazzjoni dwar l-app u l-apparat u avvenimenti tal-użu fl-app attwali."]
+      },
+      {
+        "id": "purposes",
+        "title": "Kif tintuża l-informazzjoni",
+        "paragraphs": ["L-informazzjoni tintuża biex titwettaq l-analiżi mitluba, jingħataw ir-riżultati fil-lingwa tal-app, jiġu pprovduti l-istorja u l-istatistika, jiġu applikati l-limiti tal-użu, jiġu vverifikati l-abbonamenti u jiġi protett is-servizz kontra l-abbuż.", "Ir-rikonoxximent ottiku tal-karattri (OCR) iżomm il-lingwa oriġinali tat-test. L-ispjegazzjonijiet tal-analiżi jintalbu fil-lingwa tal-app. Skont il-funzjonalità u l-konfigurazzjoni, il-kontenut jista' jintbagħat lil fornituri tal-intelliġenza artifiċjali (IA), tal-forensika tal-midja, tat-traskrizzjoni tad-diskors jew tat-traduzzjoni, inkluż għat-traduzzjoni f'analiżi mingħajr IA."]
+      },
+      {
+        "id": "providers",
+        "title": "Servizzi ta' partijiet terzi",
+        "paragraphs": ["Google Play jieħu ħsieb ix-xiri fuq Android u RevenueCat jappoġġa l-ġestjoni u l-verifika tal-abbonamenti. L-app tintegra wkoll Firebase Analytics. Il-fornituri tal-analiżi, tat-traskrizzjoni, tal-forensika u tat-traduzzjoni jirċievu l-kontenut meħtieġ għall-operazzjoni magħżula.", "Iż-żamma tad-dejta mill-fornituri, il-postijiet tal-ipproċessar u s-salvagwardji jiddependu fuq is-servizzi kkonfigurati għall-iskjerament u t-termini tagħhom. Tassumix li kull operazzjoni tibqa' fuq l-apparat jew fl-Unjoni Ewropea. JamDesigns ma tbigħx u ma tikrix id-dejta tiegħek għal finijiet ta' reklamar."]
+      },
+      {
+        "id": "storage",
+        "title": "Ħażna u tħassir",
+        "paragraphs": ["Is-server jaħżen ir-reġistri tas-sessjonijiet u tal-abbonamenti, il-kontaturi, il-previżwalizzazzjonijiet u r-riżultati tal-analiżi għall-istorja, l-istatistika u tentattivi ripetuti affidabbli. Il-midja mtellgħa tista' tiġi pproċessata permezz ta' fajls temporanji; il-fornituri esterni japplikaw l-arranġamenti tagħhom stess għaż-żamma tad-dejta.", "Il-verżjoni attwali ma tħassarx awtomatikament l-istorja tal-analiżi wara perjodu ta' żmien. Id-diżinstallazzjoni tal-app ma tħassarx ir-reġistri tas-server. Ikkuntattjana biex titlob informazzjoni jew tħassir; tista' tkun meħtieġa verifika biex jiġi evitat li jiġu esposti r-reġistri ta' persuna oħra. It-telf tal-kredenzjali tas-sessjoni jista' jipprevjeni l-aċċess għall-istorja preċedenti."]
+      },
+      {
+        "id": "security",
+        "title": "Sigurtà",
+        "paragraphs": ["L-app tuża kredenzjali tas-sessjoni protetti, awtentikazzjoni fuq is-server u kontrolli tal-aċċess. Dawn il-miżuri jnaqqsu r-riskju iżda ma jistgħux jiggarantixxu sigurtà assoluta. Ibgħat biss kontenut li għandek id-dritt li taqsam."]
+      },
+      {
+        "id": "rights",
+        "title": "Id-drittijiet tiegħek",
+        "paragraphs": ["Fejn il-liġi applikabbli tipprevedi dawn id-drittijiet, tista' titlob aċċess għad-dejta personali tiegħek, ir-rettifika, it-tħassir, ir-restrizzjoni tal-ipproċessar jew il-portabbiltà tagħha, toġġezzjona għall-ipproċessar u tressaq ilment quddiem l-awtorità kompetenti għall-protezzjoni tad-dejta. Uża l-indirizz ta' kuntatt hawn taħt biex tagħmel talba."]
+      },
+      {
+        "id": "children",
+        "title": "Tfal u informazzjoni sensittiva",
+        "paragraphs": ["Tibgħatx informazzjoni personali mhux meħtieġa dwar tfal jew materjal sensittiv ieħor. Jekk informazzjoni bħal din intbagħtet bla ħsieb, ikkuntattjana sabiex is-sitwazzjoni tkun tista' tiġi evalwata."]
+      },
+      {
+        "id": "changes",
+        "title": "Bidliet f'din il-politika",
+        "paragraphs": ["L-aġġornamenti se jiġu ppubblikati fl-app u f'din il-paġna b'data riveduta. Il-kuntatt għal AI Scam Shield huwa JamDesigns fl-indirizz hawn taħt."]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Termini tas-Servizz – AI Scam Shield",
+    "intro": "Dawn it-termini jkopru l-użu ta' AI Scam Shield għall-analiżi ta' test, URLs, stampi u vidjows qosra. Is-servizz jipprovdi indikaturi tar-riskju u gwida; ma jistax jiggarantixxi s-sejbien ta' kull frodi, manipulazzjoni jew element moħbi.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Użu tas-servizz",
+        "paragraphs": ["Uża s-servizz b'mod legali u ibgħat biss kontenut li għandek id-dritt li taqsam. Il-kontenut jista' jiġi ppejstjat jew maqsum; l-istampi u l-vidjows jistgħu jintgħażlu wkoll mill-apparat."]
+      },
+      {
+        "id": "free-premium",
+        "title": "Analiżijiet Free u Premium",
+        "paragraphs": ["Il-pjan Free jippermetti 3 analiżijiet mitmuma fil-ġimgħa. L-ewwel waħda tuża l-IA u tista' tanalizza test, URL, stampa jew vidjow. It-2 l-oħra janalizzaw test jew URLs mingħajr IA; l-istampi u l-vidjows mhumiex disponibbli għal dawk iż-żewġ analiżijiet.", "Analiżi waħda kompluta tgħodd bħala unità waħda irrispettivament mit-tip ta' kontenut jew mill-għadd ta' passi interni tal-ipproċessar. Riżultat validu iżda inkonklussiv jgħodd; żball mingħajr riżultat validu ma jgħoddx. Il-ġimgħa terġa' tibda t-Tnejn f'00:00 fiż-żona tal-ħin irreġistrata għas-sessjoni.", "Premium jipprovdi analiżijiet illimitati bl-IA waqt li l-abbonament ivverifikat ikun attiv. Xorta japplikaw limiti tekniċi fuq il-fajls, it-tul tal-vidjows, l-operazzjonijiet simultanji u d-disponibbiltà tal-fornituri."]
+      },
+      {
+        "id": "media",
+        "title": "Midja u lingwi",
+        "paragraphs": ["Il-vidjows jistgħu jkunu sa 180 sekonda inklużi u sa 100 MiB. Il-formati appoġġati u l-kapaċitajiet tal-ipproċessar jiddependu fuq l-app u l-fornituri. L-OCR iżomm il-lingwa oriġinali tat-test u l-ispjegazzjonijiet tal-analiżi jużaw il-lingwa tal-app. Interfaċċa tradotta ma tiggarantix kopertura sħiħa tal-OCR jew tal-awdjo f'kull lingwa."]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Abbonamenti u xiri",
+        "paragraphs": ["Google Play juri l-prezz, il-perjodu tal-fatturazzjoni u l-kundizzjonijiet tat-tiġdid qabel ix-xiri. Il-fatturazzjoni, il-kanċellazzjoni u t-talbiet għal rifużjoni jiġu ttrattati skont il-politiki ta' Google Play u l-liġi applikabbli; RevenueCat jappoġġa l-verifika tal-intitolamenti.", "Immaniġġja jew ikkanċella abbonament permezz tal-kont Google Play tiegħek. L-aċċess Premium jeħtieġ verifika mis-server; verifika pendenti jew li tfalli ma toħloqx intitolament ikkonfermat. Ir-restawr ta' xiri ma jirrestawrax awtomatikament l-istorja minn sessjoni mitlufa."]
+      },
+      {
+        "id": "results",
+        "title": "Limitazzjonijiet tal-analiżi",
+        "paragraphs": ["Ir-riżultati awtomatizzati u assistiti mill-IA jistgħu jkunu mhux preċiżi, mhux kompluti jew skaduti, inklużi pożittivi foloz u theddidiet li ma nstabux. It-teħid ta' kampjuni tal-frejms, il-qari tal-kodiċijiet QR u l-kontrolli tal-kontenut moħbi huma limitati u ma jistgħux jippruvaw li l-kontenut huwa sigur jew awtentiku.", "Tistrieħx biss fuq l-app għal deċiżjonijiet ta' sigurtà, finanzjarji, legali jew personali. Eżamina l-evidenza u fittex għajnuna xierqa meta jkun meħtieġ. Nuqqas ta' funzjonament ta' fornitur mhuwiex riżultat ta' riskju baxx."]
+      },
+      {
+        "id": "third-parties",
+        "title": "Servizzi ta' partijiet terzi u privatezza",
+        "paragraphs": ["Is-servizz jiddependi fuq fornituri esterni u d-disponibbiltà tan-netwerk. Il-kontenut u d-dejta tas-servizz jistgħu jiġu pproċessati kif deskritt fil-Politika tal-Privatezza. Interruzzjonijiet jew kapaċitajiet mhux disponibbli jistgħu jipprevjenu analiżi milli titlesta."]
+      },
+      {
+        "id": "liability",
+        "title": "Responsabbiltà u d-drittijiet statutorji tiegħek",
+        "paragraphs": ["Is-servizz huwa pprovdut soġġett għad-disponibbiltà tiegħu u għal-limitazzjonijiet iddikjarati. Int tibqa' responsabbli għad-deċiżjonijiet meħuda bl-użu tal-indikaturi tiegħu. Xejn f'dawn it-termini ma jeskludi responsabbiltà jew jillimita drittijiet tal-konsumatur jew tal-protezzjoni tad-dejta li ma jistgħux jiġu esklużi jew limitati legalment."]
+      },
+      {
+        "id": "changes",
+        "title": "Bidliet fis-servizz u fit-termini",
+        "paragraphs": ["Il-funzjonalitajiet u dawn it-termini jistgħu jiġu aġġornati. Bidliet sostanzjali se jiġu kkomunikati kif meħtieġ mil-liġi applikabbli; il-kundizzjonijiet tax-xiri u d-drittijiet obbligatorji jibqgħu japplikaw. It-termini aġġornati se jkollhom data riveduta. Ikkuntattja lil JamDesigns fl-indirizz hawn taħt jekk għandek mistoqsijiet."]
+      }
+    ]
+  }
+}

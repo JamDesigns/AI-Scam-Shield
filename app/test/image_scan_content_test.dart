@@ -62,5 +62,18 @@ void main() {
     );
 
     expect(content.length, 1500);
+    expect(content, endsWith('QR code content: https://fake-bank-login.example'));
+  });
+
+  test('an over-budget QR URL is not silently turned into a different URL', () {
+    final url = 'https://example.test/${'x' * 1600}';
+    final content = buildImageScanContent(
+      ocrText: 'Visible text',
+      qrContents: [url],
+      maxLength: 1500,
+    );
+    // The full value travels separately in qrContents in the API contract.
+    expect(content, 'Visible text');
+    expect(content, isNot(contains('https://example.test/')));
   });
 }

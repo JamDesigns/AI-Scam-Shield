@@ -1,11 +1,14 @@
 import type { MediaTranscriptionProvider } from "./media-transcription-provider.js";
 import { DeepgramMediaTranscriptionProvider } from "./providers/deepgram/deepgram-media-transcription-provider.js";
+import { GeminiMediaTranscriptionProvider } from "./providers/gemini/gemini-media-transcription-provider.js";
 
 export type MediaTranscriptionProviderConfig = {
   provider: string;
   baseUrl?: string;
   model: string;
   apiKey?: string;
+  maxOutputTokens?: number;
+  sendTemperature?: boolean;
 };
 
 type MediaTranscriptionProviderBuilder = (
@@ -30,6 +33,15 @@ const providerBuilders: Record<
         "https://api.eu.deepgram.com/v1",
       model,
       apiKey,
+    });
+  },
+  gemini: (config) => {
+    const model = config.model.trim();
+    const apiKey = config.apiKey?.trim();
+    if (!model || !apiKey) return null;
+    return new GeminiMediaTranscriptionProvider({
+      baseUrl: config.baseUrl?.trim() || "https://generativelanguage.googleapis.com/v1beta",
+      model, apiKey, maxOutputTokens: config.maxOutputTokens, sendTemperature: config.sendTemperature,
     });
   },
 };

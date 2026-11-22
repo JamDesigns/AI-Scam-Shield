@@ -1,0 +1,101 @@
+{
+  "locale": "ca",
+  "htmlLang": "ca",
+  "languageName": "Català",
+  "updatedLabel": "Darrera actualització",
+  "languageLabel": "Idioma",
+  "contactTitle": "Contacte",
+  "privacy": {
+    "title": "Política de privacitat – AI Scam Shield",
+    "intro": "AI Scam Shield analitza text, URL, imatges i vídeos curts per identificar possibles estafes i indicis de manipulació. Aquesta política descriu la informació tractada per l'aplicació i els seus serveis.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Informació tractada",
+        "paragraphs": ["Trieu el contingut que voleu enviar enganxant-lo, seleccionant un fitxer o compartint-lo amb l'aplicació. El material enviat pot contenir dades personals vostres o d'altres persones; eviteu incloure informació sensible innecessària."],
+        "items": ["Text, URL, imatges, vídeos, àudio, text extret, contingut de codis QR i qualsevol missatge adjunt necessari per a l'anàlisi.", "Un identificador de sessió pseudònim, un testimoni d'autenticació emmagatzemat de manera segura al dispositiu, un hash del testimoni al servidor, el fus horari registrat i l'idioma de l'aplicació.", "Comptadors d'ús, marques de temps, avaluacions de risc, previsualitzacions de text de fins a 160 caràcters, resultats de l'anàlisi i metadades de processament de contingut multimèdia.", "Identificadors de subscripció, estat dels drets d'accés, producte, entorn i informació de caducitat necessària per verificar les compres.", "Dades tècniques de les sol·licituds i registres de seguretat. Firebase Analytics també tracta informació de l'aplicació i del dispositiu, així com esdeveniments d'ús, en l'aplicació actual."]
+      },
+      {
+        "id": "purposes",
+        "title": "Com s'utilitza la informació",
+        "paragraphs": ["La informació s'utilitza per efectuar l'anàlisi sol·licitada, retornar resultats en l'idioma de l'aplicació, oferir un historial i estadístiques, aplicar límits d'ús, verificar subscripcions i protegir el servei contra els abusos.", "El reconeixement òptic de caràcters (OCR) conserva l'idioma original del text. Les explicacions de l'anàlisi se sol·liciten en l'idioma de l'aplicació. Segons la funció i la configuració, el contingut es pot enviar a proveïdors d'IA, d'anàlisi forense multimèdia, de transcripció de veu o de traducció, també per traduir en una anàlisi sense IA."]
+      },
+      {
+        "id": "providers",
+        "title": "Serveis de tercers",
+        "paragraphs": ["Google Play gestiona les compres a Android i RevenueCat facilita la gestió i la verificació de les subscripcions. L'aplicació també integra Firebase Analytics. Els proveïdors d'anàlisi, transcripció, anàlisi forense i traducció reben el contingut necessari per a l'operació seleccionada.", "La conservació de dades per part dels proveïdors, els llocs de tractament i les garanties depenen dels serveis configurats per al desplegament i de les seves condicions. No suposeu que totes les operacions es fan al dispositiu o dins de la Unió Europea. JamDesigns no ven ni lloga les vostres dades per a publicitat."]
+      },
+      {
+        "id": "storage",
+        "title": "Emmagatzematge i supressió",
+        "paragraphs": ["El servidor emmagatzema registres de sessió i de subscripció, comptadors, previsualitzacions i resultats de les anàlisis per oferir un historial, estadístiques i reintents fiables. El contingut multimèdia pujat es pot processar mitjançant fitxers temporals; els proveïdors externs apliquen les seves pròpies disposicions de conservació.", "La versió actual no elimina automàticament l'historial d'anàlisis quan ha transcorregut un termini. Desinstal·lar l'aplicació no suprimeix els registres del servidor. Contacteu amb nosaltres per sol·licitar informació o la supressió de dades; pot ser necessària una verificació per evitar exposar els registres d'una altra persona. La pèrdua de les credencials de sessió pot impedir l'accés a l'historial anterior."]
+      },
+      {
+        "id": "security",
+        "title": "Seguretat",
+        "paragraphs": ["L'aplicació utilitza credencials de sessió protegides, autenticació al servidor i controls d'accés. Aquestes mesures redueixen el risc, però no poden garantir una seguretat absoluta. Envieu només contingut que tingueu dret a compartir."]
+      },
+      {
+        "id": "rights",
+        "title": "Els vostres drets",
+        "paragraphs": ["Quan la legislació aplicable reconegui aquests drets, podeu sol·licitar l'accés, la rectificació, la supressió, la limitació del tractament o la portabilitat de les vostres dades personals, oposar-vos al tractament i presentar una reclamació davant l'autoritat de protecció de dades competent. Utilitzeu l'adreça de contacte següent per presentar una sol·licitud."]
+      },
+      {
+        "id": "children",
+        "title": "Infants i informació sensible",
+        "paragraphs": ["No envieu informació personal innecessària sobre infants ni altre material sensible. Si heu enviat aquesta informació involuntàriament, contacteu amb nosaltres perquè es pugui avaluar la situació."]
+      },
+      {
+        "id": "changes",
+        "title": "Canvis en aquesta política",
+        "paragraphs": ["Les actualitzacions es publicaran a l'aplicació i en aquesta pàgina amb una data revisada. El contacte d'AI Scam Shield és JamDesigns, a l'adreça següent."]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Condicions del servei – AI Scam Shield",
+    "intro": "Aquestes condicions regulen l'ús d'AI Scam Shield per analitzar text, URL, imatges i vídeos curts. El servei ofereix indicadors de risc i orientació; no pot garantir la detecció de totes les estafes, manipulacions o elements ocults.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Ús del servei",
+        "paragraphs": ["Utilitzeu el servei de manera lícita i envieu només contingut que tingueu dret a compartir. El contingut es pot enganxar o compartir; les imatges i els vídeos també es poden seleccionar des del dispositiu."]
+      },
+      {
+        "id": "free-premium",
+        "title": "Anàlisis Free i Premium",
+        "paragraphs": ["El pla Free permet 3 anàlisis completades per setmana. La primera utilitza IA i pot analitzar text, un URL, una imatge o un vídeo. Les altres 2 analitzen text o URL sense IA; les imatges i els vídeos no estan disponibles en aquestes dues anàlisis.", "Una anàlisi completa compta com una unitat, independentment del tipus de contingut o del nombre de passos interns de processament. Un resultat vàlid però no concloent compta; un error sense un resultat vàlid no compta. La setmana es reinicia el dilluns a les 00:00 en el fus horari registrat per a la sessió.", "Premium ofereix anàlisis il·limitades amb IA mentre la subscripció verificada estigui activa. Es continuen aplicant els límits tècnics relatius als fitxers, la durada dels vídeos, les operacions simultànies i la disponibilitat dels proveïdors."]
+      },
+      {
+        "id": "media",
+        "title": "Contingut multimèdia i idiomes",
+        "paragraphs": ["Els vídeos poden tenir una durada de fins a 180 segons inclosos i una mida de fins a 100 MiB. Els formats compatibles i les capacitats de processament depenen de l'aplicació i dels proveïdors. L'OCR conserva l'idioma original del text i les explicacions de l'anàlisi utilitzen l'idioma de l'aplicació. Una interfície traduïda no garanteix una cobertura completa de l'OCR o de l'àudio en tots els idiomes."]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Subscripcions i compres",
+        "paragraphs": ["Google Play mostra el preu, el període de facturació i les condicions de renovació abans de la compra. La facturació, la cancel·lació i les sol·licituds de reemborsament es gestionen d'acord amb les polítiques de Google Play i la legislació aplicable; RevenueCat facilita la verificació dels drets d'accés.", "Gestioneu o cancel·leu una subscripció des del vostre compte de Google Play. L'accés Premium requereix verificació al servidor; una verificació pendent o fallida no crea un dret d'accés confirmat. Restaurar una compra no restaura automàticament l'historial d'una sessió perduda."]
+      },
+      {
+        "id": "results",
+        "title": "Limitacions de l'anàlisi",
+        "paragraphs": ["Els resultats automatitzats i assistits per IA poden ser inexactes, incomplets o desactualitzats, i poden incloure falsos positius i amenaces no detectades. El mostreig de fotogrames, la lectura de codis QR i les comprovacions de contingut ocult tenen límits i no poden demostrar que un contingut sigui segur o autèntic.", "No us baseu únicament en l'aplicació per prendre decisions de seguretat, financeres, jurídiques o personals. Reviseu les proves i cerqueu ajuda adequada quan calgui. Una fallada d'un proveïdor no és un resultat de risc baix."]
+      },
+      {
+        "id": "third-parties",
+        "title": "Serveis de tercers i privacitat",
+        "paragraphs": ["El servei depèn de proveïdors externs i de la disponibilitat de la xarxa. El contingut i les dades del servei es poden tractar tal com es descriu a la Política de privacitat. Les interrupcions o les funcions no disponibles poden impedir que una anàlisi es completi."]
+      },
+      {
+        "id": "liability",
+        "title": "Responsabilitat i els vostres drets legals",
+        "paragraphs": ["El servei es presta subjecte a la seva disponibilitat i a les limitacions indicades. Continueu sent responsables de les decisions preses a partir dels seus indicadors. Cap disposició d'aquestes condicions exclou responsabilitats ni limita drets dels consumidors o de protecció de dades que legalment no es puguin excloure o limitar."]
+      },
+      {
+        "id": "changes",
+        "title": "Canvis en el servei i les condicions",
+        "paragraphs": ["Les funcions i aquestes condicions es poden actualitzar. Els canvis substancials es comunicaran tal com exigeixi la legislació aplicable; les condicions de compra i els drets imperatius continuen sent aplicables. Les condicions actualitzades inclouran una data revisada. Per a qualsevol consulta, contacteu amb JamDesigns a l'adreça següent."]
+      }
+    ]
+  }
+}

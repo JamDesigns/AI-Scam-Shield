@@ -3,15 +3,24 @@ import type {
   AiProviderMedia,
   AiProviderRequest,
 } from "../../ai-provider.js";
+import { withDeadline } from "../../../runtime-deadline.js";
+import { outputTokenLimit, reportUsage, tokenCount } from "../../provider-usage.js";
 
 export type OpenAiProviderConfig = {
   baseUrl: string;
   model: string;
   apiKey: string;
+  maxOutputTokens?: number;
+  sendTemperature?: boolean;
 };
 
 type OpenAiResponse = {
   status?: string;
+  usage?: {
+    input_tokens?: number; output_tokens?: number; total_tokens?: number;
+    input_tokens_details?: { cached_tokens?: number };
+    output_tokens_details?: { reasoning_tokens?: number };
+  };
   output?: Array<{
     type?: string;
     content?: Array<{
@@ -30,6 +39,10 @@ export class OpenAiProvider implements AiProvider {
   async requestJson<T = unknown>(
     params: AiProviderRequest,
   ): Promise<T> {
+    return withDeadline((signal) => this.performRequest<T>({ ...params, signal }), params, "OpenAI request");
+  }
+
+  private async performRequest<T>(params: AiProviderRequest): Promise<T> {
     const input = [
       ...(params.system
         ? [
@@ -55,6 +68,7 @@ export class OpenAiProvider implements AiProvider {
       `${this.normalizedBaseUrl}/responses`,
       {
         method: "POST",
+        signal: params.signal,
         headers: {
           Authorization: `Bearer ${this.config.apiKey}`,
           "content-type": "application/json",
@@ -63,7 +77,8 @@ export class OpenAiProvider implements AiProvider {
           model: this.config.model,
           input,
           store: false,
-          ...(typeof params.temperature === "number"
+          max_output_tokens: outputTokenLimit(params, this.config.maxOutputTokens),
+          ...(this.config.sendTemperature !== false && typeof params.temperature === "number"
             ? { temperature: params.temperature }
             : {}),
           text: {
@@ -79,13 +94,21 @@ export class OpenAiProvider implements AiProvider {
     );
 
     if (!response.ok) {
-      const body = await response.text().catch(() => "");
       throw new Error(
-        `OpenAI request failed (${response.status}): ${body}`,
+        `OpenAI request failed (${response.status})`,
       );
     }
 
     const body = (await response.json()) as OpenAiResponse;
+
+    if (body.usage) reportUsage(params, {
+      provider: this.name, model: this.config.model,
+      inputTokens: tokenCount(body.usage.input_tokens),
+      outputTokens: tokenCount(body.usage.output_tokens),
+      cachedInputTokens: tokenCount(body.usage.input_tokens_details?.cached_tokens),
+      reasoningTokens: tokenCount(body.usage.output_tokens_details?.reasoning_tokens),
+      totalTokens: tokenCount(body.usage.total_tokens),
+    });
 
     if (body.status && body.status !== "completed") {
       throw new Error(
@@ -102,7 +125,7 @@ export class OpenAiProvider implements AiProvider {
     )?.refusal;
 
     if (refusal) {
-      throw new Error(`OpenAI refused the request: ${refusal}`);
+      throw new Error("OpenAI refused the request");
     }
 
     const outputText = content?.find(

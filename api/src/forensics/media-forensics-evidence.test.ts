@@ -3,6 +3,20 @@ import { describe, expect, it } from "vitest";
 import { buildMediaForensicsEvidence } from "./media-forensics-evidence.js";
 
 describe("buildMediaForensicsEvidence", () => {
+  it("preserves explicit inconclusive evidence rather than reporting a negative", () => {
+    const evidence = buildMediaForensicsEvidence({ provider: "hive", mimeType: "video/mp4", result: { status: "completed", observations: [{ videoInconclusive: true }] } });
+    expect(evidence.aiGeneratedStatus).toBe("inconclusive");
+    expect(evidence.deepfakeStatus).toBe("inconclusive");
+    expect(evidence.aiGeneratedDetected).toBeNull();
+    expect(evidence.deepfakeDetected).toBeNull();
+    expect(evidence.audioAiGeneratedStatus).toBe("unavailable");
+  });
+  it("keeps missing scores unavailable and exposes positive synthetic audio separately", () => {
+    const evidence = buildMediaForensicsEvidence({ provider: "hive", mimeType: "video/mp4", result: { status: "completed", observations: [{ aiGeneratedAudioScore: 0.98 }] } });
+    expect(evidence.aiGeneratedStatus).toBe("unavailable");
+    expect(evidence.aiGeneratedDetected).toBeNull();
+    expect(evidence.audioAiGeneratedStatus).toBe("detected");
+  });
   it("detects AI-generated image evidence at the Hive threshold", () => {
     const evidence = buildMediaForensicsEvidence({
       provider: "hive",

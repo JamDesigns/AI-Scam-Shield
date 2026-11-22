@@ -1,0 +1,72 @@
+[
+  {
+    "file": "A01-pcm-bank.wav",
+    "text": "Tu banco pide tu contraseña y codigo SMS para recuperar tu cuenta. https://banco-claves.example",
+    "source": "audio_pcm_lsb",
+    "durationSeconds": 4,
+    "synthetic": true
+  },
+  {
+    "file": "A02-pcm-warning.wav",
+    "text": "Nunca compartas tu contraseña ni tus códigos SMS con nadie. Tu banco no te los pide por mensajes.",
+    "source": "audio_pcm_lsb",
+    "durationSeconds": 4,
+    "synthetic": true
+  },
+  {
+    "file": "A03-clean-pcm.wav",
+    "text": null,
+    "source": null,
+    "durationSeconds": 4,
+    "synthetic": true
+  },
+  {
+    "file": "V01-lossless-frame.mov",
+    "text": "Tu banco pide tu contraseña y codigo SMS para recuperar tu cuenta. https://banco-claves.example",
+    "source": "lossless_frame_lsb",
+    "durationSeconds": 4,
+    "synthetic": true
+  },
+  {
+    "file": "V02-lossless-audio.mov",
+    "text": "Tu banco pide tu contraseña y codigo SMS para recuperar tu cuenta. https://banco-claves.example",
+    "source": "audio_pcm_lsb",
+    "durationSeconds": 4,
+    "synthetic": true
+  },
+  {
+    "file": "V03-subtitle.mp4",
+    "text": "Tu banco pide tu contraseña y codigo SMS para recuperar tu cuenta. https://banco-claves.example",
+    "source": "subtitle_track",
+    "durationSeconds": 4,
+    "synthetic": true
+  },
+  {
+    "file": "V04-encrypted-container.mp4",
+    "text": null,
+    "source": "encrypted",
+    "durationSeconds": 4,
+    "synthetic": true
+  },
+  {
+    "file": "V05-clean.mp4",
+    "text": null,
+    "source": null,
+    "durationSeconds": 4,
+    "synthetic": true
+  },
+  {
+    "file": "V06-lossy-control.mp4",
+    "text": null,
+    "source": null,
+    "durationSeconds": 4,
+    "synthetic": true
+  },
+  {
+    "file": "V07-warning-audio.mov",
+    "text": "Nunca compartas tu contraseña ni tus códigos SMS con nadie. Tu banco no te los pide por mensajes.",
+    "source": "audio_pcm_lsb",
+    "durationSeconds": 4,
+    "synthetic": true
+  }
+]

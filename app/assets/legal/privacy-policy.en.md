@@ -1,61 +1,54 @@
 # Privacy Policy – AI Scam Shield
 
-Last updated: 2026
+Last updated: 2026-11-02
 
-AI Scam Shield is designed to help users detect potential scam messages using artificial intelligence.
+AI Scam Shield analyses text, URLs, images and short videos to identify possible scams and signs of manipulation. This policy describes the information processed by the app and its services.
 
-## Information We Collect
+## Information processed
 
-The application may process the following information:
+You choose the content to submit by pasting, selecting a file or sharing with the app. Submitted material can contain personal data about you or other people; avoid unnecessary sensitive information.
 
-- Text entered by the user for scam analysis
-- Anonymous device identifier used to manage usage limits and subscriptions
-- Subscription status (premium or free)
+- Text, URLs, images, videos, audio, extracted text, QR content and any accompanying message needed for analysis.
+- A pseudonymous session identifier, an authentication token stored securely on the device, a token hash on the server, the registered time zone and the app language.
+- Usage counters, timestamps, risk assessments, text previews of up to 160 characters, analysis results and media-processing metadata.
+- Subscription identifiers, entitlement status, product, environment and expiry information needed to verify purchases.
+- Technical request data and security logs. Firebase Analytics also processes app/device information and usage events in the current app.
 
-We do **not collect personal identity information** such as name, email, contacts, or location.
+## How information is used
 
-## How Information Is Used
+Information is used to perform the requested analysis, return results in the app language, provide history and statistics, apply usage limits, verify subscriptions and protect the service against abuse.
 
-The collected information is used exclusively to:
+OCR preserves the original text language. Analysis explanations are requested in the app language. Depending on the feature and configuration, content may be sent to AI, media-forensics, speech-transcription or translation providers, including for translation in a non-AI scan.
 
-- Analyze potential scam messages
-- Enforce usage limits for the free version
-- Manage premium subscriptions
-- Improve scam detection accuracy
+## Third-party services
 
-User-submitted text is sent to an external AI analysis service to generate a scam risk assessment.  
-The text is processed only for analysis and is not permanently stored by AI Scam Shield.
+Google Play handles Android purchases and RevenueCat supports subscription management and verification. The app also integrates Firebase Analytics. Analysis, transcription, forensic and translation providers receive the content needed for the selected operation.
 
-## Third-Party Services
+Provider retention, processing locations and safeguards depend on the services configured for deployment and their terms. Do not assume that every operation stays on the device or within the European Union. JamDesigns does not sell or rent your data for advertising.
 
-AI Scam Shield may use third-party services including:
+## Storage and deletion
 
-- AI analysis services used to detect potential scam messages
-- RevenueCat for subscription management
+The server stores session and subscription records, counters, analysis previews and results for history, statistics and reliable retries. Uploaded media may be processed through temporary files; external providers apply their own retention arrangements.
 
-These services may process limited data necessary to provide their functionality.
-
-## Data Storage
-
-Anonymous device identifiers and usage counters may be stored securely on our servers for the time necessary to operate the service.
-
-We do not sell, rent, or share user data for advertising purposes.
+The current release does not automatically expire analysis history. Uninstalling the app does not delete server records. Contact us to request information or deletion; verification may be needed to avoid exposing another person's records. Losing the session credentials can prevent access to previous history.
 
 ## Security
 
-We implement reasonable technical and organizational measures to protect the information processed by the application.
+The app uses protected session credentials, server-side authentication and access controls. These measures reduce risk but cannot guarantee absolute security. Only submit content you are entitled to share.
 
-## Children’s Privacy
+## Your rights
 
-AI Scam Shield is suitable for general audiences.
+Where applicable law provides these rights, you may request access, correction, deletion, restriction or portability of your personal data, object to processing, and complain to the competent data protection authority. Use the contact address below to make a request.
 
-The application does not knowingly collect personal information from users of any age.
+## Children and sensitive information
 
-If you believe that any sensitive data has been provided unintentionally, please contact us and we will take appropriate action.
+Do not submit unnecessary personal information about children or other sensitive material. If such information was submitted unintentionally, contact us so that the situation can be assessed.
+
+## Changes to this policy
+
+Updates will be published in the app and on this page with a revised date. The contact for AI Scam Shield is JamDesigns at the address below.
 
 ## Contact
-
-If you have any questions about this Privacy Policy, you can contact:
 
 JamDesigns  
 [joseangel.mosquera@gmail.com](mailto:joseangel.mosquera@gmail.com)

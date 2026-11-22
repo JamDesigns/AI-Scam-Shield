@@ -205,20 +205,29 @@ export function getDefaultRules(): Ruleset {
   };
 }
 
-function extractUrls(input: string): string[] {
-  // Simple and robust URL extraction for pasted text.
-  // Avoid heavy parsing; we only need candidates.
-  const matches = input.match(/\bhttps?:\/\/[^\s<>()]+/gi);
+export function extractUrls(input: string): string[] {
+  // Bare domains/IPs are common in copied messages. Do not interpret email addresses as URL candidates.
+  const matches = input.match(/(?<![\p{L}\p{N}_@.-])(?:https?:\/\/[^\s<>()]+|(?:[\p{L}\p{N}](?:[\p{L}\p{N}-]*[\p{L}\p{N}])?\.)+(?:[\p{L}]{2,63}|\d{1,3})(?::\d{1,5})?(?:[/?#][^\s<>()]*)?)/giu);
 
   if (!matches) return [];
 
   return Array.from(
     new Set(
       matches
-        .map((u) => u.replace(/[),.;!?]+$/g, "")) // trim trailing punctuation
-        .slice(0, 10),
+        .map((u) => u.replace(/[),.;!?\]}"']+$/g, ""))
+        .map((u) => /^https?:\/\//i.test(u) ? u : `https://${u}`),
     ),
   );
+}
+
+const officialDomains = [
+  "paypal.com", "apple.com", "icloud.com", "amazon.com", "amazon.co.uk", "amazon.es", "amazon.fr", "amazon.de", "amazon.it", "amazon.nl", "amazon.pl", "amazon.se", "amazon.com.be",
+  "google.com", "google.co.uk", "google.es", "google.fr", "google.de", "google.it", "microsoft.com", "microsoftonline.com", "live.com", "netflix.com",
+  "facebook.com", "instagram.com", "whatsapp.com", "dhl.com", "fedex.com", "ups.com", "usps.com",
+];
+
+function isOfficialDomain(hostname: string): boolean {
+  return officialDomains.some((domain) => hostname === domain || hostname.endsWith(`.${domain}`));
 }
 
 function looksLikeIpHost(hostname: string): boolean {
@@ -240,6 +249,7 @@ function getTld(hostname: string): string | null {
 export function scoreInput(
   input: string,
   rules: Ruleset,
+  originalUrlSource = input,
 ): { riskScore: number; category: string; reasons: RuleReason[] } {
   const lower = input.toLowerCase();
 
@@ -247,7 +257,11 @@ export function scoreInput(
   const reasons: RuleReason[] = [];
 
   // 🔹 URL heuristics (works even without translation)
-  const urls = extractUrls(input);
+  const urls = extractUrls(originalUrlSource);
+  const hostnames = urls.flatMap((raw) => {
+    try { return [new URL(raw).hostname.toLowerCase().replace(/\.$/, "")]; }
+    catch { return []; }
+  });
 
   for (const raw of urls) {
     let url: URL | null = null;
@@ -257,7 +271,8 @@ export function scoreInput(
       continue;
     }
 
-    const hostname = url.hostname.toLowerCase();
+    const hostname = url.hostname.toLowerCase().replace(/\.$/, "");
+    const official = isOfficialDomain(hostname);
 
     // IP-based URLs are common in scams
     if (looksLikeIpHost(hostname)) {
@@ -299,7 +314,7 @@ export function scoreInput(
 
     // NEW: brand impersonation in hostname (paypal, apple, amazon...)
     for (const b of rules.brandKeywords) {
-      if (hostname.includes(b)) {
+      if (!official && hostname.includes(b)) {
         score += 35;
         reasons.push("URL_TYPO");
         break;
@@ -320,7 +335,7 @@ export function scoreInput(
 
   // 🔹 URL shorteners
   for (const s of rules.urlShorteners) {
-    if (lower.includes(s)) {
+    if (hostnames.some((host) => host === s || host.endsWith(`.${s}`))) {
       score += 20;
       reasons.push("SHORTENER");
       break;
@@ -329,7 +344,7 @@ export function scoreInput(
 
   // 🔹 Suspicious typos
   for (const t of rules.suspiciousTypos) {
-    if (lower.includes(t.toLowerCase())) {
+    if (hostnames.some((host) => host.includes(t.toLowerCase()))) {
       score += 35;
       reasons.push("URL_TYPO");
       break;

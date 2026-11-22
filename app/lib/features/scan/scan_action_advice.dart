@@ -22,8 +22,10 @@ ScanActionAdviceContent buildScanActionAdviceContent({
   final safetyAdvice = [
     translate('result.copyAdvice.header'),
     '',
-    '${translate('result.riskScore')}: ${result.riskScore}/100',
+    '${translate('result.riskScore')}: ${result.isInconclusive ? translate('categories.inconclusive') : '${result.riskScore}/100'}',
     '${translate('result.category')}: ${translate('categories.${result.category}')}',
+    if (result.hasLimitedLanguageCoverage)
+      translate('result.limitedLanguageCoverage'),
     '${translate('result.threatType')}: ${translate('threatTypes.${result.threatType}')}',
     '',
     translate('result.reasons'),
@@ -46,6 +48,12 @@ List<String> _buildActionTexts(
   ScanResult result,
   String Function(String key) translate,
 ) {
+  if (result.isInconclusive) {
+    return [
+      translate('result.action.low.stayCautious'),
+      translate('result.action.verify'),
+    ];
+  }
   if (result.category == 'low_risk') {
     return [
       translate('result.action.low.noImmediateAction'),

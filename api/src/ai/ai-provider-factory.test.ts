@@ -74,4 +74,13 @@ describe("createAiProvider", () => {
       }),
     ).toThrow('Unsupported AI provider "unknown"');
   });
+
+  it("selects native Gemini by configuration without changing existing providers", () => {
+    expect(createAiProvider({ provider: "gemini", model: "gemini-3.5-flash-lite", apiKey: "synthetic-key" })?.name).toBe("gemini");
+  });
+
+  it("leaves missing Gemini credentials unavailable, without vendor fallback", () => {
+    expect(createAiProvider({ provider: "gemini", model: "gemini-3.5-flash-lite" })).toBeNull();
+    expect(createAiProvider({ provider: "gemini", model: " ", apiKey: "synthetic-key" })).toBeNull();
+  });
 });

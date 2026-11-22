@@ -1,5 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { Readable } from "node:stream";
+import { z } from "zod";
+import { withDeadline } from "../../../runtime-deadline.js";
 
 import type {
   MediaForensicsObservation,
@@ -43,7 +45,16 @@ const RESERVED_CLASSES = new Set([
   "none",
   "inconclusive",
   "inconclusive_video",
+  "inconclusive_audio",
 ]);
+
+const hiveOutputSchema = z.array(z.object({
+  classes: z.array(z.object({
+    class: z.string().min(1),
+    value: z.number().finite().min(0).max(1),
+  }).passthrough()).min(1),
+  extra: z.array(z.object({ name: z.string(), value: z.number().finite() }).passthrough()).optional(),
+}).passthrough()).min(1);
 
 export class HiveMediaForensicsProvider
   implements MediaForensicsProvider
@@ -57,6 +68,10 @@ export class HiveMediaForensicsProvider
   async analyze(
     media: MediaForensicsProviderMedia,
   ): Promise<MediaForensicsProviderResult> {
+    return withDeadline((signal) => this.performAnalysis({ ...media, signal }), media, "Hive request", 45_000);
+  }
+
+  private async performAnalysis(media: MediaForensicsProviderMedia): Promise<MediaForensicsProviderResult> {
     if (
       !media.mimeType.startsWith("image/") &&
       !media.mimeType.startsWith("video/") &&
@@ -78,6 +93,7 @@ export class HiveMediaForensicsProvider
       },
       body: multipart.body as unknown as RequestInit["body"],
       duplex: "half",
+      signal: media.signal,
     };
 
     const response = await fetch(
@@ -104,6 +120,10 @@ export class HiveMediaForensicsProvider
 
     if (!Array.isArray(body.output) || body.output.length === 0) {
       throw new Error("Hive response did not include output");
+    }
+
+    if (!hiveOutputSchema.safeParse(body.output).success) {
+      throw new Error("Hive response contained invalid observations");
     }
 
     return {
@@ -139,6 +159,11 @@ export class HiveMediaForensicsProvider
       "timestamp",
     );
 
+    if (frameIndex !== undefined && (!Number.isInteger(frameIndex) || frameIndex < 0)
+      || timestampSeconds !== undefined && timestampSeconds < 0) {
+      throw new Error("Hive response contained invalid observation timestamps");
+    }
+
     const generatorScores = Array.from(classes.entries())
       .filter(([name]) => !RESERVED_CLASSES.has(name))
       .map(([name, score]) => ({
@@ -147,6 +172,12 @@ export class HiveMediaForensicsProvider
       }));
 
     return {
+      ...(classes.has("inconclusive")
+        ? { inconclusive: classes.get("inconclusive")! >= 0.5 } : {}),
+      ...(classes.has("inconclusive_video")
+        ? { videoInconclusive: classes.get("inconclusive_video")! >= 0.5 } : {}),
+      ...(classes.has("inconclusive_audio")
+        ? { audioInconclusive: classes.get("inconclusive_audio")! >= 0.5 } : {}),
       ...(frameIndex !== undefined ? { frameIndex } : {}),
       ...(timestampSeconds !== undefined
         ? { timestampSeconds }

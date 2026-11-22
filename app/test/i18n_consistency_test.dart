@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:scam_shield_mvp/i18n/app_localizations.dart';
 
-const supportedLocales = ['en', 'es', 'fr', 'de', 'it'];
+final supportedLocales = AppLocalizations.supportedLocales
+    .map((locale) => locale.languageCode)
+    .toList();
 
 void main() {
   test('i18n files have the same translation keys', () {

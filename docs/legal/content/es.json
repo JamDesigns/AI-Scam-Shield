@@ -1,0 +1,101 @@
+{
+  "locale": "es",
+  "htmlLang": "es",
+  "languageName": "Español",
+  "updatedLabel": "Última actualización",
+  "languageLabel": "Idioma",
+  "contactTitle": "Contacto",
+  "privacy": {
+    "title": "Política de privacidad – AI Scam Shield",
+    "intro": "AI Scam Shield analiza textos, URL, imágenes y vídeos cortos para identificar posibles estafas e indicios de manipulación. Esta política describe la información que procesan la app y sus servicios.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Información que se procesa",
+        "paragraphs": ["Tú eliges el contenido que envías al pegar, seleccionar un archivo o compartirlo con la app. El material enviado puede contener datos personales tuyos o de otras personas; evita incluir información sensible innecesaria."],
+        "items": ["Textos, URL, imágenes, vídeos, audio, texto extraído, contenido de códigos QR y mensajes adjuntos necesarios para el análisis.", "Un identificador de sesión seudónimo, un token de autenticación guardado de forma segura en el dispositivo, su hash en el servidor, la zona horaria registrada y el idioma de la app.", "Contadores de uso, fechas y horas, evaluaciones de riesgo, vistas previas de texto de hasta 160 caracteres, resultados de análisis y metadatos del procesamiento multimedia.", "Identificadores de suscripción, estado del acceso, producto, entorno e información de caducidad necesarios para verificar las compras.", "Datos técnicos de las peticiones y registros de seguridad. La app actual también utiliza Firebase Analytics para procesar información de la app y del dispositivo y eventos de uso."]
+      },
+      {
+        "id": "purposes",
+        "title": "Cómo se utiliza la información",
+        "paragraphs": ["La información se utiliza para realizar el análisis solicitado, devolver resultados en el idioma de la app, ofrecer historial y estadísticas, aplicar límites de uso, verificar suscripciones y proteger el servicio frente a abusos.", "El OCR conserva el idioma original del texto. Las explicaciones del análisis se solicitan en el idioma de la app. Según la función y su configuración, el contenido puede enviarse a proveedores de IA, análisis forense multimedia, transcripción de voz o traducción, incluida la traducción en un análisis sin IA."]
+      },
+      {
+        "id": "providers",
+        "title": "Servicios de terceros",
+        "paragraphs": ["Google Play gestiona las compras de Android y RevenueCat facilita la gestión y verificación de suscripciones. La app también integra Firebase Analytics. Los proveedores de análisis, transcripción, análisis forense y traducción reciben el contenido necesario para la operación seleccionada.", "La conservación, las ubicaciones de procesamiento y las garantías de los proveedores dependen de los servicios configurados para el despliegue y de sus condiciones. No debe suponerse que todas las operaciones se realizan en el dispositivo o dentro de la Unión Europea. JamDesigns no vende ni alquila tus datos con fines publicitarios."]
+      },
+      {
+        "id": "storage",
+        "title": "Almacenamiento y eliminación",
+        "paragraphs": ["El servidor almacena registros de sesión y suscripción, contadores, vistas previas y resultados de análisis para el historial, las estadísticas y los reintentos fiables. Los archivos multimedia enviados pueden procesarse mediante archivos temporales; los proveedores externos aplican sus propias condiciones de conservación.", "La versión actual no elimina automáticamente el historial de análisis por antigüedad. Desinstalar la app no borra los registros del servidor. Contacta con nosotros para solicitar información o la eliminación; puede ser necesaria una verificación para evitar exponer los registros de otra persona. Perder las credenciales de sesión puede impedir el acceso al historial anterior."]
+      },
+      {
+        "id": "security",
+        "title": "Seguridad",
+        "paragraphs": ["La app utiliza credenciales de sesión protegidas, autenticación en el servidor y controles de acceso. Estas medidas reducen los riesgos, pero no garantizan una seguridad absoluta. Envía únicamente contenido que tengas derecho a compartir."]
+      },
+      {
+        "id": "rights",
+        "title": "Tus derechos",
+        "paragraphs": ["Cuando la legislación aplicable reconozca estos derechos, puedes solicitar el acceso, la rectificación, la eliminación, la limitación o la portabilidad de tus datos personales, oponerte al tratamiento y reclamar ante la autoridad de protección de datos competente. Utiliza la dirección de contacto que figura a continuación para presentar una solicitud."]
+      },
+      {
+        "id": "children",
+        "title": "Menores e información sensible",
+        "paragraphs": ["No envíes datos personales innecesarios de menores ni otros contenidos sensibles. Si se ha enviado esa información por error, contacta con nosotros para que podamos evaluar la situación."]
+      },
+      {
+        "id": "changes",
+        "title": "Cambios en esta política",
+        "paragraphs": ["Las actualizaciones se publicarán en la app y en esta página con una fecha revisada. El contacto de AI Scam Shield es JamDesigns, en la dirección que figura a continuación."]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Términos de servicio – AI Scam Shield",
+    "intro": "Estos términos regulan el uso de AI Scam Shield para analizar textos, URL, imágenes y vídeos cortos. El servicio proporciona indicadores de riesgo y orientación; no garantiza detectar todas las estafas, manipulaciones o elementos ocultos.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Uso del servicio",
+        "paragraphs": ["Utiliza el servicio de forma lícita y envía únicamente contenido que tengas derecho a compartir. El contenido puede pegarse o compartirse; también se pueden seleccionar imágenes y vídeos del dispositivo."]
+      },
+      {
+        "id": "free-premium",
+        "title": "Análisis gratuitos y Premium",
+        "paragraphs": ["El plan gratuito permite 3 análisis completados por semana. El primero utiliza IA y puede analizar texto, una URL, una imagen o un vídeo. Los otros 2 analizan textos o URL sin IA; las imágenes y los vídeos no están disponibles para esos dos usos.", "Cada análisis completo cuenta como una unidad, independientemente del tipo de contenido o del número de pasos internos. Un resultado inconcluso válido cuenta; un error sin resultado válido no cuenta. La semana se reinicia el lunes a las 00:00 en la zona horaria registrada para la sesión.", "Premium ofrece análisis ilimitados con IA mientras la suscripción verificada esté activa. Se siguen aplicando los límites técnicos de archivos, duración de vídeo, operaciones simultáneas y disponibilidad de los proveedores."]
+      },
+      {
+        "id": "media",
+        "title": "Multimedia e idiomas",
+        "paragraphs": ["Los vídeos pueden durar hasta 180 segundos inclusive y ocupar hasta 100 MiB. Los formatos admitidos y las capacidades de procesamiento dependen de la app y los proveedores. El OCR conserva el idioma original del texto y las explicaciones del análisis utilizan el idioma de la app. Una interfaz traducida no garantiza cobertura completa de OCR o audio en todos los idiomas."]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Suscripciones y compras",
+        "paragraphs": ["Google Play muestra el precio, el periodo de facturación y las condiciones de renovación antes de la compra. La facturación, las cancelaciones y las solicitudes de reembolso se gestionan conforme a las políticas de Google Play y la legislación aplicable; RevenueCat facilita la verificación del acceso.", "Gestiona o cancela la suscripción desde tu cuenta de Google Play. El acceso Premium requiere verificación del servidor; una verificación pendiente o fallida no concede un acceso confirmado. Restaurar una compra no restaura automáticamente el historial de una sesión perdida."]
+      },
+      {
+        "id": "results",
+        "title": "Limitaciones del análisis",
+        "paragraphs": ["Los resultados automatizados y asistidos por IA pueden ser inexactos, incompletos o estar desactualizados, e incluir falsos positivos y amenazas no detectadas. El muestreo de fotogramas, la lectura de QR y las comprobaciones de contenido oculto son limitados y no demuestran que un contenido sea seguro o auténtico.", "No te bases únicamente en la app para tomar decisiones de seguridad, financieras, legales o personales. Revisa las evidencias y busca ayuda adecuada cuando sea necesario. Un fallo del proveedor no equivale a un resultado de riesgo bajo."]
+      },
+      {
+        "id": "third-parties",
+        "title": "Servicios de terceros y privacidad",
+        "paragraphs": ["El servicio depende de proveedores externos y de la disponibilidad de la red. El contenido y los datos del servicio pueden procesarse según lo descrito en la Política de privacidad. Las interrupciones o funciones no disponibles pueden impedir que un análisis se complete."]
+      },
+      {
+        "id": "liability",
+        "title": "Responsabilidad y derechos reconocidos por ley",
+        "paragraphs": ["El servicio se proporciona sujeto a su disponibilidad y a las limitaciones indicadas. Sigues siendo responsable de las decisiones que tomes utilizando sus indicadores. Nada de lo dispuesto en estos términos excluye responsabilidades ni limita derechos de consumo o protección de datos que legalmente no puedan excluirse o limitarse."]
+      },
+      {
+        "id": "changes",
+        "title": "Cambios en el servicio y los términos",
+        "paragraphs": ["Las funciones y estos términos pueden actualizarse. Los cambios importantes se comunicarán según exija la legislación aplicable; seguirán siendo aplicables las condiciones de compra y los derechos irrenunciables. Los términos actualizados tendrán una fecha revisada. Para cualquier consulta, contacta con JamDesigns en la dirección que figura a continuación."]
+      }
+    ]
+  }
+}

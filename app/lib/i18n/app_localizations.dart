@@ -12,10 +12,39 @@ class AppLocalizations {
   late Map<String, dynamic> _fallbackTranslations;
 
   static const List<Locale> supportedLocales = [
-    Locale('en'),
+    Locale('bg'),
+    Locale('ca'),
+    Locale('cs'),
+    Locale('da'),
+    Locale('de'),
+    Locale('el'),
+    Locale('en', 'GB'),
     Locale('es'),
+    Locale('et'),
+    Locale('fi'),
     Locale('fr'),
+    Locale('ga'),
+    Locale('hr'),
+    Locale('hu'),
+    Locale('it'),
+    Locale('lt'),
+    Locale('lv'),
+    Locale('mt'),
+    Locale('nl'),
+    Locale('pl'),
+    Locale('pt'),
+    Locale('ro'),
+    Locale('sk'),
+    Locale('sl'),
+    Locale('sv'),
   ];
+
+  static Locale resolveLocale(Locale? deviceLocale) {
+    return supportedLocales.firstWhere(
+      (locale) => locale.languageCode == deviceLocale?.languageCode,
+      orElse: () => const Locale('en', 'GB'),
+    );
+  }
 
   static AppLocalizations of(BuildContext context) {
     final AppLocalizations? loc =

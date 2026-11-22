@@ -15,7 +15,7 @@ class AnalyticsService {
   }
 
   static Future<void> scanResult({
-    required int riskScore,
+    required int? riskScore,
     required String category,
     required int reasonsCount,
     required bool isPremium,
@@ -23,7 +23,7 @@ class AnalyticsService {
     return _a.logEvent(
       name: 'scan_result',
       parameters: {
-        'risk_score': riskScore,
+        if (riskScore != null) 'risk_score': riskScore,
         'category': category,
         'reasons_count': reasonsCount,
         'is_premium': isPremium ? 1 : 0,

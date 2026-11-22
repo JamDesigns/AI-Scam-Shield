@@ -1,0 +1,146 @@
+{
+  "locale": "et",
+  "htmlLang": "et",
+  "languageName": "Eesti",
+  "updatedLabel": "Viimati uuendatud",
+  "languageLabel": "Keel",
+  "contactTitle": "Kontakt",
+  "privacy": {
+    "title": "Privaatsuspoliitika – AI Scam Shield",
+    "intro": "AI Scam Shield analüüsib teksti, URL-e, pilte ja lühivideoid, et tuvastada võimalikke pettusi ning manipuleerimise märke. See poliitika kirjeldab teavet, mida rakendus ja selle teenused töötlevad.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Töödeldav teave",
+        "paragraphs": [
+          "Valite ise esitatava sisu, kleepides selle, valides faili või jagades seda rakendusega. Esitatud materjal võib sisaldada teie või teiste inimeste isikuandmeid; vältige tarbetut tundlikku teavet."
+        ],
+        "items": [
+          "Tekst, URL-id, pildid, videod, heli, eraldatud tekst, QR-sisu ja analüüsiks vajalik kaasnev sõnum.",
+          "Pseudonüümne seansitunnus, seadmesse turvaliselt salvestatud autentimistõend, serveris olev tõendi räsiväärtus, registreeritud ajavöönd ja rakenduse keel.",
+          "Kasutusloendurid, ajatemplid, riskihinnangud, kuni 160 märgi pikkused teksti eelvaated, analüüsitulemused ja meediatöötluse metaandmed.",
+          "Tellimuste tunnused, kasutusõiguse olek ning ostude kontrollimiseks vajalik teave toote, keskkonna ja aegumise kohta.",
+          "Tehnilised päringuandmed ja turvalogid. Firebase Analytics töötleb praeguses rakenduses ka rakenduse ja seadme teavet ning kasutussündmusi."
+        ]
+      },
+      {
+        "id": "purposes",
+        "title": "Teabe kasutamine",
+        "paragraphs": [
+          "Teavet kasutatakse soovitud analüüsi tegemiseks, tulemuste edastamiseks rakenduse keeles, ajaloo ja statistika pakkumiseks, kasutuspiirangute rakendamiseks, tellimuste kontrollimiseks ning teenuse kaitsmiseks kuritarvitamise eest.",
+          "OCR säilitab teksti algkeele. Analüüsi selgitusi küsitakse rakenduse keeles. Olenevalt funktsioonist ja seadistusest võidakse sisu saata tehisintellekti-, meediaekspertiisi-, kõne transkribeerimise või tõlketeenuste osutajatele, sealhulgas tõlkimiseks ilma tehisintellektita skannimisel."
+        ]
+      },
+      {
+        "id": "providers",
+        "title": "Kolmandate isikute teenused",
+        "paragraphs": [
+          "Google Play haldab Androidi oste ning RevenueCat toetab tellimuste haldamist ja kontrollimist. Rakendus sisaldab ka Firebase Analyticsit. Analüüsi-, transkribeerimis-, ekspertiisi- ja tõlketeenuste osutajad saavad valitud toiminguks vajaliku sisu.",
+          "Teenuseosutajate säilitamistingimused, töötlemiskohad ja kaitsemeetmed sõltuvad kasutuselevõtuks seadistatud teenustest ning nende tingimustest. Ärge eeldage, et kõik toimingud jäävad seadmesse või Euroopa Liitu. JamDesigns ei müü ega rendi teie andmeid reklaami eesmärgil."
+        ]
+      },
+      {
+        "id": "storage",
+        "title": "Säilitamine ja kustutamine",
+        "paragraphs": [
+          "Server säilitab seansi- ja tellimuskirjeid, loendureid, analüüside eelvaateid ning tulemusi ajaloo, statistika ja töökindlate korduskatsete jaoks. Üleslaaditud meediat võidakse töödelda ajutiste failide kaudu; välised teenuseosutajad rakendavad oma säilitamiskorda.",
+          "Praeguses versioonis analüüsiajalugu automaatselt ei aegu. Rakenduse eemaldamine ei kustuta serveri kirjeid. Teabe või kustutamise taotlemiseks võtke meiega ühendust; teise inimese kirjete avaldamise vältimiseks võib olla vaja kontrollimist. Seansi juurdepääsuandmete kaotamine võib takistada varasemale ajaloole juurdepääsu."
+        ]
+      },
+      {
+        "id": "security",
+        "title": "Turvalisus",
+        "paragraphs": [
+          "Rakendus kasutab kaitstud seansi juurdepääsuandmeid, serveripoolset autentimist ja juurdepääsukontrolli. Need meetmed vähendavad riski, kuid ei saa tagada täielikku turvalisust. Esitage ainult sisu, mida teil on õigus jagada."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "Teie õigused",
+        "paragraphs": [
+          "Kui kohaldatav õigus need õigused annab, võite taotleda juurdepääsu oma isikuandmetele, nende parandamist, kustutamist, töötlemise piiramist või ülekandmist, esitada töötlemisele vastuväite ning kaebuse pädevale andmekaitseasutusele. Taotluse esitamiseks kasutage allolevat kontaktaadressi."
+        ]
+      },
+      {
+        "id": "children",
+        "title": "Lapsed ja tundlik teave",
+        "paragraphs": [
+          "Ärge esitage tarbetuid isikuandmeid laste kohta ega muud tundlikku materjali. Kui selline teave esitati tahtmatult, võtke meiega ühendust, et olukorda saaks hinnata."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Selle poliitika muudatused",
+        "paragraphs": [
+          "Uuendused avaldatakse rakenduses ja sellel lehel koos muudetud kuupäevaga. AI Scam Shieldi kontakt on JamDesigns alloleval aadressil."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Teenuse kasutustingimused – AI Scam Shield",
+    "intro": "Need tingimused reguleerivad AI Scam Shieldi kasutamist teksti, URL-ide, piltide ja lühivideote analüüsimiseks. Teenus annab riskinäitajaid ja juhiseid; see ei saa tagada iga pettuse, manipulatsiooni või peidetud elemendi tuvastamist.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Teenuse kasutamine",
+        "paragraphs": [
+          "Kasutage teenust seaduslikult ja esitage ainult sisu, mida teil on õigus jagada. Sisendi saab kleepida või jagada; pilte ja videoid saab valida ka seadmest."
+        ]
+      },
+      {
+        "id": "free-premium",
+        "title": "Analüüsid pakettides Free ja Premium",
+        "paragraphs": [
+          "Free pakett võimaldab nädalas 3 lõpetatud analüüsi. Esimene kasutab tehisintellekti ja võib analüüsida teksti, URL-i, pilti või videot. Ülejäänud 2 analüüsivad teksti või URL-e ilma tehisintellektita; nende kahe analüüsikorra jaoks ei saa pilte ega videoid kasutada.",
+          "Üks täielik analüüs arvestatakse ühe ühikuna sõltumata sisutüübist või sisemiste töötlusetappide arvust. Kehtiv tulemus, mis ei anna kindlat järeldust, läheb arvesse; viga ilma kehtiva tulemuseta ei lähe. Nädalaarvestus lähtestatakse esmaspäeval kell 00:00 seansi jaoks registreeritud ajavööndis.",
+          "Premium võimaldab piiramatult tehisintellektiga analüüse seni, kuni kontrollitud tellimus on aktiivne. Failide, video kestuse, samaaegsete toimingute ja teenuseosutajate kättesaadavuse tehnilised piirangud kehtivad endiselt."
+        ]
+      },
+      {
+        "id": "media",
+        "title": "Meedia ja keeled",
+        "paragraphs": [
+          "Videote kestus võib olla kuni 180 sekundit (kaasa arvatud) ja maht kuni 100 MiB. Toetatud vormingud ja töötlusvõimalused sõltuvad rakendusest ning teenuseosutajatest. OCR säilitab teksti algkeele ja analüüsi selgitused kasutavad rakenduse keelt. Tõlgitud kasutajaliides ei taga täielikku OCR-i ega heli tuge igas keeles."
+        ]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Tellimused ja ostud",
+        "paragraphs": [
+          "Google Play näitab enne ostu hinda, arveldusperioodi ja uuendamistingimusi. Arveldamist, tühistamist ja tagasimaksetaotlusi käsitletakse Google Play eeskirjade ning kohaldatava õiguse kohaselt; RevenueCat toetab kasutusõiguste kontrollimist.",
+          "Hallake või tühistage tellimus oma Google Play konto kaudu. Premiumi juurdepääs nõuab serveripoolset kontrolli; pooleliolev või ebaõnnestunud kontroll ei anna kinnitatud kasutusõigust. Ostu taastamine ei taasta automaatselt kaotatud seansi ajalugu."
+        ]
+      },
+      {
+        "id": "results",
+        "title": "Analüüsi piirangud",
+        "paragraphs": [
+          "Automaatsed ja tehisintellekti abiga saadud tulemused võivad olla ebatäpsed, puudulikud või aegunud, sealhulgas anda valepositiivseid tulemusi või jätta ohud märkamata. Kaadrite valimipõhine kontroll, QR-lugemine ja peidetud sisu kontrollid on piiratud ega saa tõestada, et sisu on ohutu või ehtne.",
+          "Ärge tuginege turvalisust, rahaasju, õigust või isiklikku elu puudutavates otsustes üksnes rakendusele. Vaadake tõendid üle ja otsige vajaduse korral sobivat abi. Teenuseosutaja tõrge ei ole madala riski tulemus."
+        ]
+      },
+      {
+        "id": "third-parties",
+        "title": "Kolmandate isikute teenused ja privaatsus",
+        "paragraphs": [
+          "Teenus sõltub välistest teenuseosutajatest ja võrgu kättesaadavusest. Sisu ja teenuseandmeid võidakse töödelda privaatsuspoliitikas kirjeldatud viisil. Katkestused või kättesaamatud võimalused võivad takistada analüüsi lõpuleviimist."
+        ]
+      },
+      {
+        "id": "liability",
+        "title": "Vastutus ja teie seadusest tulenevad õigused",
+        "paragraphs": [
+          "Teenust osutatakse vastavalt selle kättesaadavusele ja nimetatud piirangutele. Vastutate endiselt otsuste eest, mille teete selle näitajate põhjal. Miski nendes tingimustes ei välista vastutust ega piira tarbija- või andmekaitseõigusi, mida ei saa seaduslikult välistada ega piirata."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Teenuse ja tingimuste muudatused",
+        "paragraphs": [
+          "Funktsioone ja neid tingimusi võidakse uuendada. Olulistest muudatustest teavitatakse kohaldatavas õiguses nõutud viisil; ostutingimused ja kohustuslikud õigused kehtivad edasi. Uuendatud tingimustele lisatakse muudetud kuupäev. Küsimuste korral võtke ühendust JamDesignsiga alloleval aadressil."
+        ]
+      }
+    ]
+  }
+}

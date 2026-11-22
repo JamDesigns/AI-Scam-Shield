@@ -4,6 +4,20 @@ import type {
   MediaTranscriptionResult,
   MediaTranscriptionWord,
 } from "../../media-transcription-provider.js";
+import { z } from "zod";
+import { withDeadline } from "../../../runtime-deadline.js";
+
+const confidenceSchema = z.number().finite().min(0).max(1);
+const alternativeSchema = z.object({
+  transcript: z.string(),
+  confidence: confidenceSchema.optional(),
+  languages: z.array(z.string().min(1)).optional(),
+  words: z.array(z.object({
+    word: z.string().optional(), punctuated_word: z.string().optional(),
+    start: z.number().finite().min(0), end: z.number().finite().min(0),
+    confidence: confidenceSchema.optional(), language: z.string().min(1).optional(),
+  }).passthrough().refine((word) => word.end >= word.start, "Invalid word timestamps")).optional(),
+}).passthrough();
 
 export type DeepgramMediaTranscriptionProviderConfig = {
   baseUrl: string;
@@ -53,6 +67,10 @@ export class DeepgramMediaTranscriptionProvider
   async transcribe(
     media: MediaTranscriptionProviderMedia,
   ): Promise<MediaTranscriptionResult> {
+    return withDeadline((signal) => this.performTranscription({ ...media, signal }), media, "Deepgram request", 60_000);
+  }
+
+  private async performTranscription(media: MediaTranscriptionProviderMedia): Promise<MediaTranscriptionResult> {
     if (
       !media.mimeType.startsWith("audio/") &&
       !media.mimeType.startsWith("video/")
@@ -79,6 +97,7 @@ export class DeepgramMediaTranscriptionProvider
       body:
         media.createReadStream() as unknown as RequestInit["body"],
       duplex: "half",
+      signal: media.signal,
     };
 
     const response = await fetch(url, request);
@@ -100,6 +119,10 @@ export class DeepgramMediaTranscriptionProvider
       throw new Error(
         "Deepgram response did not include a transcription alternative",
       );
+    }
+
+    if (!alternativeSchema.safeParse(alternative).success) {
+      throw new Error("Deepgram response contained invalid transcription data");
     }
 
     const languages = this.getLanguages(

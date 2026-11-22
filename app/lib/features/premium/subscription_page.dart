@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design/shield_design.dart';
 
 import '../../core/revenuecat_service.dart';
 import '../../i18n/app_localizations.dart';
@@ -14,11 +15,18 @@ class SubscriptionPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(t.t('subscription.title')),
       ),
-      body: Padding(
-        padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 24),
-        child: Column(
+      body: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+        padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 32),
+        child: BrandPanel(
+            child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            BrandHero(title: t.t('subscription.title'), compact: true),
+            const Icon(Icons.workspace_premium_outlined,
+                color: ShieldDesign.mint, size: 32),
+            const SizedBox(height: 16),
             Text(
               t.t('subscription.subtitle'),
               style: Theme.of(context).textTheme.bodyMedium,
@@ -38,7 +46,8 @@ class SubscriptionPage extends StatelessWidget {
               textAlign: TextAlign.start,
             ),
           ],
-        ),
+        )),
+      ),
       ),
     );
   }

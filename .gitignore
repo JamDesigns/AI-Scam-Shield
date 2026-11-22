@@ -35,3 +35,12 @@ app/windows/flutter/ephemeral/
 
 # Logs
 *.log
+
+# Local validation artifacts and private Android signing configuration
+local-validation/
+app/android/key.properties
+*.jks
+*.keystore
+*.apk
+*.aab
+*.dump

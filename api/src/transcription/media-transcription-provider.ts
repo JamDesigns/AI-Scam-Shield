@@ -1,10 +1,17 @@
 import type { Readable } from "node:stream";
+import type { AiProviderUsage } from "../ai/ai-provider.js";
 
 export type MediaTranscriptionProviderMedia = {
   filename: string;
   mimeType: string;
   sizeBytes: number;
   createReadStream: () => Readable;
+  signal?: AbortSignal;
+  timeoutMs?: number;
+  /** Trusted server tempfile/probe metadata, never accepted directly from the mobile payload. */
+  filePath?: string;
+  durationSeconds?: number;
+  onUsage?: (usage: AiProviderUsage) => void;
 };
 
 export type MediaTranscriptionWord = {
@@ -21,6 +28,7 @@ export type MediaTranscriptionResult = {
   confidence?: number;
   languages: string[];
   words: MediaTranscriptionWord[];
+  transcriptionStatus?: "no_speech" | "transcribed" | "unintelligible";
 };
 
 export interface MediaTranscriptionProvider {

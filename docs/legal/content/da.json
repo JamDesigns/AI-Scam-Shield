@@ -1,0 +1,146 @@
+{
+  "locale": "da",
+  "htmlLang": "da",
+  "languageName": "Dansk",
+  "updatedLabel": "Senest opdateret",
+  "languageLabel": "Sprog",
+  "contactTitle": "Kontakt",
+  "privacy": {
+    "title": "Privatlivspolitik – AI Scam Shield",
+    "intro": "AI Scam Shield analyserer tekst, URL'er, billeder og korte videoer for at finde mulige svindelforsøg og tegn på manipulation. Denne politik beskriver de oplysninger, som appen og dens tjenester behandler.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Behandlede oplysninger",
+        "paragraphs": [
+          "Du vælger det indhold, du vil indsende, ved at indsætte det, vælge en fil eller dele med appen. Det indsendte materiale kan indeholde personoplysninger om dig eller andre; undgå unødvendige følsomme oplysninger."
+        ],
+        "items": [
+          "Tekst, URL'er, billeder, videoer, lyd, udtrukket tekst, QR-indhold og eventuelle ledsagende beskeder, der er nødvendige for analysen.",
+          "En pseudonym sessionsidentifikator, et godkendelsestoken, som opbevares sikkert på enheden, en hashværdi af tokenet på serveren, den registrerede tidszone og appens sprog.",
+          "Brugstællere, tidsstempler, risikovurderinger, tekstvisninger på op til 160 tegn, analyseresultater og metadata om mediebehandling.",
+          "Abonnementsidentifikatorer, status for adgangsrettigheder samt produkt-, miljø- og udløbsoplysninger, der er nødvendige for at bekræfte køb.",
+          "Tekniske anmodningsdata og sikkerhedslogfiler. Firebase Analytics behandler også oplysninger om appen/enheden og brugshændelser i den nuværende app."
+        ]
+      },
+      {
+        "id": "purposes",
+        "title": "Sådan bruges oplysningerne",
+        "paragraphs": [
+          "Oplysningerne bruges til at udføre den ønskede analyse, returnere resultater på appens sprog, levere historik og statistik, håndhæve brugsgrænser, bekræfte abonnementer og beskytte tjenesten mod misbrug.",
+          "OCR bevarer tekstens oprindelige sprog. Forklaringer til analysen anmodes på appens sprog. Afhængigt af funktionen og konfigurationen kan indhold blive sendt til udbydere af AI, medieforensik, taletransskription eller oversættelse, også til oversættelse i en scanning uden AI."
+        ]
+      },
+      {
+        "id": "providers",
+        "title": "Tredjepartstjenester",
+        "paragraphs": [
+          "Google Play håndterer Android-køb, og RevenueCat understøtter administration og bekræftelse af abonnementer. Appen integrerer også Firebase Analytics. Udbydere af analyse, transskription, forensik og oversættelse modtager det indhold, der er nødvendigt for den valgte handling.",
+          "Udbydernes opbevaring, behandlingssteder og beskyttelsesforanstaltninger afhænger af de tjenester, der er konfigureret til idriftsættelsen, og deres vilkår. Antag ikke, at alle handlinger foregår på enheden eller inden for Den Europæiske Union. JamDesigns sælger eller udlejer ikke dine data til reklameformål."
+        ]
+      },
+      {
+        "id": "storage",
+        "title": "Opbevaring og sletning",
+        "paragraphs": [
+          "Serveren gemmer sessions- og abonnementsoplysninger, tællere, analysevisninger og resultater til historik, statistik og pålidelige genforsøg. Uploadede medier kan behandles via midlertidige filer; eksterne udbydere anvender deres egne opbevaringsordninger.",
+          "Den nuværende version sletter ikke automatisk analysehistorikken efter en bestemt tid. Afinstallation af appen sletter ikke oplysninger på serveren. Kontakt os for at anmode om oplysninger eller sletning; bekræftelse kan være nødvendig for at undgå at udlevere en anden persons oplysninger. Hvis sessionens legitimationsoplysninger går tabt, kan det forhindre adgang til tidligere historik."
+        ]
+      },
+      {
+        "id": "security",
+        "title": "Sikkerhed",
+        "paragraphs": [
+          "Appen bruger beskyttede sessionslegitimationsoplysninger, godkendelse på serveren og adgangskontrol. Disse foranstaltninger mindsker risikoen, men kan ikke garantere fuldstændig sikkerhed. Indsend kun indhold, som du har ret til at dele."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "Dine rettigheder",
+        "paragraphs": [
+          "Hvis gældende lovgivning giver disse rettigheder, kan du anmode om indsigt, berigtigelse, sletning, begrænsning eller overførsel af dine personoplysninger, gøre indsigelse mod behandlingen og klage til den kompetente databeskyttelsesmyndighed. Brug kontaktadressen nedenfor til at fremsætte en anmodning."
+        ]
+      },
+      {
+        "id": "children",
+        "title": "Børn og følsomme oplysninger",
+        "paragraphs": [
+          "Indsend ikke unødvendige personoplysninger om børn eller andet følsomt materiale. Hvis sådanne oplysninger blev indsendt utilsigtet, skal du kontakte os, så situationen kan vurderes."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Ændringer af denne politik",
+        "paragraphs": [
+          "Opdateringer offentliggøres i appen og på denne side med en revideret dato. Kontaktpersonen for AI Scam Shield er JamDesigns på adressen nedenfor."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Tjenestevilkår – AI Scam Shield",
+    "intro": "Disse vilkår dækker brugen af AI Scam Shield til analyse af tekst, URL'er, billeder og korte videoer. Tjenesten giver risikoindikatorer og vejledning; den kan ikke garantere, at alle svindelforsøg, manipulationer eller skjulte elementer opdages.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Brug af tjenesten",
+        "paragraphs": [
+          "Brug tjenesten lovligt, og indsend kun indhold, som du har ret til at dele. Input kan indsættes eller deles; billeder og videoer kan også vælges fra enheden."
+        ]
+      },
+      {
+        "id": "free-premium",
+        "title": "Free- og Premium-analyse",
+        "paragraphs": [
+          "Free-abonnementet giver mulighed for 3 gennemførte analyser om ugen. Den første bruger AI og kan analysere tekst, en URL, et billede eller en video. De andre 2 analyserer tekst eller URL'er uden AI; billeder og videoer er ikke tilgængelige i disse to analysepladser.",
+          "En fuldstændig analyse tæller som én enhed uanset indholdstype eller antal interne behandlingstrin. Et gyldigt resultat uden entydig konklusion tæller; en fejl uden et gyldigt resultat tæller ikke. Ugen nulstilles mandag kl. 00:00 i den tidszone, der er registreret for sessionen.",
+          "Premium giver ubegrænsede analyser med AI, mens det bekræftede abonnement er aktivt. Tekniske grænser for filer, videolængde, samtidige handlinger og udbydernes tilgængelighed gælder stadig."
+        ]
+      },
+      {
+        "id": "media",
+        "title": "Medier og sprog",
+        "paragraphs": [
+          "Videoer må højst være 180 sekunder lange og fylde 100 MiB. Understøttede formater og behandlingsmuligheder afhænger af appen og udbyderne. OCR bevarer tekstens oprindelige sprog, og analyseforklaringer bruger appens sprog. En oversat brugerflade garanterer ikke fuldstændig OCR- eller lydunderstøttelse på alle sprog."
+        ]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Abonnementer og køb",
+        "paragraphs": [
+          "Google Play viser pris, faktureringsperiode og fornyelsesvilkår før købet. Fakturering, opsigelse og anmodninger om refusion håndteres efter Google Plays politikker og gældende lovgivning; RevenueCat understøtter bekræftelse af adgangsrettigheder.",
+          "Administrer eller opsig et abonnement via din Google Play-konto. Premium-adgang kræver bekræftelse på serveren; en afventende eller mislykket bekræftelse giver ikke en bekræftet adgangsret. Gendannelse af et køb gendanner ikke automatisk historik fra en mistet session."
+        ]
+      },
+      {
+        "id": "results",
+        "title": "Analysens begrænsninger",
+        "paragraphs": [
+          "Automatiserede og AI-assisterede resultater kan være unøjagtige, ufuldstændige eller forældede, herunder falske alarmer og oversete trusler. Stikprøver af videobilleder, QR-læsning og kontroller for skjult indhold er begrænsede og kan ikke bevise, at indhold er sikkert eller autentisk.",
+          "Stol ikke udelukkende på appen ved sikkerhedsmæssige, økonomiske, juridiske eller personlige beslutninger. Gennemgå dokumentationen, og søg passende hjælp ved behov. En udbyderfejl er ikke et resultat med lav risiko."
+        ]
+      },
+      {
+        "id": "third-parties",
+        "title": "Tredjepartstjenester og privatliv",
+        "paragraphs": [
+          "Tjenesten afhænger af eksterne udbydere og netværkets tilgængelighed. Indhold og tjenestedata kan behandles som beskrevet i privatlivspolitikken. Afbrydelser eller utilgængelige funktioner kan forhindre, at en analyse gennemføres."
+        ]
+      },
+      {
+        "id": "liability",
+        "title": "Ansvar og dine lovbestemte rettigheder",
+        "paragraphs": [
+          "Tjenesten stilles til rådighed med forbehold for dens tilgængelighed og de angivne begrænsninger. Du er fortsat ansvarlig for beslutninger truffet på baggrund af dens indikatorer. Intet i disse vilkår udelukker ansvar eller begrænser forbruger- eller databeskyttelsesrettigheder, som ikke lovligt kan udelukkes eller begrænses."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Ændringer af tjenesten og vilkårene",
+        "paragraphs": [
+          "Funktioner og disse vilkår kan blive opdateret. Væsentlige ændringer meddeles som krævet af gældende lovgivning; købsvilkår og ufravigelige rettigheder gælder fortsat. Opdaterede vilkår får en revideret dato. Kontakt JamDesigns på adressen nedenfor, hvis du har spørgsmål."
+        ]
+      }
+    ]
+  }
+}

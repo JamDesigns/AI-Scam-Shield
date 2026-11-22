@@ -5,6 +5,8 @@ export type MediaForensicsProviderMedia = {
   mimeType: string;
   sizeBytes: number;
   createReadStream: () => Readable;
+  signal?: AbortSignal;
+  timeoutMs?: number;
 };
 
 export type MediaForensicsGeneratorScore = {
@@ -21,6 +23,9 @@ export type MediaForensicsObservation = {
   aiGeneratedAudioScore?: number;
   notAiGeneratedAudioScore?: number;
   generatorScores?: MediaForensicsGeneratorScore[];
+  inconclusive?: boolean;
+  videoInconclusive?: boolean;
+  audioInconclusive?: boolean;
 };
 
 export type MediaForensicsCompletedResult = {

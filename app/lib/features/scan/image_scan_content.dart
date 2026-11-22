@@ -11,22 +11,35 @@ String buildImageScanContent({
   );
 
   final preparedQrContents = qrContents
-      .map((content) => prepareImageScanText(content, maxLength: maxLength))
+      .map((content) => content.replaceAll(RegExp(r'\s+'), ' ').trim())
       .where((content) => content.isNotEmpty)
       .toSet()
       .toList();
 
+  // This is the bounded legacy text representation. QR contents are also sent
+  // separately in the API contract, so no URL depends on the OCR budget.
+  final qrParts = <String>[];
+  var qrLength = 0;
+  for (final content in preparedQrContents) {
+    final part = 'QR code content: $content';
+    final nextLength = qrLength + (qrParts.isEmpty ? 0 : 1) + part.length;
+    if (nextLength <= maxLength) {
+      qrParts.add(part);
+      qrLength = nextLength;
+    }
+  }
+  final ocrBudget = maxLength - qrLength - (qrParts.isEmpty ? 0 : 1);
+  final boundedOcr = ocrBudget > 0
+      ? prepareImageScanText(preparedOcrText, maxLength: ocrBudget)
+      : '';
   final parts = <String>[
-    if (preparedOcrText.isNotEmpty) preparedOcrText,
-    ...preparedQrContents.map((content) => 'QR code content: $content'),
+    if (boundedOcr.isNotEmpty) boundedOcr,
+    ...qrParts,
   ];
 
   if (parts.isEmpty) {
     return '';
   }
 
-  return prepareImageScanText(
-    parts.join(' '),
-    maxLength: maxLength,
-  );
+  return parts.join(' ');
 }

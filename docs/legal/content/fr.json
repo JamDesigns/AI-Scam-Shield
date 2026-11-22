@@ -1,0 +1,101 @@
+{
+  "locale": "fr",
+  "htmlLang": "fr",
+  "languageName": "Français",
+  "updatedLabel": "Dernière mise à jour",
+  "languageLabel": "Langue",
+  "contactTitle": "Contact",
+  "privacy": {
+    "title": "Politique de confidentialité – AI Scam Shield",
+    "intro": "AI Scam Shield analyse des textes, des URL, des images et de courtes vidéos afin de repérer d'éventuelles escroqueries et des signes de manipulation. Cette politique décrit les informations traitées par l'application et ses services.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Informations traitées",
+        "paragraphs": ["Vous choisissez le contenu à envoyer en le collant, en sélectionnant un fichier ou en le partageant avec l'application. Les éléments envoyés peuvent contenir des données personnelles vous concernant ou concernant d'autres personnes ; évitez les informations sensibles inutiles."],
+        "items": ["Textes, URL, images, vidéos, audio, texte extrait, contenu des codes QR et tout message joint nécessaire à l'analyse.", "Un identifiant de session pseudonyme, un jeton d'authentification stocké de manière sécurisée sur l'appareil, une empreinte du jeton sur le serveur, le fuseau horaire enregistré et la langue de l'application.", "Compteurs d'utilisation, horodatages, évaluations des risques, aperçus de texte de 160 caractères maximum, résultats d'analyse et métadonnées de traitement des médias.", "Identifiants d'abonnement, état des droits d'accès, produit, environnement et informations d'expiration nécessaires à la vérification des achats.", "Données techniques des requêtes et journaux de sécurité. Firebase Analytics traite également des informations sur l'application et l'appareil ainsi que des événements d'utilisation dans l'application actuelle."]
+      },
+      {
+        "id": "purposes",
+        "title": "Utilisation des informations",
+        "paragraphs": ["Les informations servent à effectuer l'analyse demandée, à fournir les résultats dans la langue de l'application, à proposer un historique et des statistiques, à appliquer les limites d'utilisation, à vérifier les abonnements et à protéger le service contre les abus.", "La reconnaissance optique de caractères (OCR) conserve la langue d'origine du texte. Les explications de l'analyse sont demandées dans la langue de l'application. Selon la fonctionnalité et la configuration, le contenu peut être envoyé à des prestataires d'IA, d'analyse forensique des médias, de transcription vocale ou de traduction, y compris pour une traduction lors d'une analyse sans IA."]
+      },
+      {
+        "id": "providers",
+        "title": "Services tiers",
+        "paragraphs": ["Google Play gère les achats Android et RevenueCat facilite la gestion et la vérification des abonnements. L'application intègre également Firebase Analytics. Les prestataires d'analyse, de transcription, d'analyse forensique et de traduction reçoivent le contenu nécessaire à l'opération choisie.", "La conservation des données par les prestataires, les lieux de traitement et les garanties dépendent des services configurés pour le déploiement et de leurs conditions. Ne présumez pas que toutes les opérations restent sur l'appareil ou au sein de l'Union européenne. JamDesigns ne vend ni ne loue vos données à des fins publicitaires."]
+      },
+      {
+        "id": "storage",
+        "title": "Stockage et suppression",
+        "paragraphs": ["Le serveur stocke les enregistrements de session et d'abonnement, les compteurs, les aperçus et les résultats d'analyse pour l'historique, les statistiques et la fiabilité des nouvelles tentatives. Les médias téléversés peuvent être traités au moyen de fichiers temporaires ; les prestataires externes appliquent leurs propres modalités de conservation.", "La version actuelle ne supprime pas automatiquement l'historique des analyses après un délai donné. Désinstaller l'application ne supprime pas les enregistrements du serveur. Contactez-nous pour demander des informations ou une suppression ; une vérification peut être nécessaire pour éviter de divulguer les enregistrements d'une autre personne. La perte des identifiants de session peut empêcher l'accès à l'historique précédent."]
+      },
+      {
+        "id": "security",
+        "title": "Sécurité",
+        "paragraphs": ["L'application utilise des identifiants de session protégés, une authentification côté serveur et des contrôles d'accès. Ces mesures réduisent les risques, mais ne peuvent pas garantir une sécurité absolue. N'envoyez que du contenu que vous êtes en droit de partager."]
+      },
+      {
+        "id": "rights",
+        "title": "Vos droits",
+        "paragraphs": ["Lorsque la loi applicable prévoit ces droits, vous pouvez demander l'accès, la rectification, la suppression, la limitation du traitement ou la portabilité de vos données personnelles, vous opposer au traitement et déposer une réclamation auprès de l'autorité de protection des données compétente. Utilisez l'adresse de contact ci-dessous pour présenter une demande."]
+      },
+      {
+        "id": "children",
+        "title": "Enfants et informations sensibles",
+        "paragraphs": ["N'envoyez pas d'informations personnelles inutiles concernant des enfants ni d'autres éléments sensibles. Si de telles informations ont été envoyées involontairement, contactez-nous afin que la situation puisse être évaluée."]
+      },
+      {
+        "id": "changes",
+        "title": "Modifications de cette politique",
+        "paragraphs": ["Les mises à jour seront publiées dans l'application et sur cette page avec une date révisée. Le contact pour AI Scam Shield est JamDesigns, à l'adresse ci-dessous."]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Conditions d'utilisation – AI Scam Shield",
+    "intro": "Ces conditions régissent l'utilisation d'AI Scam Shield pour l'analyse de textes, d'URL, d'images et de courtes vidéos. Le service fournit des indicateurs de risque et des conseils ; il ne peut pas garantir la détection de chaque escroquerie, manipulation ou élément caché.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Utilisation du service",
+        "paragraphs": ["Utilisez le service dans le respect de la loi et n'envoyez que du contenu que vous êtes en droit de partager. Le contenu peut être collé ou partagé ; les images et les vidéos peuvent également être sélectionnées sur l'appareil."]
+      },
+      {
+        "id": "free-premium",
+        "title": "Analyses Free et Premium",
+        "paragraphs": ["L'offre Free permet 3 analyses terminées par semaine. La première utilise l'IA et peut analyser un texte, une URL, une image ou une vidéo. Les 2 autres analysent des textes ou des URL sans IA ; les images et les vidéos ne sont pas disponibles pour ces deux analyses.", "Une analyse complète compte pour une unité, quel que soit le type de contenu ou le nombre d'étapes de traitement internes. Un résultat valide mais non concluant est comptabilisé ; une erreur sans résultat valide ne l'est pas. La semaine est réinitialisée le lundi à 00:00 dans le fuseau horaire enregistré pour la session.", "Premium offre des analyses illimitées avec l'IA tant que l'abonnement vérifié est actif. Les limites techniques relatives aux fichiers, à la durée des vidéos, aux opérations simultanées et à la disponibilité des prestataires restent applicables."]
+      },
+      {
+        "id": "media",
+        "title": "Médias et langues",
+        "paragraphs": ["Les vidéos peuvent durer jusqu'à 180 secondes incluses et atteindre 100 MiB. Les formats pris en charge et les capacités de traitement dépendent de l'application et des prestataires. L'OCR conserve la langue d'origine du texte et les explications de l'analyse utilisent la langue de l'application. Une interface traduite ne garantit pas une prise en charge complète de l'OCR ou de l'audio dans toutes les langues."]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Abonnements et achats",
+        "paragraphs": ["Google Play affiche le prix, la période de facturation et les conditions de renouvellement avant l'achat. La facturation, la résiliation et les demandes de remboursement sont traitées conformément aux règles de Google Play et à la loi applicable ; RevenueCat facilite la vérification des droits d'accès.", "Gérez ou résiliez un abonnement depuis votre compte Google Play. L'accès Premium nécessite une vérification par le serveur ; une vérification en attente ou échouée ne crée pas de droit d'accès confirmé. La restauration d'un achat ne rétablit pas automatiquement l'historique d'une session perdue."]
+      },
+      {
+        "id": "results",
+        "title": "Limites de l'analyse",
+        "paragraphs": ["Les résultats automatisés et assistés par IA peuvent être inexacts, incomplets ou obsolètes, et comporter des faux positifs ou des menaces non détectées. L'échantillonnage des images vidéo, la lecture des codes QR et les vérifications de contenu caché sont limités et ne peuvent pas prouver qu'un contenu est sûr ou authentique.", "Ne vous fiez pas uniquement à l'application pour vos décisions en matière de sécurité, de finances, de droit ou de vie personnelle. Examinez les éléments disponibles et sollicitez une aide appropriée si nécessaire. Une défaillance d'un prestataire n'est pas un résultat indiquant un faible risque."]
+      },
+      {
+        "id": "third-parties",
+        "title": "Services tiers et confidentialité",
+        "paragraphs": ["Le service dépend de prestataires externes et de la disponibilité du réseau. Le contenu et les données du service peuvent être traités comme décrit dans la Politique de confidentialité. Des interruptions ou des fonctionnalités indisponibles peuvent empêcher une analyse d'aboutir."]
+      },
+      {
+        "id": "liability",
+        "title": "Responsabilité et vos droits légaux",
+        "paragraphs": ["Le service est fourni sous réserve de sa disponibilité et des limites indiquées. Vous restez responsable des décisions prises à l'aide de ses indicateurs. Aucune disposition de ces conditions n'exclut une responsabilité ni ne limite des droits des consommateurs ou relatifs à la protection des données qui ne peuvent pas légalement être exclus ou limités."]
+      },
+      {
+        "id": "changes",
+        "title": "Modifications du service et des conditions",
+        "paragraphs": ["Les fonctionnalités et ces conditions peuvent être mises à jour. Les modifications importantes seront communiquées conformément à la loi applicable ; les conditions d'achat et les droits impératifs restent applicables. Les conditions mises à jour porteront une date révisée. Pour toute question, contactez JamDesigns à l'adresse ci-dessous."]
+      }
+    ]
+  }
+}

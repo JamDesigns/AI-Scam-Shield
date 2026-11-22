@@ -1,8 +1,41 @@
 import { describe, expect, it } from "vitest";
 
-import { getDefaultRules, scoreInput } from "./rules.js";
+import { extractUrls, getDefaultRules, scoreInput } from "./rules.js";
 
 describe("scoreInput", () => {
+  it.each(["https://paypal.com", "paypal.com", "https://www.apple.com", "https://accounts.google.com", "https://www.amazon.es"])("does not label official domain %s as a typo", (url) => {
+    const result = scoreInput(url, getDefaultRules());
+    expect(result.category).toBe("low_risk");
+    expect(result.reasons).not.toContain("URL_TYPO");
+  });
+
+  it("still detects brands on a foreign registrable domain", () => {
+    const result = scoreInput("https://paypal.com.evil.xyz/login", getDefaultRules());
+    expect(result.category).toBe("high_risk");
+    expect(result.reasons).toContain("URL_TYPO");
+  });
+
+  it("scores a bare IP and domain with path", () => {
+    expect(scoreInput("192.168.1.10/login", getDefaultRules()).reasons).toContain("IP_URL");
+    expect(scoreInput("bank-login.xyz/account", getDefaultRules()).reasons).toContain("SUSPICIOUS_TLD");
+  });
+
+  it("does not turn email addresses into URL evidence", () => {
+    expect(extractUrls("Write to person@example.com for the public bulletin")).toEqual([]);
+  });
+
+  it("retains original URL evidence when translated prose changes a URL", () => {
+    expect(scoreInput("Public notice at example.com", getDefaultRules(), "http://192.168.1.10/login").reasons).toContain("IP_URL");
+  });
+
+  it("ignores malformed candidates without throwing", () => {
+    expect(() => scoreInput("http://. https://999.999.999.999/path", getDefaultRules())).not.toThrow();
+  });
+
+  it("does not hide a dangerous URL behind ten benign URLs", () => {
+    const benign = Array.from({ length: 10 }, (_, i) => `https://example.com/${i}`).join(" ");
+    expect(scoreInput(`${benign} http://192.168.1.10/login`, getDefaultRules()).reasons).toContain("IP_URL");
+  });
   it("returns low risk for harmless text", () => {
     const result = scoreInput(
       "This is a normal public news article about weather updates.",
