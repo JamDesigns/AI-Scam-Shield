@@ -1,0 +1,101 @@
+{
+  "locale": "pl",
+  "htmlLang": "pl",
+  "languageName": "Polski",
+  "updatedLabel": "Ostatnia aktualizacja",
+  "languageLabel": "Język",
+  "contactTitle": "Kontakt",
+  "privacy": {
+    "title": "Polityka prywatności – AI Scam Shield",
+    "intro": "AI Scam Shield analizuje teksty, adresy URL, obrazy i krótkie filmy, aby rozpoznawać możliwe oszustwa i oznaki manipulacji. Niniejsza polityka opisuje informacje przetwarzane przez aplikację i jej usługi.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Przetwarzane informacje",
+        "paragraphs": ["Wybierasz treści do przesłania, wklejając je, wybierając plik lub udostępniając je aplikacji. Przesłane materiały mogą zawierać dane osobowe dotyczące Ciebie lub innych osób; unikaj zbędnych informacji wrażliwych."],
+        "items": ["Teksty, adresy URL, obrazy, filmy, nagrania dźwiękowe, wyodrębniony tekst, zawartość kodów QR oraz wszelkie dołączone wiadomości niezbędne do analizy.", "Pseudonimowy identyfikator sesji, token uwierzytelniający bezpiecznie przechowywany na urządzeniu, skrót tokenu na serwerze, zarejestrowana strefa czasowa i język aplikacji.", "Liczniki użycia, znaczniki czasu, oceny ryzyka, podglądy tekstu o długości do 160 znaków, wyniki analiz i metadane przetwarzania multimediów.", "Identyfikatory subskrypcji, stan uprawnień dostępu, produkt, środowisko i informacje o wygaśnięciu niezbędne do weryfikacji zakupów.", "Dane techniczne żądań i dzienniki bezpieczeństwa. W obecnej aplikacji Firebase Analytics przetwarza również informacje o aplikacji i urządzeniu oraz zdarzenia dotyczące użytkowania."]
+      },
+      {
+        "id": "purposes",
+        "title": "Sposób wykorzystania informacji",
+        "paragraphs": ["Informacje są wykorzystywane do przeprowadzenia żądanej analizy, przekazania wyników w języku aplikacji, udostępnienia historii i statystyk, stosowania limitów użycia, weryfikacji subskrypcji i ochrony usługi przed nadużyciami.", "Optyczne rozpoznawanie znaków (OCR) zachowuje oryginalny język tekstu. Objaśnienia analizy są zamawiane w języku aplikacji. W zależności od funkcji i konfiguracji treści mogą być przesyłane dostawcom usług sztucznej inteligencji (AI), analizy kryminalistycznej multimediów, transkrypcji mowy lub tłumaczenia, w tym w celu tłumaczenia podczas analizy bez AI."]
+      },
+      {
+        "id": "providers",
+        "title": "Usługi podmiotów trzecich",
+        "paragraphs": ["Google Play obsługuje zakupy w systemie Android, a RevenueCat wspiera zarządzanie subskrypcjami i ich weryfikację. Aplikacja integruje również Firebase Analytics. Dostawcy usług analizy, transkrypcji, analizy kryminalistycznej i tłumaczenia otrzymują treści niezbędne do wybranej operacji.", "Okresy przechowywania danych przez dostawców, miejsca przetwarzania i zabezpieczenia zależą od usług skonfigurowanych na potrzeby wdrożenia oraz ich warunków. Nie zakładaj, że każda operacja odbywa się wyłącznie na urządzeniu lub na terenie Unii Europejskiej. JamDesigns nie sprzedaje ani nie wynajmuje Twoich danych do celów reklamowych."]
+      },
+      {
+        "id": "storage",
+        "title": "Przechowywanie i usuwanie",
+        "paragraphs": ["Serwer przechowuje rekordy sesji i subskrypcji, liczniki, podglądy i wyniki analiz na potrzeby historii, statystyk i niezawodnego ponawiania prób. Przesłane multimedia mogą być przetwarzane z wykorzystaniem plików tymczasowych; zewnętrzni dostawcy stosują własne zasady przechowywania.", "Obecna wersja nie usuwa automatycznie historii analiz po upływie określonego czasu. Odinstalowanie aplikacji nie usuwa rekordów z serwera. Skontaktuj się z nami, aby poprosić o informacje lub usunięcie danych; może być wymagana weryfikacja, aby uniknąć ujawnienia rekordów innej osoby. Utrata danych uwierzytelniających sesji może uniemożliwić dostęp do wcześniejszej historii."]
+      },
+      {
+        "id": "security",
+        "title": "Bezpieczeństwo",
+        "paragraphs": ["Aplikacja korzysta z chronionych danych uwierzytelniających sesji, uwierzytelniania po stronie serwera i kontroli dostępu. Środki te ograniczają ryzyko, ale nie mogą zagwarantować pełnego bezpieczeństwa. Przesyłaj wyłącznie treści, które masz prawo udostępniać."]
+      },
+      {
+        "id": "rights",
+        "title": "Twoje prawa",
+        "paragraphs": ["Jeżeli właściwe przepisy przewidują takie prawa, możesz żądać dostępu do swoich danych osobowych, ich sprostowania, usunięcia, ograniczenia przetwarzania lub przenoszenia, wnieść sprzeciw wobec przetwarzania oraz złożyć skargę do właściwego organu ochrony danych. Aby złożyć żądanie, skorzystaj z podanego poniżej adresu kontaktowego."]
+      },
+      {
+        "id": "children",
+        "title": "Dzieci i informacje wrażliwe",
+        "paragraphs": ["Nie przesyłaj zbędnych danych osobowych dotyczących dzieci ani innych wrażliwych materiałów. Jeśli takie informacje zostały przesłane nieumyślnie, skontaktuj się z nami, aby można było ocenić sytuację."]
+      },
+      {
+        "id": "changes",
+        "title": "Zmiany niniejszej polityki",
+        "paragraphs": ["Aktualizacje będą publikowane w aplikacji i na tej stronie ze zmienioną datą. Podmiotem kontaktowym w sprawie AI Scam Shield jest JamDesigns pod podanym poniżej adresem."]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Warunki korzystania z usługi – AI Scam Shield",
+    "intro": "Niniejsze warunki obejmują korzystanie z AI Scam Shield do analizy tekstów, adresów URL, obrazów i krótkich filmów. Usługa dostarcza wskaźniki ryzyka i wskazówki; nie może zagwarantować wykrycia każdego oszustwa, manipulacji ani ukrytego elementu.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Korzystanie z usługi",
+        "paragraphs": ["Korzystaj z usługi zgodnie z prawem i przesyłaj tylko treści, które masz prawo udostępniać. Treści można wklejać lub udostępniać; obrazy i filmy można również wybierać z urządzenia."]
+      },
+      {
+        "id": "free-premium",
+        "title": "Analizy Free i Premium",
+        "paragraphs": ["Plan Free pozwala na 3 ukończone analizy tygodniowo. Pierwsza korzysta z AI i może analizować tekst, adres URL, obraz lub film. Pozostałe 2 analizują teksty lub adresy URL bez AI; obrazy i filmy nie są dostępne w ramach tych dwóch analiz.", "Jedna pełna analiza liczy się jako jedna jednostka, niezależnie od rodzaju treści i liczby wewnętrznych etapów przetwarzania. Prawidłowy, choć nierozstrzygający wynik jest wliczany; błąd bez prawidłowego wyniku nie jest wliczany. Tydzień resetuje się w poniedziałek o 00:00 w strefie czasowej zarejestrowanej dla sesji.", "Premium zapewnia nieograniczone analizy z AI, dopóki zweryfikowana subskrypcja jest aktywna. Nadal obowiązują ograniczenia techniczne dotyczące plików, długości filmów, jednoczesnych operacji i dostępności dostawców."]
+      },
+      {
+        "id": "media",
+        "title": "Multimedia i języki",
+        "paragraphs": ["Filmy mogą mieć długość do 180 sekund włącznie i rozmiar do 100 MiB. Obsługiwane formaty i możliwości przetwarzania zależą od aplikacji i dostawców. OCR zachowuje oryginalny język tekstu, a objaśnienia analizy są w języku aplikacji. Przetłumaczony interfejs nie gwarantuje pełnej obsługi OCR ani dźwięku w każdym języku."]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Subskrypcje i zakupy",
+        "paragraphs": ["Google Play wyświetla cenę, okres rozliczeniowy i warunki odnowienia przed zakupem. Rozliczenia, anulowanie i wnioski o zwrot są obsługiwane zgodnie z zasadami Google Play i właściwymi przepisami; RevenueCat wspiera weryfikację uprawnień dostępu.", "Zarządzaj subskrypcją lub anuluj ją za pośrednictwem swojego konta Google Play. Dostęp Premium wymaga weryfikacji przez serwer; oczekująca lub nieudana weryfikacja nie tworzy potwierdzonego uprawnienia dostępu. Przywrócenie zakupu nie przywraca automatycznie historii utraconej sesji."]
+      },
+      {
+        "id": "results",
+        "title": "Ograniczenia analizy",
+        "paragraphs": ["Wyniki automatyczne i wspomagane przez AI mogą być niedokładne, niekompletne lub nieaktualne, w tym zawierać wyniki fałszywie dodatnie i pomijać zagrożenia. Próbkowanie klatek, odczytywanie kodów QR i sprawdzanie ukrytych treści mają ograniczony zakres i nie mogą dowieść, że treść jest bezpieczna lub autentyczna.", "Nie polegaj wyłącznie na aplikacji przy podejmowaniu decyzji dotyczących bezpieczeństwa, finansów, prawa lub spraw osobistych. Przeanalizuj dostępne dowody i w razie potrzeby zwróć się o odpowiednią pomoc. Awaria dostawcy nie jest wynikiem wskazującym na niskie ryzyko."]
+      },
+      {
+        "id": "third-parties",
+        "title": "Usługi podmiotów trzecich i prywatność",
+        "paragraphs": ["Usługa zależy od zewnętrznych dostawców i dostępności sieci. Treści i dane usługi mogą być przetwarzane w sposób opisany w Polityce prywatności. Przerwy w działaniu lub niedostępne funkcje mogą uniemożliwić ukończenie analizy."]
+      },
+      {
+        "id": "liability",
+        "title": "Odpowiedzialność i prawa ustawowe",
+        "paragraphs": ["Usługa jest świadczona z zastrzeżeniem jej dostępności i podanych ograniczeń. Ponosisz odpowiedzialność za decyzje podejmowane na podstawie jej wskaźników. Żadne postanowienie niniejszych warunków nie wyłącza odpowiedzialności ani nie ogranicza praw konsumentów lub praw w zakresie ochrony danych, których zgodnie z prawem nie można wyłączyć ani ograniczyć."]
+      },
+      {
+        "id": "changes",
+        "title": "Zmiany usługi i warunków",
+        "paragraphs": ["Funkcje i niniejsze warunki mogą być aktualizowane. Istotne zmiany będą komunikowane zgodnie z wymogami właściwych przepisów; warunki zakupu i bezwzględnie obowiązujące prawa nadal mają zastosowanie. Zaktualizowane warunki będą opatrzone zmienioną datą. W razie pytań skontaktuj się z JamDesigns pod podanym poniżej adresem."]
+      }
+    ]
+  }
+}

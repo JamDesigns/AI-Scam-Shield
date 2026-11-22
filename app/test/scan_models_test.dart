@@ -2,6 +2,40 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:scam_shield_mvp/features/scan/scan_models.dart';
 
 void main() {
+  test('ScanResult fromJson parses threat type correctly', () {
+    final json = {
+      'riskScore': 85,
+      'category': 'high_risk',
+      'threatType': 'bank_phishing',
+      'reasons': ['Suspicious bank login request'],
+      'isPremium': false,
+      'weeklyUsed': 1,
+      'aiAllowed': true,
+      'aiUsed': true,
+      'aiWeeklyUsed': 1,
+      'aiUnlimited': false,
+    };
+
+    final result = ScanResult.fromJson(json);
+
+    expect(result.riskScore, 85);
+    expect(result.category, 'high_risk');
+    expect(result.threatType, 'bank_phishing');
+    expect(result.reasons, ['Suspicious bank login request']);
+  });
+
+  test('ScanResult fromJson falls back to none threat type', () {
+    final json = {
+      'riskScore': 10,
+      'category': 'low_risk',
+      'reasons': <String>[],
+    };
+
+    final result = ScanResult.fromJson(json);
+
+    expect(result.threatType, 'none');
+  });
+
   test('ScanStats fromJson parses correctly', () {
     final json = {
       'scansToday': 3,
@@ -23,8 +57,9 @@ void main() {
       'items': [
         {
           'inputPreview': 'Test message',
-          'finalCategory': 'low_risk',
-          'finalRiskScore': 10,
+          'finalCategory': 'medium_risk',
+          'threatType': 'delivery_scam',
+          'finalRiskScore': 45,
           'createdAt': '2026-01-01T10:00:00Z',
         }
       ]
@@ -34,8 +69,140 @@ void main() {
 
     expect(response.items.length, 1);
     expect(response.items.first.inputPreview, 'Test message');
-    expect(response.items.first.finalCategory, 'low_risk');
-    expect(response.items.first.finalRiskScore, 10);
+    expect(response.items.first.finalCategory, 'medium_risk');
+    expect(response.items.first.threatType, 'delivery_scam');
+    expect(response.items.first.finalRiskScore, 45);
     expect(response.items.first.createdAtDate, isNotNull);
+  });
+
+  test('ScanActivityItem fromJson falls back to none threat type', () {
+    final item = ScanActivityItem.fromJson({
+      'inputPreview': 'Test message',
+      'finalCategory': 'low_risk',
+      'finalRiskScore': 10,
+      'createdAt': '2026-01-01T10:00:00Z',
+    });
+
+    expect(item.threatType, 'none');
+  });
+
+  test('VideoAnalysisResult parses semantic analysis', () {
+    final result = VideoAnalysisResult.fromJson({
+      'analysisId': 'video-analysis-123',
+      'status': 'completed',
+      'forensics': {
+        'provider': 'hive',
+        'aiGeneratedDetected': false,
+        'deepfakeDetected': false,
+        'maxAiGeneratedScore': 0.01,
+        'maxDeepfakeScore': 0.02,
+        'maxAiGeneratedAudioScore': 0.03,
+        'topGenerator': null,
+        'suspiciousTimestamps': <num>[],
+      },
+      'analysis': {
+        'riskScore': 82,
+        'category': 'high_risk',
+        'threatType': 'bank_phishing',
+        'reasons': [
+          'Solicita credenciales bancarias.',
+          'Utiliza lenguaje de urgencia.',
+        ],
+        'explanation':
+            'El vídeo intenta obtener información bancaria sensible.',
+      },
+    });
+
+    expect(result.analysisId, 'video-analysis-123');
+    expect(result.status, 'completed');
+    expect(result.forensics, isNotNull);
+    expect(result.analysis, isNotNull);
+    expect(result.analysis!.riskScore, 82);
+    expect(result.analysis!.category, 'high_risk');
+    expect(result.analysis!.threatType, 'bank_phishing');
+    expect(result.analysis!.reasons, [
+      'Solicita credenciales bancarias.',
+      'Utiliza lenguaje de urgencia.',
+    ]);
+    expect(
+      result.analysis!.explanation,
+      'El vídeo intenta obtener información bancaria sensible.',
+    );
+  });
+
+  test('VideoAnalysisResult keeps legacy responses compatible', () {
+    final result = VideoAnalysisResult.fromJson({
+      'analysisId': 'legacy-video-analysis',
+      'status': 'completed',
+      'result': {
+        'provider': 'hive',
+        'aiGeneratedDetected': true,
+        'deepfakeDetected': false,
+        'maxAiGeneratedScore': 0.95,
+        'maxDeepfakeScore': 0.1,
+        'maxAiGeneratedAudioScore': null,
+        'topGenerator': null,
+        'suspiciousTimestamps': [1, 3],
+      },
+    });
+
+    expect(result.forensics, isNotNull);
+    expect(result.forensics!.provider, 'hive');
+    expect(result.forensics!.aiGeneratedDetected, isTrue);
+    expect(result.forensics!.suspiciousTimestamps, [1.0, 3.0]);
+    expect(result.analysis, isNull);
+  });
+
+  test('missing forensics is inconclusive instead of a negative detection', () {
+    final result = VideoAnalysisResult.fromJson({
+      'status': 'completed',
+      'forensics': {
+        'provider': 'test',
+        'aiGeneratedDetected': null,
+        'deepfakeDetected': null,
+        'audioAiGeneratedStatus': 'unavailable'
+      },
+    });
+    expect(result.forensics!.aiGeneratedStatus, 'inconclusive');
+    expect(result.forensics!.deepfakeStatus, 'inconclusive');
+    expect(result.forensics!.audioAiGeneratedStatus, 'unavailable');
+    expect(result.forensics!.aiGeneratedDetected, isNull);
+  });
+
+  test('explicit evidence status takes precedence over legacy defaults', () {
+    final result = VideoAnalysisResult.fromJson({
+      'status': 'completed',
+      'forensics': {
+        'aiGeneratedDetected': false,
+        'aiGeneratedStatus': 'unavailable',
+        'deepfakeStatus': 'not_detected'
+      },
+    });
+    expect(result.forensics!.aiGeneratedStatus, 'unavailable');
+    expect(result.forensics!.deepfakeStatus, 'not_detected');
+  });
+
+  test('inconclusive activity retains a null score instead of zero risk', () {
+    final item = ScanActivityItem.fromJson({
+      'finalCategory': 'inconclusive',
+      'finalRiskScore': null,
+    });
+    expect(item.finalCategory, 'inconclusive');
+    expect(item.finalRiskScore, isNull);
+  });
+  test(
+      'video preserves unreadable encrypted-content status without claiming contents',
+      () {
+    final result = VideoAnalysisResult.fromJson({
+      'analysisId': 'video-with-encrypted-attachment',
+      'status': 'completed',
+      'hiddenContent': {'encryptedEntriesDeclared': 1},
+    });
+    expect(result.hasUnreadableHiddenContent, isTrue);
+    expect(result.analysis, isNull);
+    expect(
+        VideoAnalysisResult.fromJson({'status': 'completed'})
+            .hasUnreadableHiddenContent,
+        isFalse);
   });
 }

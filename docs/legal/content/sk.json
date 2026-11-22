@@ -1,0 +1,146 @@
+{
+  "locale": "sk",
+  "htmlLang": "sk",
+  "languageName": "Slovenčina",
+  "updatedLabel": "Posledná aktualizácia",
+  "languageLabel": "Jazyk",
+  "contactTitle": "Kontakt",
+  "privacy": {
+    "title": "Zásady ochrany osobných údajov – AI Scam Shield",
+    "intro": "AI Scam Shield analyzuje text, adresy URL, obrázky a krátke videá s cieľom odhaliť možné podvody a známky manipulácie. Tieto zásady opisujú informácie spracúvané aplikáciou a jej službami.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Spracúvané informácie",
+        "paragraphs": [
+          "Obsah na odoslanie vyberáte vložením, výberom súboru alebo zdieľaním s aplikáciou. Odoslaný materiál môže obsahovať osobné údaje o vás alebo iných ľuďoch; vyhýbajte sa zbytočným citlivým informáciám."
+        ],
+        "items": [
+          "Text, adresy URL, obrázky, videá, zvuk, extrahovaný text, obsah QR kódov a prípadná sprievodná správa potrebná na analýzu.",
+          "Pseudonymný identifikátor relácie, autentifikačný token bezpečne uložený v zariadení, odtlačok tokenu na serveri, zaregistrované časové pásmo a jazyk aplikácie.",
+          "Počítadlá používania, časové pečiatky, hodnotenia rizika, textové náhľady s dĺžkou do 160 znakov, výsledky analýz a metadáta spracovania médií.",
+          "Identifikátory predplatného, stav nároku na prístup, údaje o produkte, prostredí a uplynutí platnosti potrebné na overenie nákupov.",
+          "Technické údaje požiadaviek a bezpečnostné denníky. Firebase Analytics v súčasnej aplikácii spracúva aj informácie o aplikácii/zariadení a udalosti používania."
+        ]
+      },
+      {
+        "id": "purposes",
+        "title": "Ako sa informácie používajú",
+        "paragraphs": [
+          "Informácie sa používajú na vykonanie požadovanej analýzy, vrátenie výsledkov v jazyku aplikácie, poskytovanie histórie a štatistík, uplatňovanie limitov používania, overovanie predplatného a ochranu služby pred zneužitím.",
+          "OCR zachováva pôvodný jazyk textu. Vysvetlenia analýzy sa vyžadujú v jazyku aplikácie. V závislosti od funkcie a konfigurácie sa obsah môže odosielať poskytovateľom AI, forenznej analýzy médií, prepisu reči alebo prekladu, a to aj na preklad pri kontrole bez AI."
+        ]
+      },
+      {
+        "id": "providers",
+        "title": "Služby tretích strán",
+        "paragraphs": [
+          "Google Play zabezpečuje nákupy v systéme Android a RevenueCat podporuje správu a overovanie predplatného. Aplikácia tiež integruje Firebase Analytics. Poskytovatelia analýzy, prepisu, forenznej analýzy a prekladu dostávajú obsah potrebný na zvolenú operáciu.",
+          "Uchovávanie údajov u poskytovateľov, miesta spracúvania a ochranné opatrenia závisia od služieb nakonfigurovaných na nasadenie a ich podmienok. Nepredpokladajte, že každá operácia zostáva v zariadení alebo v Európskej únii. JamDesigns vaše údaje nepredáva ani neprenajíma na reklamné účely."
+        ]
+      },
+      {
+        "id": "storage",
+        "title": "Ukladanie a vymazanie",
+        "paragraphs": [
+          "Server ukladá záznamy o reláciách a predplatnom, počítadlá, náhľady analýz a výsledky na účely histórie, štatistík a spoľahlivého opakovania požiadaviek. Nahrané médiá sa môžu spracúvať prostredníctvom dočasných súborov; externí poskytovatelia uplatňujú vlastné pravidlá uchovávania.",
+          "V súčasnej verzii sa história analýz automaticky nevymazáva po uplynutí určitého času. Odinštalovaním aplikácie sa nevymažú záznamy na serveri. Ak chcete požiadať o informácie alebo vymazanie, kontaktujte nás; môže byť potrebné overenie, aby sa zabránilo sprístupneniu záznamov inej osoby. Strata prihlasovacích údajov relácie môže znemožniť prístup k predchádzajúcej histórii."
+        ]
+      },
+      {
+        "id": "security",
+        "title": "Bezpečnosť",
+        "paragraphs": [
+          "Aplikácia používa chránené prihlasovacie údaje relácie, autentifikáciu na strane servera a riadenie prístupu. Tieto opatrenia znižujú riziko, ale nemôžu zaručiť absolútnu bezpečnosť. Odosielajte iba obsah, ktorý ste oprávnení zdieľať."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "Vaše práva",
+        "paragraphs": [
+          "Ak tieto práva stanovujú platné právne predpisy, môžete požiadať o prístup k svojim osobným údajom, ich opravu, vymazanie, obmedzenie spracúvania alebo prenosnosť, namietať proti spracúvaniu a podať sťažnosť príslušnému orgánu na ochranu osobných údajov. Žiadosť odošlite na nižšie uvedenú kontaktnú adresu."
+        ]
+      },
+      {
+        "id": "children",
+        "title": "Deti a citlivé informácie",
+        "paragraphs": [
+          "Neodosielajte zbytočné osobné informácie o deťoch ani iný citlivý materiál. Ak boli takéto informácie odoslané neúmyselne, kontaktujte nás, aby bolo možné posúdiť situáciu."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Zmeny týchto zásad",
+        "paragraphs": [
+          "Aktualizácie budú zverejnené v aplikácii a na tejto stránke s upraveným dátumom. Kontaktným subjektom pre AI Scam Shield je JamDesigns na nižšie uvedenej adrese."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Podmienky služby – AI Scam Shield",
+    "intro": "Tieto podmienky upravujú používanie AI Scam Shield na analýzu textu, adries URL, obrázkov a krátkych videí. Služba poskytuje ukazovatele rizika a usmernenia; nemôže zaručiť odhalenie každého podvodu, manipulácie alebo skrytého prvku.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Používanie služby",
+        "paragraphs": [
+          "Službu používajte v súlade so zákonom a odosielajte iba obsah, ktorý ste oprávnení zdieľať. Vstup možno vložiť alebo zdieľať; obrázky a videá možno vybrať aj zo zariadenia."
+        ]
+      },
+      {
+        "id": "free-premium",
+        "title": "Analýzy v plánoch Free a Premium",
+        "paragraphs": [
+          "Plán Free umožňuje 3 dokončené analýzy týždenne. Prvá využíva AI a môže analyzovať text, adresu URL, obrázok alebo video. Zvyšné 2 analyzujú text alebo adresy URL bez AI; obrázky a videá pre tieto dve analýzy nie sú dostupné.",
+          "Jedna dokončená analýza sa počíta ako jedna jednotka bez ohľadu na typ obsahu alebo počet interných krokov spracovania. Platný výsledok bez jednoznačného záveru sa započítava; chyba bez platného výsledku sa nezapočítava. Týždenný limit sa obnovuje v pondelok o 00:00 v časovom pásme zaregistrovanom pre reláciu.",
+          "Premium poskytuje neobmedzené analýzy s AI, kým je overené predplatné aktívne. Naďalej platia technické limity súborov, dĺžky videí, súbežných operácií a dostupnosti poskytovateľov."
+        ]
+      },
+      {
+        "id": "media",
+        "title": "Médiá a jazyky",
+        "paragraphs": [
+          "Videá môžu mať dĺžku až 180 sekúnd vrátane a veľkosť do 100 MiB. Podporované formáty a možnosti spracovania závisia od aplikácie a poskytovateľov. OCR zachováva pôvodný jazyk textu a vysvetlenia analýzy používajú jazyk aplikácie. Preložené rozhranie nezaručuje úplnú podporu OCR alebo zvuku v každom jazyku."
+        ]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Predplatné a nákupy",
+        "paragraphs": [
+          "Google Play pred nákupom zobrazuje cenu, fakturačné obdobie a podmienky obnovenia. Fakturácia, rušenie a žiadosti o vrátenie peňazí sa vybavujú podľa pravidiel Google Play a platných právnych predpisov; RevenueCat podporuje overovanie nároku na prístup.",
+          "Predplatné spravujte alebo zrušte prostredníctvom svojho účtu Google Play. Prístup k Premium vyžaduje overenie serverom; čakajúce alebo neúspešné overenie nezakladá potvrdený nárok na prístup. Obnovenie nákupu automaticky neobnoví históriu zo stratenej relácie."
+        ]
+      },
+      {
+        "id": "results",
+        "title": "Obmedzenia analýzy",
+        "paragraphs": [
+          "Automatizované výsledky a výsledky získané s pomocou AI môžu byť nepresné, neúplné alebo zastarané vrátane falošne pozitívnych nálezov a neodhalených hrozieb. Vzorkovanie snímok, čítanie QR kódov a kontroly skrytého obsahu majú obmedzený rozsah a nemôžu preukázať, že je obsah bezpečný alebo autentický.",
+          "Pri rozhodovaní v otázkach bezpečnosti, financií, práva alebo osobných záležitostí sa nespoliehajte iba na aplikáciu. Preskúmajte dôkazy a podľa potreby vyhľadajte vhodnú pomoc. Zlyhanie poskytovateľa nie je výsledkom s nízkym rizikom."
+        ]
+      },
+      {
+        "id": "third-parties",
+        "title": "Služby tretích strán a súkromie",
+        "paragraphs": [
+          "Služba závisí od externých poskytovateľov a dostupnosti siete. Obsah a údaje služby sa môžu spracúvať spôsobom opísaným v Zásadách ochrany osobných údajov. Výpadky alebo nedostupné funkcie môžu zabrániť dokončeniu analýzy."
+        ]
+      },
+      {
+        "id": "liability",
+        "title": "Zodpovednosť a vaše zákonné práva",
+        "paragraphs": [
+          "Služba sa poskytuje v závislosti od svojej dostupnosti a s uvedenými obmedzeniami. Za rozhodnutia prijaté na základe jej ukazovateľov naďalej zodpovedáte vy. Žiadne ustanovenie týchto podmienok nevylučuje zodpovednosť ani neobmedzuje spotrebiteľské práva alebo práva na ochranu osobných údajov, ktoré nemožno zo zákona vylúčiť alebo obmedziť."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Zmeny služby a podmienok",
+        "paragraphs": [
+          "Funkcie aj tieto podmienky sa môžu aktualizovať. Podstatné zmeny budú oznámené v súlade s platnými právnymi predpismi; nákupné podmienky a práva, od ktorých sa nemožno odchýliť, platia aj naďalej. Aktualizované podmienky budú obsahovať upravený dátum. S otázkami sa obráťte na JamDesigns na nižšie uvedenej adrese."
+        ]
+      }
+    ]
+  }
+}

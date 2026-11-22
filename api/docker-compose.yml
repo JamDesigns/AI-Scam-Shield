@@ -1,5 +1,8 @@
+name: api_scam_shield
+
 services:
   postgres:
+    container_name: api_scam_shield_postgres
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: scam
@@ -9,19 +12,25 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scam -d scam_shield"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
 
   api:
+    container_name: api_scam_shield_api
     build: .
     env_file:
       - .env
     ports:
       - "3000:3000"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
 volumes:
   pgdata:
-  
+    name: api_scam_shield_pgdata

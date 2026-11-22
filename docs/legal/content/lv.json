@@ -1,0 +1,146 @@
+{
+  "locale": "lv",
+  "htmlLang": "lv",
+  "languageName": "Latviešu",
+  "updatedLabel": "Pēdējo reizi atjaunināts",
+  "languageLabel": "Valoda",
+  "contactTitle": "Kontaktinformācija",
+  "privacy": {
+    "title": "Privātuma politika – AI Scam Shield",
+    "intro": "AI Scam Shield analizē tekstu, URL adreses, attēlus un īsus videoklipus, lai noteiktu iespējamu krāpniecību un manipulācijas pazīmes. Šajā politikā aprakstīta informācija, ko apstrādā lietotne un tās pakalpojumi.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Apstrādātā informācija",
+        "paragraphs": [
+          "Jūs izvēlaties iesniedzamo saturu, to ielīmējot, atlasot failu vai kopīgojot ar lietotni. Iesniegtais materiāls var saturēt jūsu vai citu personu personas datus; izvairieties no nevajadzīgas sensitīvas informācijas."
+        ],
+        "items": [
+          "Teksts, URL adreses, attēli, videoklipi, audio, izgūtais teksts, QR saturs un jebkurš pievienotais ziņojums, kas nepieciešams analīzei.",
+          "Pseidonimizēts sesijas identifikators, ierīcē droši glabāts autentifikācijas marķieris, marķiera jaucējvērtība serverī, reģistrētā laika josla un lietotnes valoda.",
+          "Lietojuma skaitītāji, laika zīmogi, riska novērtējumi, teksta priekšskatījumi līdz 160 rakstzīmēm, analīzes rezultāti un multivides apstrādes metadati.",
+          "Abonementu identifikatori, piekļuves tiesību statuss, kā arī informācija par produktu, vidi un derīguma termiņu, kas nepieciešama pirkumu pārbaudei.",
+          "Tehniskie pieprasījumu dati un drošības žurnāli. Firebase Analytics pašreizējā lietotnē apstrādā arī informāciju par lietotni un ierīci, kā arī lietojuma notikumus."
+        ]
+      },
+      {
+        "id": "purposes",
+        "title": "Kā informācija tiek izmantota",
+        "paragraphs": [
+          "Informācija tiek izmantota, lai veiktu pieprasīto analīzi, sniegtu rezultātus lietotnes valodā, nodrošinātu vēsturi un statistiku, piemērotu lietojuma ierobežojumus, pārbaudītu abonementus un aizsargātu pakalpojumu pret ļaunprātīgu izmantošanu.",
+          "OCR saglabā teksta sākotnējo valodu. Analīzes skaidrojumi tiek pieprasīti lietotnes valodā. Atkarībā no funkcijas un konfigurācijas saturs var tikt nosūtīts mākslīgā intelekta, multivides ekspertīzes, runas transkripcijas vai tulkošanas pakalpojumu sniedzējiem, tostarp tulkošanai pārbaudē bez mākslīgā intelekta."
+        ]
+      },
+      {
+        "id": "providers",
+        "title": "Trešo pušu pakalpojumi",
+        "paragraphs": [
+          "Google Play apstrādā Android pirkumus, un RevenueCat atbalsta abonementu pārvaldību un pārbaudi. Lietotnē ir integrēts arī Firebase Analytics. Analīzes, transkripcijas, ekspertīzes un tulkošanas pakalpojumu sniedzēji saņem izvēlētajai darbībai nepieciešamo saturu.",
+          "Pakalpojumu sniedzēju glabāšanas kārtība, apstrādes vietas un aizsardzības pasākumi ir atkarīgi no izvietošanai konfigurētajiem pakalpojumiem un to noteikumiem. Nepieņemiet, ka katra darbība paliek ierīcē vai Eiropas Savienībā. JamDesigns nepārdod un neiznomā jūsu datus reklāmas nolūkiem."
+        ]
+      },
+      {
+        "id": "storage",
+        "title": "Glabāšana un dzēšana",
+        "paragraphs": [
+          "Serveris glabā sesiju un abonementu ierakstus, skaitītājus, analīžu priekšskatījumus un rezultātus vēsturei, statistikai un uzticamiem atkārtotiem mēģinājumiem. Augšupielādēto multividi var apstrādāt, izmantojot pagaidu failus; ārējie pakalpojumu sniedzēji piemēro savu glabāšanas kārtību.",
+          "Pašreizējā versijā analīžu vēsturei nav automātiska derīguma termiņa. Lietotnes atinstalēšana neizdzēš servera ierakstus. Sazinieties ar mums, lai pieprasītu informāciju vai dzēšanu; var būt nepieciešama pārbaude, lai netiktu atklāti citas personas ieraksti. Sesijas piekļuves datu zaudēšana var liegt piekļuvi iepriekšējai vēsturei."
+        ]
+      },
+      {
+        "id": "security",
+        "title": "Drošība",
+        "paragraphs": [
+          "Lietotne izmanto aizsargātus sesijas piekļuves datus, autentifikāciju servera pusē un piekļuves kontroli. Šie pasākumi mazina risku, taču nevar garantēt pilnīgu drošību. Iesniedziet tikai tādu saturu, ko jums ir tiesības kopīgot."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "Jūsu tiesības",
+        "paragraphs": [
+          "Ja piemērojamie tiesību akti paredz šīs tiesības, varat pieprasīt piekļuvi saviem personas datiem, to labošanu, dzēšanu, apstrādes ierobežošanu vai datu pārnesamību, iebilst pret apstrādi un iesniegt sūdzību kompetentajai datu aizsardzības iestādei. Pieprasījumam izmantojiet tālāk norādīto kontaktadresi."
+        ]
+      },
+      {
+        "id": "children",
+        "title": "Bērni un sensitīva informācija",
+        "paragraphs": [
+          "Neiesniedziet nevajadzīgu personas informāciju par bērniem vai citus sensitīvus materiālus. Ja šāda informācija tika iesniegta netīši, sazinieties ar mums, lai situāciju varētu izvērtēt."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Šīs politikas izmaiņas",
+        "paragraphs": [
+          "Atjauninājumi tiks publicēti lietotnē un šajā lapā ar pārskatītu datumu. AI Scam Shield kontaktpersona ir JamDesigns tālāk norādītajā adresē."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Pakalpojuma lietošanas noteikumi – AI Scam Shield",
+    "intro": "Šie noteikumi attiecas uz AI Scam Shield izmantošanu teksta, URL adrešu, attēlu un īsu videoklipu analīzei. Pakalpojums sniedz riska rādītājus un norādes; tas nevar garantēt ikvienas krāpniecības, manipulācijas vai slēpta elementa atklāšanu.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Pakalpojuma izmantošana",
+        "paragraphs": [
+          "Izmantojiet pakalpojumu likumīgi un iesniedziet tikai tādu saturu, ko jums ir tiesības kopīgot. Ievadi var ielīmēt vai kopīgot; attēlus un videoklipus var arī atlasīt no ierīces."
+        ]
+      },
+      {
+        "id": "free-premium",
+        "title": "Free un Premium analīzes",
+        "paragraphs": [
+          "Free plāns ļauj veikt 3 pabeigtas analīzes nedēļā. Pirmajā tiek izmantots mākslīgais intelekts, un tā var analizēt tekstu, URL adresi, attēlu vai videoklipu. Pārējās 2 analizē tekstu vai URL adreses bez mākslīgā intelekta; šīm divām analīzes reizēm attēli un videoklipi nav pieejami.",
+          "Viena pilna analīze tiek skaitīta kā viena vienība neatkarīgi no satura veida vai iekšējo apstrādes darbību skaita. Derīgs rezultāts bez skaidra secinājuma tiek ieskaitīts; kļūda bez derīga rezultāta netiek ieskaitīta. Nedēļas skaitītājs tiek atiestatīts pirmdien plkst. 00:00 sesijai reģistrētajā laika joslā.",
+          "Premium nodrošina neierobežotu skaitu analīžu ar mākslīgo intelektu, kamēr pārbaudītais abonements ir aktīvs. Joprojām ir spēkā tehniskie ierobežojumi failiem, videoklipu ilgumam, vienlaicīgām darbībām un pakalpojumu sniedzēju pieejamībai."
+        ]
+      },
+      {
+        "id": "media",
+        "title": "Multivide un valodas",
+        "paragraphs": [
+          "Videoklipi drīkst būt līdz 180 sekundēm ieskaitot un līdz 100 MiB lieli. Atbalstītie formāti un apstrādes iespējas ir atkarīgas no lietotnes un pakalpojumu sniedzējiem. OCR saglabā teksta sākotnējo valodu, un analīzes skaidrojumi izmanto lietotnes valodu. Tulkota saskarne negarantē pilnīgu OCR vai audio atbalstu visās valodās."
+        ]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Abonementi un pirkumi",
+        "paragraphs": [
+          "Google Play pirms pirkuma parāda cenu, norēķinu periodu un atjaunošanas nosacījumus. Norēķini, atcelšana un atmaksas pieprasījumi tiek apstrādāti saskaņā ar Google Play politikām un piemērojamajiem tiesību aktiem; RevenueCat atbalsta piekļuves tiesību pārbaudi.",
+          "Pārvaldiet vai atceliet abonementu savā Google Play kontā. Premium piekļuvei ir nepieciešama servera pārbaude; gaidoša vai neveiksmīga pārbaude nerada apstiprinātas piekļuves tiesības. Pirkuma atjaunošana automātiski neatjauno zaudētas sesijas vēsturi."
+        ]
+      },
+      {
+        "id": "results",
+        "title": "Analīzes ierobežojumi",
+        "paragraphs": [
+          "Automatizēti un ar mākslīgā intelekta palīdzību iegūti rezultāti var būt neprecīzi, nepilnīgi vai novecojuši, tostarp ar kļūdaini pozitīviem rezultātiem un nepamanītiem draudiem. Kadru izlases pārbaude, QR nolasīšana un slēpta satura pārbaudes ir ierobežotas un nevar pierādīt, ka saturs ir drošs vai autentisks.",
+          "Pieņemot lēmumus par drošību, finansēm, juridiskiem vai personiskiem jautājumiem, nepaļaujieties tikai uz lietotni. Izvērtējiet pierādījumus un vajadzības gadījumā meklējiet atbilstošu palīdzību. Pakalpojuma sniedzēja kļūme nav zema riska rezultāts."
+        ]
+      },
+      {
+        "id": "third-parties",
+        "title": "Trešo pušu pakalpojumi un privātums",
+        "paragraphs": [
+          "Pakalpojums ir atkarīgs no ārējiem pakalpojumu sniedzējiem un tīkla pieejamības. Saturu un pakalpojuma datus var apstrādāt, kā aprakstīts privātuma politikā. Pārtraukumi vai nepieejamas iespējas var liegt pabeigt analīzi."
+        ]
+      },
+      {
+        "id": "liability",
+        "title": "Atbildība un jūsu likumā noteiktās tiesības",
+        "paragraphs": [
+          "Pakalpojums tiek sniegts atbilstoši tā pieejamībai un norādītajiem ierobežojumiem. Jūs joprojām esat atbildīgs par lēmumiem, kas pieņemti, izmantojot tā rādītājus. Nekas šajos noteikumos neizslēdz atbildību un neierobežo patērētāju vai datu aizsardzības tiesības, kuras saskaņā ar likumu nedrīkst izslēgt vai ierobežot."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Pakalpojuma un noteikumu izmaiņas",
+        "paragraphs": [
+          "Funkcijas un šie noteikumi var tikt atjaunināti. Par būtiskām izmaiņām tiks paziņots, kā to prasa piemērojamie tiesību akti; pirkuma nosacījumi un obligātās tiesības joprojām ir spēkā. Atjauninātajiem noteikumiem būs pārskatīts datums. Ja ir jautājumi, sazinieties ar JamDesigns tālāk norādītajā adresē."
+        ]
+      }
+    ]
+  }
+}

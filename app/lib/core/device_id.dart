@@ -1,23 +1,8 @@
-import 'dart:math';
+import 'app_session.dart';
 
-import 'package:shared_preferences/shared_preferences.dart';
-
+/// Kept as a compatibility adapter: IDs are now server-issued and backed by
+/// the same secure session used by ApiClient and RevenueCat.
 class DeviceId {
-  static const _key = 'device_id';
-
-  static Future<String> getOrCreate() async {
-    final prefs = await SharedPreferences.getInstance();
-    final existing = prefs.getString(_key);
-    if (existing != null && existing.isNotEmpty) return existing;
-
-    final id = _randomId();
-    await prefs.setString(_key, id);
-    return id;
-  }
-
-  static String _randomId() {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    final r = Random.secure();
-    return List.generate(24, (_) => chars[r.nextInt(chars.length)]).join();
-  }
+  static Future<String> getOrCreate() async =>
+      (await SessionRepository.instance.getOrCreate()).deviceId;
 }

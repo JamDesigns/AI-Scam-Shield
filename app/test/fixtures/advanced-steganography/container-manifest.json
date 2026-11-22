@@ -1,0 +1,66 @@
+[
+  {
+    "id": "C01-jpeg-deflate",
+    "file": "C01-jpeg-deflate.jpg",
+    "text": "Tu banco pide tu contraseña y código SMS para recuperar la cuenta. https://banco-claves.example",
+    "encryptedEntries": 0,
+    "recognized": true,
+    "synthetic": true
+  },
+  {
+    "id": "C02-png-stored",
+    "file": "C02-png-stored.png",
+    "text": "Tu banco nunca pide contraseñas ni códigos SMS por mensajes. No compartas tus claves con otras personas.",
+    "encryptedEntries": 0,
+    "recognized": true,
+    "synthetic": true
+  },
+  {
+    "id": "C03-jpeg-aes",
+    "file": "C03-jpeg-aes.jpg",
+    "text": null,
+    "encryptedEntries": 1,
+    "recognized": true,
+    "synthetic": true
+  },
+  {
+    "id": "C04-random-trailer",
+    "file": "C04-random-trailer.jpg",
+    "text": null,
+    "encryptedEntries": 0,
+    "recognized": false,
+    "synthetic": true
+  },
+  {
+    "id": "C05-fake-zip-magic",
+    "file": "C05-fake-zip-magic.jpg",
+    "text": null,
+    "encryptedEntries": 0,
+    "recognized": false,
+    "synthetic": true
+  },
+  {
+    "id": "C06-conflicting-headers",
+    "file": "C06-conflicting-headers.jpg",
+    "text": null,
+    "encryptedEntries": 0,
+    "recognized": false,
+    "synthetic": true
+  },
+  {
+    "id": "C07-oversized-text",
+    "file": "C07-oversized-text.jpg",
+    "text": null,
+    "encryptedEntries": 0,
+    "recognized": true,
+    "synthetic": true
+  },
+  {
+    "id": "C08-inflation-bounds",
+    "file": "C08-inflation-bounds.jpg",
+    "text": null,
+    "encryptedEntries": 0,
+    "recognized": true,
+    "synthetic": true
+  }
+]

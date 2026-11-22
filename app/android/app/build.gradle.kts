@@ -1,5 +1,4 @@
 import java.util.Properties
-import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
@@ -8,11 +7,21 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+// Debug builds must work without accessing the private release signing file.
+val releaseSigningRequested = gradle.startParameter.taskNames.any {
+    val task = it.substringAfterLast(':').lowercase()
+    task.contains("release") || task in setOf("build", "assemble", "bundle")
+}
 val keystoreProperties = Properties()
-val keystorePropertiesFile = rootProject.file("key.properties")
-
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+if (releaseSigningRequested) {
+    val signingFile = rootProject.file("key.properties")
+    require(signingFile.isFile) { "Release signing requires android/key.properties." }
+    signingFile.inputStream().use { keystoreProperties.load(it) }
+    for (key in listOf("keyAlias", "keyPassword", "storeFile", "storePassword")) {
+        require(!keystoreProperties.getProperty(key).isNullOrBlank()) {
+            "Missing release signing property: $key"
+        }
+    }
 }
 
 android {
@@ -31,10 +40,12 @@ android {
 
     signingConfigs {
         create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = file(keystoreProperties["storeFile"] as String)
-            storePassword = keystoreProperties["storePassword"] as String
+            if (releaseSigningRequested) {
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+            }
         }
     }
 
@@ -49,6 +60,16 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
+        }
+    }
+}
+
+tasks.configureEach {
+    if (name == "validateSigningRelease") {
+        doFirst {
+            check(releaseSigningRequested) {
+                "Request a release task explicitly to load private release signing."
+            }
         }
     }
 }

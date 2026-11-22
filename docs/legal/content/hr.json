@@ -1,0 +1,146 @@
+{
+  "locale": "hr",
+  "htmlLang": "hr",
+  "languageName": "Hrvatski",
+  "updatedLabel": "Posljednje ažuriranje",
+  "languageLabel": "Jezik",
+  "contactTitle": "Kontakt",
+  "privacy": {
+    "title": "Pravila privatnosti – AI Scam Shield",
+    "intro": "AI Scam Shield analizira tekst, URL-ove, slike i kratke videozapise kako bi prepoznao moguće prijevare i znakove manipulacije. Ova pravila opisuju informacije koje obrađuju aplikacija i njezine usluge.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Informacije koje se obrađuju",
+        "paragraphs": [
+          "Sadržaj za slanje birate lijepljenjem, odabirom datoteke ili dijeljenjem s aplikacijom. Poslani materijal može sadržavati osobne podatke o vama ili drugim osobama; izbjegavajte nepotrebne osjetljive informacije."
+        ],
+        "items": [
+          "Tekst, URL-ovi, slike, videozapisi, zvuk, izdvojeni tekst, sadržaj QR kodova i svaka popratna poruka potrebna za analizu.",
+          "Pseudonimni identifikator sesije, autentifikacijski token sigurno pohranjen na uređaju, sažetak tokena na poslužitelju, registrirana vremenska zona i jezik aplikacije.",
+          "Brojači korištenja, vremenske oznake, procjene rizika, tekstualni pretpregledi do 160 znakova, rezultati analiza i metapodaci obrade medija.",
+          "Identifikatori pretplate, status prava pristupa te podaci o proizvodu, okruženju i isteku potrebni za provjeru kupnji.",
+          "Tehnički podaci zahtjeva i sigurnosni zapisnici. Firebase Analytics u trenutačnoj aplikaciji obrađuje i informacije o aplikaciji/uređaju te događaje korištenja."
+        ]
+      },
+      {
+        "id": "purposes",
+        "title": "Kako se informacije upotrebljavaju",
+        "paragraphs": [
+          "Informacije se upotrebljavaju za obavljanje zatražene analize, vraćanje rezultata na jeziku aplikacije, pružanje povijesti i statistike, primjenu ograničenja korištenja, provjeru pretplata i zaštitu usluge od zlouporabe.",
+          "OCR zadržava izvorni jezik teksta. Objašnjenja analize traže se na jeziku aplikacije. Ovisno o značajci i konfiguraciji, sadržaj se može slati pružateljima usluga umjetne inteligencije, forenzičke analize medija, transkripcije govora ili prevođenja, uključujući radi prijevoda pri provjeri bez umjetne inteligencije."
+        ]
+      },
+      {
+        "id": "providers",
+        "title": "Usluge trećih strana",
+        "paragraphs": [
+          "Google Play obrađuje kupnje za Android, a RevenueCat podržava upravljanje pretplatama i njihovu provjeru. Aplikacija također integrira Firebase Analytics. Pružatelji usluga analize, transkripcije, forenzičke analize i prevođenja primaju sadržaj potreban za odabranu radnju.",
+          "Zadržavanje podataka kod pružatelja, mjesta obrade i zaštitne mjere ovise o uslugama konfiguriranima za puštanje u rad i njihovim uvjetima. Nemojte pretpostavljati da se svaka radnja odvija na uređaju ili unutar Europske unije. JamDesigns ne prodaje niti iznajmljuje vaše podatke za oglašavanje."
+        ]
+      },
+      {
+        "id": "storage",
+        "title": "Pohrana i brisanje",
+        "paragraphs": [
+          "Poslužitelj pohranjuje zapise o sesijama i pretplatama, brojače, pretpreglede analiza i rezultate za povijest, statistiku i pouzdano ponavljanje zahtjeva. Preneseni mediji mogu se obrađivati putem privremenih datoteka; vanjski pružatelji primjenjuju vlastita pravila zadržavanja podataka.",
+          "U trenutačnoj verziji povijest analiza ne briše se automatski nakon isteka određenog vremena. Deinstaliranjem aplikacije ne brišu se zapisi na poslužitelju. Obratite nam se kako biste zatražili informacije ili brisanje; provjera može biti potrebna da bi se izbjeglo otkrivanje zapisa druge osobe. Gubitak pristupnih podataka sesije može onemogućiti pristup prethodnoj povijesti."
+        ]
+      },
+      {
+        "id": "security",
+        "title": "Sigurnost",
+        "paragraphs": [
+          "Aplikacija upotrebljava zaštićene pristupne podatke sesije, autentifikaciju na poslužitelju i kontrole pristupa. Te mjere smanjuju rizik, ali ne mogu jamčiti potpunu sigurnost. Šaljite samo sadržaj koji imate pravo dijeliti."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "Vaša prava",
+        "paragraphs": [
+          "Ako mjerodavno pravo predviđa ta prava, možete zatražiti pristup svojim osobnim podacima, njihov ispravak, brisanje, ograničenje obrade ili prenosivost, uložiti prigovor na obradu i podnijeti pritužbu nadležnom tijelu za zaštitu podataka. Za podnošenje zahtjeva upotrijebite kontaktnu adresu u nastavku."
+        ]
+      },
+      {
+        "id": "children",
+        "title": "Djeca i osjetljive informacije",
+        "paragraphs": [
+          "Nemojte slati nepotrebne osobne informacije o djeci niti drugi osjetljivi materijal. Ako su takve informacije poslane nenamjerno, obratite nam se kako bi se situacija mogla procijeniti."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Izmjene ovih pravila",
+        "paragraphs": [
+          "Ažuriranja će biti objavljena u aplikaciji i na ovoj stranici s izmijenjenim datumom. Kontakt za AI Scam Shield je JamDesigns na adresi u nastavku."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Uvjeti pružanja usluge – AI Scam Shield",
+    "intro": "Ovi uvjeti uređuju korištenje aplikacije AI Scam Shield za analizu teksta, URL-ova, slika i kratkih videozapisa. Usluga pruža pokazatelje rizika i smjernice; ne može jamčiti otkrivanje svake prijevare, manipulacije ili skrivenog elementa.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Korištenje usluge",
+        "paragraphs": [
+          "Uslugom se koristite zakonito i šaljite samo sadržaj koji imate pravo dijeliti. Ulazni sadržaj može se zalijepiti ili podijeliti; slike i videozapisi mogu se odabrati i s uređaja."
+        ]
+      },
+      {
+        "id": "free-premium",
+        "title": "Analize Free i Premium",
+        "paragraphs": [
+          "Plan Free omogućuje 3 dovršene analize tjedno. Prva upotrebljava umjetnu inteligenciju i može analizirati tekst, URL, sliku ili videozapis. Ostale 2 analiziraju tekst ili URL-ove bez umjetne inteligencije; slike i videozapisi nisu dostupni za te dvije analize.",
+          "Jedna dovršena analiza računa se kao jedna jedinica bez obzira na vrstu sadržaja ili broj internih koraka obrade. Valjan rezultat bez konačnog zaključka računa se; pogreška bez valjanog rezultata ne računa se. Tjedni se limit obnavlja u ponedjeljak u 00:00 u vremenskoj zoni registriranoj za sesiju.",
+          "Premium pruža neograničene analize s umjetnom inteligencijom dok je provjerena pretplata aktivna. Tehnička ograničenja datoteka, trajanja videozapisa, istodobnih radnji i dostupnosti pružatelja i dalje vrijede."
+        ]
+      },
+      {
+        "id": "media",
+        "title": "Mediji i jezici",
+        "paragraphs": [
+          "Videozapisi mogu trajati do uključivo 180 sekundi i imati veličinu do 100 MiB. Podržani formati i mogućnosti obrade ovise o aplikaciji i pružateljima. OCR zadržava izvorni jezik teksta, a objašnjenja analize upotrebljavaju jezik aplikacije. Prevedeno sučelje ne jamči potpunu podršku za OCR ili zvuk u svakom jeziku."
+        ]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Pretplate i kupnje",
+        "paragraphs": [
+          "Google Play prikazuje cijenu, obračunsko razdoblje i uvjete obnove prije kupnje. Naplata, otkazivanje i zahtjevi za povrat obrađuju se u skladu s pravilima Google Play i mjerodavnim pravom; RevenueCat podržava provjeru prava pristupa.",
+          "Upravljajte pretplatom ili je otkažite putem svojeg računa Google Play. Pristup paketu Premium zahtijeva provjeru na poslužitelju; provjera na čekanju ili neuspjela provjera ne stvara potvrđeno pravo pristupa. Obnova kupnje ne obnavlja automatski povijest izgubljene sesije."
+        ]
+      },
+      {
+        "id": "results",
+        "title": "Ograničenja analize",
+        "paragraphs": [
+          "Automatizirani rezultati i rezultati uz pomoć umjetne inteligencije mogu biti netočni, nepotpuni ili zastarjeli, uključujući lažno pozitivne rezultate i neotkrivene prijetnje. Uzorkovanje kadrova, čitanje QR kodova i provjere skrivenog sadržaja ograničenog su opsega te ne mogu dokazati da je sadržaj siguran ili autentičan.",
+          "Nemojte se oslanjati samo na aplikaciju pri donošenju sigurnosnih, financijskih, pravnih ili osobnih odluka. Pregledajte dokaze i prema potrebi potražite odgovarajuću pomoć. Neuspjeh pružatelja nije rezultat niskog rizika."
+        ]
+      },
+      {
+        "id": "third-parties",
+        "title": "Usluge trećih strana i privatnost",
+        "paragraphs": [
+          "Usluga ovisi o vanjskim pružateljima i dostupnosti mreže. Sadržaj i podaci usluge mogu se obrađivati kako je opisano u Pravilima privatnosti. Prekidi ili nedostupne mogućnosti mogu onemogućiti dovršetak analize."
+        ]
+      },
+      {
+        "id": "liability",
+        "title": "Odgovornost i vaša zakonska prava",
+        "paragraphs": [
+          "Usluga se pruža ovisno o dostupnosti i uz navedena ograničenja. I dalje ste odgovorni za odluke donesene na temelju njezinih pokazatelja. Ništa u ovim uvjetima ne isključuje odgovornost niti ograničava prava potrošača ili prava na zaštitu podataka koja se prema zakonu ne mogu isključiti ili ograničiti."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Izmjene usluge i uvjeta",
+        "paragraphs": [
+          "Značajke i ovi uvjeti mogu se ažurirati. Bitne izmjene bit će priopćene u skladu sa zahtjevima mjerodavnog prava; uvjeti kupnje i obvezna prava i dalje vrijede. Ažurirani uvjeti imat će izmijenjeni datum. Za pitanja se obratite društvu JamDesigns na adresi u nastavku."
+        ]
+      }
+    ]
+  }
+}

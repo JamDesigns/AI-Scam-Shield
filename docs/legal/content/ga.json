@@ -1,0 +1,101 @@
+{
+  "locale": "ga",
+  "htmlLang": "ga",
+  "languageName": "Gaeilge",
+  "updatedLabel": "Nuashonraithe go deireanach",
+  "languageLabel": "Teanga",
+  "contactTitle": "Teagmháil",
+  "privacy": {
+    "title": "Beartas Príobháideachais – AI Scam Shield",
+    "intro": "Déanann AI Scam Shield anailís ar théacs, URLanna, íomhánna agus físeáin ghearra chun camscéimeanna féideartha agus comharthaí ionramhála a aithint. Déantar cur síos sa bheartas seo ar an bhfaisnéis a phróiseálann an aip agus a seirbhísí.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Faisnéis a phróiseáiltear",
+        "paragraphs": ["Roghnaíonn tú an t-ábhar atá le seoladh tríd é a ghreamú, comhad a roghnú nó é a chomhroinnt leis an aip. D'fhéadfadh sonraí pearsanta fút féin nó faoi dhaoine eile a bheith san ábhar a sheoltar; seachain faisnéis íogair nach bhfuil riachtanach."],
+        "items": ["Téacs, URLanna, íomhánna, físeáin, fuaim, téacs a bhaintear amach, ábhar QR agus aon teachtaireacht a théann leo agus atá riachtanach don anailís.", "Aitheantóir seisiúin bréagainmneach, comhartha fíordheimhnithe a stóráiltear go slán ar an ngléas, luach hais an chomhartha ar an bhfreastalaí, an crios ama cláraithe agus teanga na haipe.", "Áiritheoirí úsáide, stampaí ama, measúnuithe riosca, réamhamhairc téacs suas le 160 carachtar, torthaí anailíse agus meiteashonraí próiseála meán.", "Aitheantóirí síntiúis, stádas teidlíochta, táirge, timpeallacht agus faisnéis éaga a theastaíonn chun ceannacháin a fhíorú.", "Sonraí teicniúla na n-iarratas agus logaí slándála. Próiseálann Firebase Analytics faisnéis faoin aip agus faoin ngléas agus imeachtaí úsáide san aip reatha freisin."]
+      },
+      {
+        "id": "purposes",
+        "title": "An chaoi a n-úsáidtear faisnéis",
+        "paragraphs": ["Úsáidtear faisnéis chun an anailís iarrtha a dhéanamh, torthaí a thabhairt ar ais i dteanga na haipe, stair agus staitisticí a chur ar fáil, teorainneacha úsáide a chur i bhfeidhm, síntiúis a fhíorú agus an tseirbhís a chosaint ar mhí-úsáid.", "Caomhnaíonn aithint optúil carachtar (OCR) teanga bhunaidh an téacs. Iarrtar míniúcháin na hanailíse i dteanga na haipe. Ag brath ar an ngné agus ar an gcumraíocht, féadfar ábhar a sheoladh chuig soláthraithe intleachta saorga (IS), fóiréinsice meán, trascríofa cainte nó aistriúcháin, lena n-áirítear le haghaidh aistriúcháin in anailís gan IS."]
+      },
+      {
+        "id": "providers",
+        "title": "Seirbhísí tríú páirtithe",
+        "paragraphs": ["Láimhseálann Google Play ceannacháin Android agus tacaíonn RevenueCat le bainistiú agus fíorú síntiús. Tá Firebase Analytics comhtháite san aip freisin. Faigheann soláthraithe anailíse, trascríofa, fóiréinsice agus aistriúcháin an t-ábhar atá riachtanach don oibríocht roghnaithe.", "Braitheann coinneáil sonraí na soláthraithe, suíomhanna próiseála agus coimircí ar na seirbhísí atá cumraithe don imscaradh agus ar a dtéarmaí. Ná glac leis go bhfanann gach oibríocht ar an ngléas nó laistigh den Aontas Eorpach. Ní dhíolann JamDesigns do shonraí ná ní chuireann sé ar cíos iad chun críocha fógraíochta."]
+      },
+      {
+        "id": "storage",
+        "title": "Stóráil agus scriosadh",
+        "paragraphs": ["Stórálann an freastalaí taifid seisiúin agus síntiúis, áiritheoirí, réamhamhairc agus torthaí anailíse le haghaidh staire, staitisticí agus athiarrachtaí iontaofa. Féadfar meáin uaslódáilte a phróiseáil trí chomhaid shealadacha; cuireann soláthraithe seachtracha a socruithe coinneála féin i bhfeidhm.", "Ní théann stair anailíse in éag go huathoibríoch sa leagan reatha. Ní scriostar taifid an fhreastalaí nuair a dhíshuiteáiltear an aip. Déan teagmháil linn chun faisnéis nó scriosadh a iarraidh; d'fhéadfadh fíorú a bheith riachtanach chun nochtadh thaifid duine eile a sheachaint. D'fhéadfadh cailliúint dhintiúir an tseisiúin cosc a chur ar rochtain ar an stair roimhe sin."]
+      },
+      {
+        "id": "security",
+        "title": "Slándáil",
+        "paragraphs": ["Úsáideann an aip dintiúir seisiúin chosanta, fíordheimhniú ar thaobh an fhreastalaí agus rialuithe rochtana. Laghdaíonn na bearta seo an riosca ach ní féidir leo slándáil iomlán a ráthú. Ná seol ach ábhar a bhfuil tú i dteideal é a chomhroinnt."]
+      },
+      {
+        "id": "rights",
+        "title": "Do chearta",
+        "paragraphs": ["Sa chás go bhforáiltear do na cearta seo leis an dlí is infheidhme, féadfaidh tú rochtain ar do shonraí pearsanta, a gceartú, a scriosadh, srianadh a bpróiseála nó a n-iniomparthacht a iarraidh, agóid a dhéanamh i gcoinne próiseála agus gearán a dhéanamh leis an údarás inniúil cosanta sonraí. Úsáid an seoladh teagmhála thíos chun iarratas a dhéanamh."]
+      },
+      {
+        "id": "children",
+        "title": "Leanaí agus faisnéis íogair",
+        "paragraphs": ["Ná seol faisnéis phearsanta neamhriachtanach faoi leanaí ná ábhar íogair eile. Má seoladh faisnéis den sórt sin de thaisme, déan teagmháil linn ionas gur féidir an cás a mheas."]
+      },
+      {
+        "id": "changes",
+        "title": "Athruithe ar an mbeartas seo",
+        "paragraphs": ["Foilseofar nuashonruithe san aip agus ar an leathanach seo le dáta athbhreithnithe. Is é JamDesigns an teagmhálaí le haghaidh AI Scam Shield ag an seoladh thíos."]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Téarmaí Seirbhíse – AI Scam Shield",
+    "intro": "Baineann na téarmaí seo le húsáid AI Scam Shield chun anailís a dhéanamh ar théacs, URLanna, íomhánna agus físeáin ghearra. Soláthraíonn an tseirbhís táscairí riosca agus treoir; ní féidir léi a ráthú go mbraithfear gach camscéim, ionramháil nó eilimint fholaithe.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Úsáid na seirbhíse",
+        "paragraphs": ["Úsáid an tseirbhís go dleathach agus ná seol ach ábhar a bhfuil tú i dteideal é a chomhroinnt. Is féidir ábhar a ghreamú nó a chomhroinnt; is féidir íomhánna agus físeáin a roghnú ón ngléas freisin."]
+      },
+      {
+        "id": "free-premium",
+        "title": "Anailísí Free agus Premium",
+        "paragraphs": ["Ceadaíonn an plean Free 3 anailís chríochnaithe sa tseachtain. Úsáideann an chéad cheann IS agus is féidir léi anailís a dhéanamh ar théacs, ar URL, ar íomhá nó ar fhíseán. Déanann an 2 cheann eile anailís ar théacs nó ar URLanna gan IS; níl íomhánna ná físeáin ar fáil don dá anailís sin.", "Áirítear anailís iomlán amháin mar aonad amháin, beag beann ar an gcineál ábhair nó ar líon na gcéimeanna próiseála inmheánacha. Áirítear toradh bailí neamhchinntitheach; ní áirítear earráid gan toradh bailí. Athshocraítear an tseachtain Dé Luain ag 00:00 sa chrios ama atá cláraithe don seisiún.", "Soláthraíonn Premium anailísí neamhtheoranta le IS fad atá an síntiús fíoraithe gníomhach. Tá teorainneacha teicniúla maidir le comhaid, fad físeán, oibríochtaí comhuaineacha agus infhaighteacht soláthraithe fós i bhfeidhm."]
+      },
+      {
+        "id": "media",
+        "title": "Meáin agus teangacha",
+        "paragraphs": ["Féadfaidh físeáin a bheith suas le 180 soicind ar fad, an fad sin san áireamh, agus suas le 100 MiB i méid. Braitheann na formáidí a dtacaítear leo agus na cumais phróiseála ar an aip agus ar na soláthraithe. Coinníonn OCR teanga bhunaidh an téacs agus úsáideann míniúcháin na hanailíse teanga na haipe. Ní ráthaíonn comhéadan aistrithe clúdach iomlán OCR ná fuaime i ngach teanga."]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Síntiúis agus ceannacháin",
+        "paragraphs": ["Taispeánann Google Play an praghas, an tréimhse bhilleála agus na coinníollacha athnuachana roimh cheannach. Láimhseáiltear billeáil, cealú agus iarratais ar aisíocaíocht de réir bheartais Google Play agus an dlí is infheidhme; tacaíonn RevenueCat le fíorú teidlíochtaí.", "Bainistigh nó cealaigh síntiús trí do chuntas Google Play. Teastaíonn fíorú ón bhfreastalaí chun rochtain Premium a fháil; ní chruthaíonn fíorú atá ar feitheamh nó ar theip air teidlíocht dheimhnithe. Ní athbhunaítear stair seisiúin caillte go huathoibríoch nuair a athbhunaítear ceannach."]
+      },
+      {
+        "id": "results",
+        "title": "Teorainneacha na hanailíse",
+        "paragraphs": ["D'fhéadfadh torthaí uathoibrithe agus torthaí le cúnamh IS a bheith míchruinn, neamhiomlán nó as dáta, lena n-áirítear torthaí dearfacha bréagacha agus bagairtí nár braitheadh. Tá sampláil frámaí, léamh QR agus seiceálacha ar ábhar folaithe teoranta agus ní féidir leo a chruthú go bhfuil ábhar sábháilte nó barántúil.", "Ná bí ag brath ar an aip amháin le haghaidh cinntí slándála, airgeadais, dlíthiúla nó pearsanta. Athbhreithnigh an fhianaise agus lorg cúnamh oiriúnach nuair is gá. Ní toradh riosca íseal é teip soláthraí."]
+      },
+      {
+        "id": "third-parties",
+        "title": "Seirbhísí tríú páirtithe agus príobháideachas",
+        "paragraphs": ["Braitheann an tseirbhís ar sholáthraithe seachtracha agus ar infhaighteacht líonra. Féadfar ábhar agus sonraí na seirbhíse a phróiseáil mar a thuairiscítear sa Bheartas Príobháideachais. D'fhéadfadh cur isteach ar an tseirbhís nó cumais nach bhfuil ar fáil cosc a chur ar anailís a chríochnú."]
+      },
+      {
+        "id": "liability",
+        "title": "Freagracht agus do chearta reachtúla",
+        "paragraphs": ["Cuirtear an tseirbhís ar fáil faoi réir a hinfhaighteachta agus na dteorainneacha luaite. Tá tú fós freagrach as cinntí a dhéantar ag baint úsáid as a táscairí. Ní dhéanann aon ní sna téarmaí seo dliteanas a eisiamh ná cearta tomhaltóirí nó cearta cosanta sonraí a theorannú nach féidir a eisiamh nó a theorannú go dleathach."]
+      },
+      {
+        "id": "changes",
+        "title": "Athruithe ar an tseirbhís agus ar na téarmaí",
+        "paragraphs": ["Féadfar gnéithe agus na téarmaí seo a nuashonrú. Cuirfear athruithe suntasacha in iúl de réir mar a éilíonn an dlí is infheidhme; leanfaidh coinníollacha ceannaigh agus cearta éigeantacha d'fheidhm a bheith acu. Beidh dáta athbhreithnithe ar théarmaí nuashonraithe. Déan teagmháil le JamDesigns ag an seoladh thíos má tá ceisteanna agat."]
+      }
+    ]
+  }
+}

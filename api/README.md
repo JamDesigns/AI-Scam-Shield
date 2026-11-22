@@ -1,354 +1,77 @@
 # AI Scam Shield API
 
-AI Scam Shield API is the **backend service** that powers scam detection for the mobile app.
+A Fastify/TypeScript service for the Android and iOS clients. In production, it runs on **remote server A** and connects to PostgreSQL on a separate **remote server B**. Clients installed from Google Play/App Store call the API over HTTPS; they never access the DB directly.
 
-It provides:
+## Responsibilities
 
-- rule-based scam detection
-- AI-powered semantic analysis (Ollama)
-- weekly quota enforcement (free vs premium)
-- device-based tracking
-- subscription handling
+- Issue and authenticate sessions with separate identifiers and tokens.
+- Analyse text/URLs, images and videos using the configured providers.
+- Apply quotas transactionally and idempotently.
+- Verify Premium access through RevenueCat and reconcile events/synchronisations.
+- Retain history/results and return statistics for the registered time zone.
 
----
+Free allows 3 results/week: the first uses AI for any content type; the other 2 cover text/URLs without AI. Premium always uses AI with no commercial weekly quota. The reset occurs on Monday at 00:00 in the session's time zone. A valid inconclusive result counts as one unit; a failure without a valid result does not count. There is no silent fallback to heuristics when the analysis requires AI.
 
-## Features
+## Production deployment: separate API and DB
 
-- Fastify-based API
-- PostgreSQL persistence
-- Dockerized environment
-- weekly usage tracking per device
-- AI + heuristic hybrid analysis
-- freemium model support
-- RevenueCat webhook integration
+Build the API image from the repository root:
 
----
-
-## Tech stack
-
-- Node.js
-- Fastify
-- PostgreSQL
-- Docker
-- Zod (validation)
-- Ollama (AI provider)
-
----
-
-## Architecture
-
-The API follows a **simple modular architecture** focused on clarity and scalability.
-
-Core responsibilities are separated into:
-
-- **HTTP layer (Fastify)**  
-  Handles routing, validation and request lifecycle.
-
-- **Domain logic**  
-  - `rules.ts` → heuristic scam detection  
-  - `ai.ts` → AI semantic analysis  
-  - `translate.ts` → optional input normalization  
-
-- **Persistence layer**  
-  - `db.ts` → PostgreSQL access and quota tracking  
-
-- **Configuration layer**  
-  - environment-driven setup using Zod validation  
-
-The system is designed with a **hybrid detection approach**:
-
-1. Fast heuristic scoring (cheap, instant)
-2. AI analysis (expensive, controlled by quota)
-3. Unified final result
-
-This keeps the API:
-
-- fast
-- cost-efficient
-- scalable
-
----
-
-## Request flow
-
-### Scan pipeline
-
-```
-Client → POST /scan
-        ↓
-Validate input (Zod)
-        ↓
-Ensure device exists (DB)
-        ↓
-Check weekly quota
-        ↓
-Heuristic analysis (rules.ts)
-        ↓
-AI eligibility check
-        ↓
-(Optional) AI analysis (ai.ts)
-        ↓
-Merge results
-        ↓
-Update usage counters
-        ↓
-Return response
+```sh
+docker build --target runtime -t ai-scam-shield-api:release ./api
 ```
 
----
+The runtime uses Node 22, compiled JavaScript, ffmpeg and the `node` user, with production dependencies. The image does not contain PostgreSQL or private environment files. It is also possible to compile TypeScript and run `node dist/index.js` in an equivalent environment with ffmpeg/ffprobe available.
 
-### Key behaviors
+| Setting | Location and purpose |
+|---|---|
+| API HTTPS domain | Public entry point on server A, configured in the mobile builds through `API_BASE_URL` |
+| `PORT` | API process port on A; default value 3000 |
+| `DATABASE_URL` | On A only: connection to remote PostgreSQL host B, credentials and relevant TLS settings |
+| `NODE_ENV=production` | Remote service mode |
+| `ALLOW_TEST_ADMIN=false` | Keeps manual granting of test Premium access disabled |
+| `SESSION_RATE_LIMIT_SECRET` | Stable, random secret for session registration, at least 32 characters long; shared between API instances |
+| Provider variables | On A only: configuration/keys for AI, forensics, transcription and translation |
+| `REVENUECAT_API_KEY`, `REVENUECAT_WEBHOOK_AUTH` | Verification and webhook secrets on A |
+| `REVENUECAT_ENVIRONMENT=PRODUCTION` | Published purchase environment; entitlement consistent with the project/stores |
 
-- **Quota enforcement happens before AI execution**
-- **AI is optional and can fail gracefully**
-- **Heuristic analysis always runs**
-- **Final result prioritizes AI when available**
+`src/db.ts` passes `DATABASE_URL` to a `pg` pool. A remote DB does not activate a TLS policy by itself: certificates and validation must be configured for the selected PostgreSQL service. See [TLS with node-postgres](https://node-postgres.com/features/ssl).
 
----
+The DB, its access identity, connectivity from A, TLS, backups and retention are configured on B. The domain and HTTPS termination are configured on A; the Node process listens on `0.0.0.0:PORT`. The Dockerfile does not configure HTTPS or control of the incoming proxy. Network exposure and per-IP limits must be validated in the actual deployment; indiscriminate trust in proxy headers has not been enabled.
 
-### Performance considerations
+Startup applies pending migrations to the specified DB **before listening for HTTP requests**. Coordinate permissions and backups on server B before activation. These are deployment procedures; no remote servers have been provisioned as part of this delivery.
 
-- Heuristic scoring is always O(1) and fast
-- AI calls are:
-  - limited by quota
-  - protected with timeout
-- Database writes are minimal and batched per request
+## Private configuration
 
----
+`api/.env.example` documents variables with development values and no private keys. It is not production configuration and must not replace an environment that already contains valid keys. Inject the actual values through the server's private configuration. `.env`, `.env.production`, tokens, credentials and private keys are not added to Git or the mobile app.
 
-### Design goals
+Providers are selected in the backend. Local Ollama is an option for the development environment; a client installed from the stores does not need Ollama on the phone or access to the development computer. The AI/forensics/audio/translation dependencies must be accessible from A according to the contracted/configured service.
 
-- predictable cost (AI usage controlled)
-- fast response times
-- simple debugging and observability
-- easy extension for future features (history, caching, fraud signals)
+## Client contract
 
----
+`POST /sessions` registers an IANA time zone and returns the identity and its token. User routes require `Authorization: Bearer …` and `x-device-id`; if `x-time-zone` is sent, it must match the registered time zone. The client retains its identity after a 401 and does not automatically create another one.
 
-## Project structure
+Analyses use `Idempotency-Key` for retries where the outcome is uncertain. The backend retains the response from a completed operation and prevents a second quota debit for the same identifier and content. Quotas and effective Premium access are determined on the server.
 
-```text
-src/
-  index.ts        # API entry point
-  db.ts           # database access
-  rules.ts        # heuristic rules
-  ai.ts           # AI integration (Ollama)
-  translate.ts    # optional translation (DeepL)
+Public status routes: `GET /health` and `GET /rules`. Usage, history, statistics and subscription status require a session. A response from `/health` does not by itself verify providers or establish that a real purchase or analysis has occurred.
+
+## Local development, separate from production
+
+`docker-compose.yml` groups the API and PostgreSQL **only for local development and testing**: the API is on `localhost:3000`, and the DB is exposed on `localhost:5433`. It does not describe the two remote production servers.
+
+These services and their volume already exist in the current environment. They are reused; no parallel DB is created and no volumes are deleted. To update the local API, use the procedure prepared for this project, preserving its private configuration.
+
+For API code development, from this folder with dependencies installed:
+
+```sh
+npm test
+npm run typecheck
+npm run build
 ```
 
----
+Do not use a test administration endpoint as a substitute for a real purchase/validation. If explicitly enabled for testing, the administrator requires an allowed environment and private configuration; no command is published for granting Premium in production.
 
-## Run locally (Docker)
+See [architecture and mobile builds](../README.md), [Flutter client](../app/README.md) and [legal documentation](../docs/README.md).
 
-From the `api/` folder:
+## Analysis profiles
 
-```bash
-docker compose up --build
-```
-
-Services:
-
-- API → http://localhost:3000
-- PostgreSQL → localhost:5433
-
----
-
-## Environment variables
-
-### `.env`
-
-```env
-PORT=3000
-
-DATABASE_URL=postgresql://scam:scam@postgres:5432/scam_shield?schema=public
-
-ADMIN_TOKEN=your_admin_token_here
-REVENUECAT_WEBHOOK_AUTH=your_webhook_token_here
-
-FREE_WEEKLY_LIMIT=3
-FREE_WEEKLY_AI_LIMIT=1
-
-AI_PROVIDER=ollama
-AI_MODE=local
-AI_BASE_URL=http://host.docker.internal:11434
-AI_MODEL=llama3.1:8b
-```
-
----
-
-## API endpoints
-
-### Health check
-
-```http
-GET /health
-```
-
-Response:
-
-```json
-{
-  "ok": true
-}
-```
-
----
-
-### Scan input
-
-```http
-POST /scan
-```
-
-Headers:
-
-```text
-x-device-id: <device_id>
-```
-
-Body:
-
-```json
-{
-  "input": "text or url",
-  "outputLanguage": "en"
-}
-```
-
-Response:
-
-```json
-{
-  "riskScore": 20,
-  "category": "low_risk",
-  "reasons": [],
-  "weeklyRemaining": 2,
-  "aiAllowed": true,
-  "aiUsed": true
-}
-```
-
----
-
-### Weekly usage
-
-```http
-GET /usage/week
-```
-
-Returns current quota status:
-
-- scans used
-- remaining scans
-- AI usage
-
----
-
-### Subscription status
-
-```http
-GET /subscriptions/status
-```
-
----
-
-### Admin (manual premium toggle)
-
-```http
-POST /admin/subscriptions/set
-```
-
-Headers:
-
-```text
-x-admin-token: <ADMIN_TOKEN>
-```
-
----
-
-### RevenueCat webhook
-
-```http
-POST /webhooks/revenuecat
-```
-
-Used to sync premium status automatically.
-
----
-
-## Quota system
-
-Free users:
-
-- limited weekly scans
-- limited AI scans
-
-Premium users:
-
-- unlimited scans
-- unlimited AI analysis
-
-Quota is tracked per:
-
-- device ID
-- ISO week (e.g. 2026-W10)
-
----
-
-## AI integration
-
-The API uses **Ollama** for AI analysis.
-
-Modes:
-
-### Local (development)
-
-```env
-AI_MODE=local
-AI_BASE_URL=http://host.docker.internal:11434
-```
-
-Requires Ollama running on host machine.
-
----
-
-### Cloud (production-ready)
-
-```env
-AI_MODE=cloud
-AI_API_KEY=<your_api_key>
-```
-
----
-
-## Database
-
-Main tables:
-
-- `devices`
-- `subscriptions`
-- `device_weekly_usage`
-
-Usage tracking includes:
-
-- total scans
-- AI scans
-
----
-
-## Notes
-
-- The API is the single source of truth for quotas.
-- The mobile app must always include `x-device-id`.
-- AI failures fallback to heuristic analysis.
-- Docker is the recommended way to run the API locally.
-
----
-
-## Future improvements
-
-- caching results to avoid duplicate scans
-- rate limiting improvements
-- better AI explanations
-- multi-language AI responses
-- observability (logs, metrics)
+See [local and production analysis](../docs/analysis-profiles.md) for explicit provider routing, local model setup and validation limits.

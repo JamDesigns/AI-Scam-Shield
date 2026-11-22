@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design/shield_design.dart';
 import 'package:flutter/services.dart'
     show Clipboard, ClipboardData, rootBundle;
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -18,19 +19,29 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
   bool _loading = true;
   bool _hasError = false;
 
+  String? _contentLocale;
+  int _loadGeneration = 0;
+
   @override
-  void initState() {
-    super.initState();
-    _loadContent();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final locale = Localizations.localeOf(context).languageCode;
+    if (_contentLocale == locale) {
+      return;
+    }
+
+    _contentLocale = locale;
+    _loading = true;
+    _hasError = false;
+    _loadContent(locale, ++_loadGeneration);
   }
 
-  Future<void> _loadContent() async {
+  Future<void> _loadContent(String locale, int generation) async {
     try {
-      final content = await rootBundle.loadString(
-        'assets/legal/privacy-policy.md',
-      );
+      final content = await _loadLocalizedPrivacyPolicy(locale);
 
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
 
       setState(() {
         _content = content;
@@ -38,7 +49,7 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
         _hasError = false;
       });
     } catch (_) {
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
 
       setState(() {
         _loading = false;
@@ -47,14 +58,22 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
     }
   }
 
+  Future<String> _loadLocalizedPrivacyPolicy(String locale) async {
+    try {
+      return await rootBundle.loadString(
+        'assets/legal/privacy-policy.$locale.md',
+      );
+    } catch (_) {
+      return rootBundle.loadString('assets/legal/privacy-policy.en.md');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.t('about.privacyTitle')),
-      ),
+      appBar: readableAppBar(context, t.t('about.privacyTitle')),
       body: SafeArea(
         child: _loading
             ? const Center(child: CircularProgressIndicator())
@@ -62,6 +81,24 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
                 ? Center(child: Text(t.t('errors.network')))
                 : Markdown(
                     data: _content ?? '',
+                    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                        .copyWith(
+                      p: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(height: 1.7),
+                      a: const TextStyle(
+                          color: ShieldDesign.cyan,
+                          decoration: TextDecoration.underline),
+                      blockquoteDecoration: BoxDecoration(
+                          color: ShieldDesign.panel,
+                          borderRadius: BorderRadius.circular(12)),
+                      horizontalRuleDecoration: BoxDecoration(
+                          border: Border(
+                              top: BorderSide(
+                                  color: ShieldDesign.cyan
+                                      .withValues(alpha: .25)))),
+                    ),
                     padding: const EdgeInsets.all(16),
                     selectable: true,
                     onTapLink: (text, href, title) async {

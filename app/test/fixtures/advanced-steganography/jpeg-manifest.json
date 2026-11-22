@@ -1,0 +1,34 @@
+[
+  {
+    "id": "J01-phishing",
+    "file": "J01-phishing.jpg",
+    "text": "Tu banco necesita tu contraseña y código SMS para recuperar tu cuenta. https://banco-claves.example",
+    "littleEndian": true,
+    "subsampling": 2,
+    "synthetic": true
+  },
+  {
+    "id": "J02-warning",
+    "file": "J02-warning.jpg",
+    "text": "Nunca compartas tu contraseña ni el código SMS con otras personas aunque lo soliciten.",
+    "littleEndian": true,
+    "subsampling": 0,
+    "synthetic": true
+  },
+  {
+    "id": "J03-utf8",
+    "file": "J03-utf8.jpg",
+    "text": "Ποτέ μην στέλνετε τον κωδικό σας. Никога не изпращайте своята парола на други хора.",
+    "littleEndian": false,
+    "subsampling": 2,
+    "synthetic": true
+  },
+  {
+    "id": "J04-clean",
+    "file": "J04-clean.jpg",
+    "text": null,
+    "littleEndian": true,
+    "subsampling": 2,
+    "synthetic": true
+  }
+]

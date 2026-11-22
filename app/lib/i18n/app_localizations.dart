@@ -9,12 +9,42 @@ class AppLocalizations {
 
   final Locale locale;
   late Map<String, dynamic> _translations;
+  late Map<String, dynamic> _fallbackTranslations;
 
   static const List<Locale> supportedLocales = [
-    Locale('en'),
+    Locale('bg'),
+    Locale('ca'),
+    Locale('cs'),
+    Locale('da'),
+    Locale('de'),
+    Locale('el'),
+    Locale('en', 'GB'),
     Locale('es'),
+    Locale('et'),
+    Locale('fi'),
     Locale('fr'),
+    Locale('ga'),
+    Locale('hr'),
+    Locale('hu'),
+    Locale('it'),
+    Locale('lt'),
+    Locale('lv'),
+    Locale('mt'),
+    Locale('nl'),
+    Locale('pl'),
+    Locale('pt'),
+    Locale('ro'),
+    Locale('sk'),
+    Locale('sl'),
+    Locale('sv'),
   ];
+
+  static Locale resolveLocale(Locale? deviceLocale) {
+    return supportedLocales.firstWhere(
+      (locale) => locale.languageCode == deviceLocale?.languageCode,
+      orElse: () => const Locale('en', 'GB'),
+    );
+  }
 
   static AppLocalizations of(BuildContext context) {
     final AppLocalizations? loc =
@@ -23,19 +53,21 @@ class AppLocalizations {
   }
 
   Future<void> load() async {
+    final String fallbackData =
+        await rootBundle.loadString('assets/i18n/en.json');
+    _fallbackTranslations = json.decode(fallbackData) as Map<String, dynamic>;
+
     try {
       final String data = await rootBundle
           .loadString('assets/i18n/${locale.languageCode}.json');
       _translations = json.decode(data) as Map<String, dynamic>;
     } catch (_) {
-      final String fallbackData =
-          await rootBundle.loadString('assets/i18n/en.json');
-      _translations = json.decode(fallbackData) as Map<String, dynamic>;
+      _translations = _fallbackTranslations;
     }
   }
 
   String t(String key, {Map<String, String>? params}) {
-    final dynamic value = _translations[key];
+    final dynamic value = _translations[key] ?? _fallbackTranslations[key];
     if (value is! String) return key;
 
     var text = value;

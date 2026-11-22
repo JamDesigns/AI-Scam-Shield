@@ -1,156 +1,58 @@
-# AI Scam Shield App
+# AI Scam Shield mobile client
 
-AI Scam Shield is the **Flutter mobile client** for the AI Scam Shield MVP.
+The Flutter app is installed on the phone from Google Play or Apple App Store and communicates over HTTPS with the API deployed on a remote server. The API accesses PostgreSQL on another remote server. The client does not host the API, connect directly to PostgreSQL or require the developer's computer for production use.
 
-It allows users to:
+## Two independent builds
 
-- scan suspicious messages or links
-- receive a scam risk score and category
-- see reasons for the detected risk
-- access AI-powered analysis with a freemium model
-- manage premium status through the app flow
+| Platform | Publication artefact | Channel | Status |
+|---|---|---|---|
+| Android | `.aab` | Google Play Console → Google Play | Implementation undergoing validation; debug APK available for testing, release publication pending |
+| iOS | `.ipa` | App Store Connect/TestFlight → App Store | Native implementation and validation pending |
 
-The app connects to the backend API, which performs:
+The platforms share Dart code, but each needs its own native project, identifier, service configuration, signing and testing. A debug APK does not replace the signed AAB for Google Play; it cannot be installed on iOS either. The `ios/` folder does not yet represent an app ready for App Store.
 
-- rule-based scam detection
-- AI semantic analysis
-- weekly quota enforcement
-- subscription status handling
+## API selection
 
----
+`lib/core/app_config.dart` allows `API_BASE_URL` to be defined at build time. Both distribution builds must explicitly point to the same remote HTTPS service:
 
-## Features
-
-- Flutter mobile app
-- i18n-ready structure
-- RTL-friendly UI patterns
-- weekly scan quota support
-- premium / free user flow
-- backend-driven scam analysis
-- AI explanation support
-- share intent support for text and URLs
-- automatic scan on app open when content is shared
-- smart result reuse for repeated shared inputs to avoid extra quota usage
-
----
-
-## Share intent (v3)
-
-The app supports Android share intent for text content.
-
-Users can:
-
-- share a URL or message from any app
-- open AI Scam Shield directly from the share menu
-- trigger automatic scam analysis without copy/paste
-
-Flow:
-
-Share → AI Scam Shield → automatic scan → result
-
-When the same shared input is received again, the app reuses the last successful result instead of consuming another scan.
-
----
-
-## Tech stack
-
-- Flutter
-- Dart
-- RevenueCat
-- REST API integration
-- Local device ID generation
-
----
-
-## Project structure
-
-```text
-lib/
-  core/
-  features/
-  i18n/
+```sh
+flutter build appbundle --release --dart-define=API_BASE_URL=https://api.example.com
 ```
 
-Main feature modules include:
+Once iOS has been implemented and configured, run this on macOS with Xcode:
 
-- `features/scan`
-- `features/premium`
-
----
-
-## Run locally
-
-### Backend API
-
-From the `api/` folder:
-
-```bash
-docker compose up --build
+```sh
+flutter build ipa --release --dart-define=API_BASE_URL=https://api.example.com
 ```
 
-The API will be exposed on:
+Replace the example domain with the actual API server. Android produces the AAB under `build/app/outputs/bundle/release/`; iOS produces the archive and IPA under `build/ios/archive/` and `build/ios/ipa/`. Signing, the build number and store accounts are configured separately for each platform. These two publication artefacts have not been generated as part of this delivery.
 
-```text
-http://localhost:3000
-```
+The code retains a historical release URL in `AppConfig` and an Android emulator debug value. Do not assume these values correspond to the final deployment: use the explicit parameter for every build. An API URL is public configuration; PostgreSQL credentials, private AI keys and server secrets must never be passed through `--dart-define` or included in the mobile package.
 
-### Flutter app
+## Current features and pending iOS work
 
-From the `app/` folder:
+The client includes text/URL, image and short-video analysis, Free/Premium quotas, statistics, a protected session and 25 languages. On Android, it receives shared text and files and allows images/videos to be selected; the content and its accompanying message form one operation.
 
-```bash
+For iOS, native share reception and its permissions/capabilities, Firebase configuration, the RevenueCat SDK and purchases for Apple, signing, and plugin/device validation are still pending. The current purchase code configures Android; running `flutter build ipa` alone does not complete the Apple version.
+
+The API determines results, quotas and effective Premium access. Free allows 3 results/week: the first uses AI for any content type, and the other 2 cover text/URLs without AI. Premium always uses AI with no commercial weekly quota. An AI failure is not converted into a conventional result that pretends to be an AI analysis.
+
+## Development checks
+
+From this folder:
+
+```sh
 flutter pub get
-flutter run
+flutter test
+flutter analyze
 ```
 
-For the Android emulator, the app connects to the backend through:
+To test against a remote test API, use its HTTPS URL in `flutter run --dart-define=API_BASE_URL=https://api-staging.example.com`.
 
-```text
-http://10.0.2.2:3000
-```
+Only when using the **local** Docker API:
 
-Make sure the backend API is running before launching the app.
+- The Android emulator reaches the computer through `http://10.0.2.2:3000`.
+- An Android phone connected by USB can use `adb reverse tcp:3000 tcp:3000` and `flutter run --dart-define=API_BASE_URL=http://127.0.0.1:3000`.
+- These HTTP values and the USB cable are specific to development; they are not used in store builds.
 
----
-
-## Internationalization
-
-Base language files are stored in:
-
-```text
-assets/i18n/
-```
-
-Current app setup includes:
-
-- English
-- Spanish
-- French
-
-The UI uses directional layout utilities such as:
-
-- `EdgeInsetsDirectional`
-- `AlignmentDirectional`
-- `TextAlign.start/end`
-
-This keeps the app ready for RTL languages in the future.
-
----
-
-## Notes
-
-- The Flutter app does not call Ollama directly.
-- All AI analysis is performed by the backend API.
-- Free and premium limits are enforced server-side.
-- In development, the app runs against the Dockerized backend API.
-- In release builds, the app uses the deployed production backend.
-
----
-
-## Future improvements
-
-- polish UI/UX
-- improve premium onboarding
-- add more languages
-- enrich result explanations
-- add history or saved scans
+The existing local API and DB are reused. The legal policies in `assets/legal/` are generated alongside the pages in `docs/`; see [language maintenance](../docs/README.md). See [the overall architecture](../README.md) for remote deployment and the two publication channels.

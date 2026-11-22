@@ -8,6 +8,8 @@ export async function translateWithDeepL(params: {
   authKey: string;
   apiBase: string;
   targetLang: string; // e.g. "EN"
+  signal?: AbortSignal;
+  timeoutMs?: number;
 }): Promise<TranslationResult> {
   const { text, authKey, apiBase, targetLang } = params;
 
@@ -26,11 +28,11 @@ export async function translateWithDeepL(params: {
       accept: "application/json",
     },
     body,
+    signal: params.signal ? AbortSignal.any([params.signal, AbortSignal.timeout(params.timeoutMs ?? 15000)]) : AbortSignal.timeout(params.timeoutMs ?? 15000),
   });
 
   if (!res.ok) {
-    const payload = await res.text().catch(() => "");
-    throw new Error(`DeepL error: ${res.status} ${payload}`);
+    throw new Error(`DeepL error: ${res.status}`);
   }
 
   const json = (await res.json()) as {

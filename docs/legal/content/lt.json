@@ -1,0 +1,146 @@
+{
+  "locale": "lt",
+  "htmlLang": "lt",
+  "languageName": "Lietuvių",
+  "updatedLabel": "Paskutinį kartą atnaujinta",
+  "languageLabel": "Kalba",
+  "contactTitle": "Kontaktai",
+  "privacy": {
+    "title": "Privatumo politika – AI Scam Shield",
+    "intro": "AI Scam Shield analizuoja tekstą, URL adresus, vaizdus ir trumpus vaizdo įrašus, kad nustatytų galimą sukčiavimą ir manipuliavimo požymius. Šioje politikoje aprašoma informacija, kurią tvarko programėlė ir jos paslaugos.",
+    "sections": [
+      {
+        "id": "data",
+        "title": "Tvarkoma informacija",
+        "paragraphs": [
+          "Pateikiamą turinį pasirenkate jį įklijuodami, pasirinkdami failą arba bendrindami su programėle. Pateiktoje medžiagoje gali būti jūsų ar kitų žmonių asmens duomenų; venkite nereikalingos neskelbtinos informacijos."
+        ],
+        "items": [
+          "Tekstas, URL adresai, vaizdai, vaizdo įrašai, garsas, išskirtas tekstas, QR turinys ir bet koks analizei reikalingas lydintis pranešimas.",
+          "Pseudoniminis seanso identifikatorius, įrenginyje saugiai saugomas autentifikavimo žetonas, žetono maišos reikšmė serveryje, užregistruota laiko juosta ir programėlės kalba.",
+          "Naudojimo skaitikliai, laiko žymos, rizikos vertinimai, iki 160 ženklų teksto peržiūros, analizės rezultatai ir medijos apdorojimo metaduomenys.",
+          "Prenumeratų identifikatoriai, prieigos teisių būsena ir produkto, aplinkos bei galiojimo pabaigos informacija, reikalinga pirkiniams patikrinti.",
+          "Techniniai užklausų duomenys ir saugumo žurnalai. Dabartinėje programėlėje Firebase Analytics taip pat tvarko informaciją apie programėlę ir įrenginį bei naudojimo įvykius."
+        ]
+      },
+      {
+        "id": "purposes",
+        "title": "Kaip naudojama informacija",
+        "paragraphs": [
+          "Informacija naudojama prašomai analizei atlikti, rezultatams programėlės kalba pateikti, istorijai ir statistikai teikti, naudojimo riboms taikyti, prenumeratoms patikrinti ir paslaugai nuo piktnaudžiavimo apsaugoti.",
+          "OCR išsaugo originalią teksto kalbą. Analizės paaiškinimų prašoma programėlės kalba. Atsižvelgiant į funkciją ir konfigūraciją, turinys gali būti siunčiamas dirbtinio intelekto, medijos ekspertizės, kalbos transkribavimo ar vertimo paslaugų teikėjams, taip pat vertimui atliekant patikrą be dirbtinio intelekto."
+        ]
+      },
+      {
+        "id": "providers",
+        "title": "Trečiųjų šalių paslaugos",
+        "paragraphs": [
+          "Google Play tvarko Android pirkinius, o RevenueCat padeda valdyti ir tikrinti prenumeratas. Programėlėje taip pat integruota Firebase Analytics. Analizės, transkribavimo, ekspertizės ir vertimo paslaugų teikėjai gauna pasirinktai operacijai reikalingą turinį.",
+          "Teikėjų duomenų saugojimas, tvarkymo vietos ir apsaugos priemonės priklauso nuo diegimui sukonfigūruotų paslaugų ir jų sąlygų. Nemanykite, kad visos operacijos atliekamos tik įrenginyje ar Europos Sąjungoje. JamDesigns neparduoda ir nenuomoja jūsų duomenų reklamos tikslais."
+        ]
+      },
+      {
+        "id": "storage",
+        "title": "Saugojimas ir ištrynimas",
+        "paragraphs": [
+          "Serveris saugo seansų ir prenumeratų įrašus, skaitiklius, analizių peržiūras ir rezultatus istorijai, statistikai bei patikimiems pakartotiniams bandymams. Įkelta medija gali būti apdorojama naudojant laikinuosius failus; išoriniai teikėjai taiko savo saugojimo tvarką.",
+          "Dabartinėje versijoje analizės istorija automatiškai nenustoja galioti. Pašalinus programėlę serverio įrašai neištrinami. Susisiekite su mumis, jei norite paprašyti informacijos ar ištrynimo; gali prireikti patikrinimo, kad nebūtų atskleisti kito asmens įrašai. Praradus seanso prisijungimo duomenis, gali būti neįmanoma pasiekti ankstesnės istorijos."
+        ]
+      },
+      {
+        "id": "security",
+        "title": "Saugumas",
+        "paragraphs": [
+          "Programėlė naudoja apsaugotus seanso prisijungimo duomenis, serverio autentifikavimą ir prieigos kontrolę. Šios priemonės sumažina riziką, tačiau negali užtikrinti visiško saugumo. Pateikite tik tokį turinį, kurį turite teisę bendrinti."
+        ]
+      },
+      {
+        "id": "rights",
+        "title": "Jūsų teisės",
+        "paragraphs": [
+          "Kai taikomi teisės aktai suteikia šias teises, galite prašyti susipažinti su savo asmens duomenimis, juos ištaisyti, ištrinti, apriboti jų tvarkymą ar perkelti duomenis, nesutikti su tvarkymu ir pateikti skundą kompetentingai duomenų apsaugos institucijai. Prašymui pateikti naudokite toliau nurodytą kontaktinį adresą."
+        ]
+      },
+      {
+        "id": "children",
+        "title": "Vaikai ir neskelbtina informacija",
+        "paragraphs": [
+          "Nepateikite nereikalingos asmeninės informacijos apie vaikus ar kitos neskelbtinos medžiagos. Jei tokia informacija buvo pateikta netyčia, susisiekite su mumis, kad būtų galima įvertinti situaciją."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Šios politikos pakeitimai",
+        "paragraphs": [
+          "Atnaujinimai bus skelbiami programėlėje ir šiame puslapyje su pakeista data. Dėl AI Scam Shield susisiekite su JamDesigns toliau nurodytu adresu."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Paslaugų teikimo sąlygos – AI Scam Shield",
+    "intro": "Šios sąlygos taikomos naudojant AI Scam Shield tekstui, URL adresams, vaizdams ir trumpiems vaizdo įrašams analizuoti. Paslauga pateikia rizikos rodiklius ir rekomendacijas; ji negali garantuoti, kad bus aptiktas kiekvienas sukčiavimo atvejis, manipuliavimas ar paslėptas elementas.",
+    "sections": [
+      {
+        "id": "use",
+        "title": "Naudojimasis paslauga",
+        "paragraphs": [
+          "Naudokitės paslauga teisėtai ir pateikite tik tokį turinį, kurį turite teisę bendrinti. Įvestį galima įklijuoti arba bendrinti; vaizdus ir vaizdo įrašus taip pat galima pasirinkti iš įrenginio."
+        ]
+      },
+      {
+        "id": "free-premium",
+        "title": "Free ir Premium analizės",
+        "paragraphs": [
+          "Free planas leidžia atlikti 3 užbaigtas analizes per savaitę. Pirmoji naudoja dirbtinį intelektą ir gali analizuoti tekstą, URL adresą, vaizdą arba vaizdo įrašą. Kitos 2 analizuoja tekstą arba URL adresus be dirbtinio intelekto; šioms dviem analizėms vaizdai ir vaizdo įrašai nepasiekiami.",
+          "Viena visa analizė skaičiuojama kaip vienas vienetas, neatsižvelgiant į turinio tipą ar vidinių apdorojimo veiksmų skaičių. Galiojantis rezultatas be aiškios išvados įskaičiuojamas; klaida be galiojančio rezultato neįskaičiuojama. Savaitės skaitiklis nustatomas iš naujo pirmadienį 00:00 seansui užregistruotoje laiko juostoje.",
+          "Premium suteikia neribotą analizių su dirbtiniu intelektu skaičių, kol patikrinta prenumerata yra aktyvi. Toliau taikomi techniniai failų, vaizdo įrašų trukmės, vienu metu atliekamų operacijų ir teikėjų prieinamumo apribojimai."
+        ]
+      },
+      {
+        "id": "media",
+        "title": "Medija ir kalbos",
+        "paragraphs": [
+          "Vaizdo įrašai gali būti iki 180 sekundžių imtinai ir iki 100 MiB dydžio. Palaikomi formatai ir apdorojimo galimybės priklauso nuo programėlės bei teikėjų. OCR išsaugo originalią teksto kalbą, o analizės paaiškinimai pateikiami programėlės kalba. Išversta sąsaja negarantuoja visapusiško OCR ar garso palaikymo visomis kalbomis."
+        ]
+      },
+      {
+        "id": "subscriptions",
+        "title": "Prenumeratos ir pirkiniai",
+        "paragraphs": [
+          "Prieš perkant Google Play rodo kainą, atsiskaitymo laikotarpį ir atnaujinimo sąlygas. Atsiskaitymas, atšaukimas ir pinigų grąžinimo prašymai tvarkomi pagal Google Play politiką ir taikomus teisės aktus; RevenueCat padeda tikrinti prieigos teises.",
+          "Valdykite arba atšaukite prenumeratą savo Google Play paskyroje. Premium prieigai reikia serverio patikrinimo; laukiantis arba nepavykęs patikrinimas nesuteikia patvirtintos prieigos teisės. Pirkinio atkūrimas automatiškai neatkuria prarasto seanso istorijos."
+        ]
+      },
+      {
+        "id": "results",
+        "title": "Analizės apribojimai",
+        "paragraphs": [
+          "Automatiniai ir dirbtinio intelekto padedami rezultatai gali būti netikslūs, neišsamūs ar pasenę, įskaitant klaidingus teigiamus rezultatus ir nepastebėtas grėsmes. Atrankinis kadrų tikrinimas, QR skaitymas ir paslėpto turinio patikros yra riboti ir negali įrodyti, kad turinys yra saugus ar autentiškas.",
+          "Priimdami saugumo, finansinius, teisinius ar asmeninius sprendimus nesikliaukite vien programėle. Peržiūrėkite įrodymus ir prireikus kreipkitės tinkamos pagalbos. Teikėjo sutrikimas nėra mažos rizikos rezultatas."
+        ]
+      },
+      {
+        "id": "third-parties",
+        "title": "Trečiųjų šalių paslaugos ir privatumas",
+        "paragraphs": [
+          "Paslauga priklauso nuo išorinių teikėjų ir tinklo prieinamumo. Turinys ir paslaugos duomenys gali būti tvarkomi taip, kaip aprašyta privatumo politikoje. Pertrūkiai ar nepasiekiamos galimybės gali neleisti užbaigti analizės."
+        ]
+      },
+      {
+        "id": "liability",
+        "title": "Atsakomybė ir jūsų įstatyminės teisės",
+        "paragraphs": [
+          "Paslauga teikiama atsižvelgiant į jos prieinamumą ir nurodytus apribojimus. Jūs ir toliau atsakote už sprendimus, priimtus naudojant jos rodiklius. Nė viena šių sąlygų nuostata neatmeta atsakomybės ir neriboja vartotojų ar duomenų apsaugos teisių, kurių pagal teisės aktus negalima atmesti ar apriboti."
+        ]
+      },
+      {
+        "id": "changes",
+        "title": "Paslaugos ir sąlygų pakeitimai",
+        "paragraphs": [
+          "Funkcijos ir šios sąlygos gali būti atnaujinamos. Apie esminius pakeitimus bus pranešama, kaip reikalaujama pagal taikomus teisės aktus; pirkimo sąlygos ir privalomos teisės toliau galioja. Atnaujintose sąlygose bus nurodyta pakeista data. Kilus klausimų, susisiekite su JamDesigns toliau nurodytu adresu."
+        ]
+      }
+    ]
+  }
+}
