@@ -1,4 +1,5 @@
 import { Readable } from "node:stream";
+import { resolve } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("../../../local-analysis.js", () => ({ extractPcm: vi.fn() }));
 import { extractPcm } from "../../../local-analysis.js";
@@ -6,7 +7,7 @@ import { encodeTranscriptionWav, GeminiMediaTranscriptionProvider } from "./gemi
 
 const configuration = { baseUrl: "https://fixture.invalid/v1beta", model: "gemini-3.5-flash-lite", apiKey: "synthetic-key" };
 const media = { filename: "fixture.mp4", mimeType: "video/mp4", sizeBytes: 100 * 1024 * 1024,
-  filePath: "C:/synthetic/fixture.mp4", durationSeconds: 60, createReadStream: () => Readable.from("full video must not be uploaded") };
+  filePath: resolve("synthetic", "fixture.mp4"), durationSeconds: 60, createReadStream: () => Readable.from("full video must not be uploaded") };
 const pcm = Buffer.from([1, 0, 2, 0, 3, 0]);
 const response = (value: unknown = { transcript: "Dia duit", languages: ["ga"] }) => ({
   candidates: [{ finishReason: "STOP", content: { parts: [{ text: JSON.stringify(value) }] } }],
