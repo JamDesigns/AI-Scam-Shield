@@ -39,10 +39,10 @@ type LocalAnalyzerOptions = {
   speechBaseUrl?: string;
 };
 
-export function localEndpoint(baseUrl: string, endpointPath: string): URL {
+export function localEndpoint(baseUrl: string, endpointPath: string, trustedServiceHost?: string): URL {
   const url = new URL(baseUrl);
   const path = url.pathname.replace(/\/+$/, "");
-  if (!["http:", "https:"].includes(url.protocol) || !localHosts.has(url.hostname)
+  if (!["http:", "https:"].includes(url.protocol) || !(localHosts.has(url.hostname) || url.hostname === trustedServiceHost)
     || url.username || url.password || url.search || url.hash || !["", "/v1"].includes(path)) {
     throw new Error("Local analysis requires a loopback or trusted Docker host URL");
   }

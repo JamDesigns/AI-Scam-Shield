@@ -1,5 +1,8 @@
 import base64
 import io
+import hashlib
+import tempfile
+from pathlib import Path
 import time
 import unittest
 from types import SimpleNamespace
@@ -8,6 +11,20 @@ from unittest.mock import Mock, patch
 import numpy as np
 from PIL import Image
 from server import AUDIO_SAMPLES, DeadlineReader, Engine, audio_windows, preprocess_image, verify_file
+
+
+class TextIntegrityTests(unittest.TestCase):
+    def test_config_accepts_only_the_pinned_content_across_line_endings(self):
+        original = Path(__file__).with_name('AASIST.conf').read_bytes().replace(b'\r\n', b'\n')
+        expected = '8b6cfe6a9a4a448dc3082e5e10b0a46c478237908ad6a0c886a37a3a8ffe82e3'
+        self.assertEqual(hashlib.sha256(original).hexdigest(), expected)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'config'
+            path.write_bytes(original.replace(b'\n', b'\r\n'))
+            verify_file(path, expected, normalize_text=True)
+            path.write_bytes(original.replace(b'64600', b'64601'))
+            with self.assertRaises(ValueError):
+                verify_file(path, expected, normalize_text=True)
 
 
 class ForensicsTests(unittest.TestCase):

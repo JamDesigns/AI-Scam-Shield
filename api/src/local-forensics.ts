@@ -33,8 +33,8 @@ export function evidenceFromLocalSignals(signals: LocalForensicsSignals): MediaF
     audioAiGeneratedStatus: signals.audioWindows.length ? "inconclusive" : "unavailable", localSignals: signals };
 }
 
-export function createLocalForensicsAnalyzer(options: { baseUrl: string; fetchImpl?: typeof fetch }) {
-  const endpoint = localEndpoint(options.baseUrl, "/analyze");
+export function createLocalForensicsAnalyzer(options: { baseUrl: string; fetchImpl?: typeof fetch; trustedServiceHost?: string }) {
+  const endpoint = localEndpoint(options.baseUrl, "/analyze", options.trustedServiceHost);
   const fetchImpl = options.fetchImpl ?? fetch;
   return {
     analyze(input: DeadlineOptions & { filePath: string; durationSeconds: number; frames: VideoFrame[] }): Promise<MediaForensicsEvidence> {

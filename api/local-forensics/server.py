@@ -39,8 +39,11 @@ class DeadlineReader(io.RawIOBase):
         return self.connection.recv_into(buffer)
 
 
-def verify_file(path, expected):
-    if hashlib.sha256(Path(path).read_bytes()).hexdigest() != expected:
+def verify_file(path, expected, normalize_text=False):
+    data = Path(path).read_bytes()
+    if normalize_text:
+        data = data.replace(b"\r\n", b"\n")
+    if hashlib.sha256(data).hexdigest() != expected:
         raise ValueError("Model checksum mismatch")
 
 
@@ -103,7 +106,7 @@ class Engine:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         config_path = Path(__file__).parent / "AASIST.conf"
-        verify_file(config_path, "c25023331685027cce90e1b9a0d2df10aa04b2a27d9b27d5afa36e6815b0fe76")
+        verify_file(config_path, "8b6cfe6a9a4a448dc3082e5e10b0a46c478237908ad6a0c886a37a3a8ffe82e3", normalize_text=True)
         config = json.loads(config_path.read_text())["model_config"]
         self.audio = module.Model(config)
         self.audio.load_state_dict(torch.load(audio_model, map_location="cpu", weights_only=True))

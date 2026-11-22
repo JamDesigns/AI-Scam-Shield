@@ -4,7 +4,7 @@ import { createSelfHostedForensicsAnalyzer } from "./self-hosted-forensics.js";
 const mocks = vi.hoisted(() => ({ analyze: vi.fn() }));
 vi.mock("../local-forensics.js", async () => {
   const actual = await vi.importActual<typeof import("../local-forensics.js")>("../local-forensics.js");
-  return { ...actual, createLocalForensicsAnalyzer: (options: { baseUrl: string }) => {
+  return { ...actual, createLocalForensicsAnalyzer: (options: { baseUrl: string; trustedServiceHost?: string }) => {
     // Validate the real origin guard, but do not run models, ffmpeg or HTTP in these tests.
     actual.createLocalForensicsAnalyzer(options);
     return { analyze: mocks.analyze };
@@ -12,6 +12,12 @@ vi.mock("../local-forensics.js", async () => {
 });
 afterEach(() => vi.resetAllMocks());
 describe("explicit self-hosted forensic routing", () => {
+  it.each(["http://aiss-forensics:8081", "http://aiss-forensics-ab12:8081"])("accepts a configured private service hostname: %s", (url) => {
+    expect(() => createSelfHostedForensicsAnalyzer(url)).not.toThrow();
+  });
+  it.each(["http://aiss-forensics:80", "https://aiss-forensics:8081", "http://203.0.113.1:8081", "http://aiss-forensics:8081/analyze", "http://aiss-forensics:8081?key=x"])("rejects an unsuitable service address: %s", (url) => {
+    expect(() => createSelfHostedForensicsAnalyzer(url)).toThrow();
+  });
   it.each(["https://public.invalid", "http://127.0.0.1.evil.invalid", "http://u:p@127.0.0.1", ""])("rejects an origin unsuitable for the private sidecar: %s", (url) => {
     expect(() => createSelfHostedForensicsAnalyzer(url)).toThrow();
   });

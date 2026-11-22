@@ -1,0 +1,15 @@
+**
+!api/
+!api/local-forensics/
+!api/local-forensics/server.py
+!api/local-forensics/benchmark.py
+!api/local-forensics/speech_vad.py
+!api/local-forensics/prepare_model.py
+!api/local-forensics/AASIST.conf
+!api/local-forensics/requirements-forensics.txt
+!api/local-forensics/vendor/
+!api/local-forensics/vendor/**
+!app/
+!app/assets/
+!app/assets/models/
+!app/assets/models/community_forensics_frontier_fp16.onnx
