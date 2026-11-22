@@ -31,7 +31,7 @@ docker build -f api/local-forensics/Dockerfile -t aiss-forensics:validation .
 docker run --rm --network none --memory 4g --cpus 2 aiss-forensics:validation python benchmark.py
 ```
 
-These commands create an isolated image and ephemeral benchmark container. They do not recreate the API, change ports or access PostgreSQL. Build downloads dependencies/models; the benchmark has no network. The 4 GiB limit is a local test ceiling, not measured usage or a hosting recommendation. Synthetic results report load/analysis times, processed frames/audio windows and peak RSS; they do not measure accuracy, real-client concurrency, Docker's complete memory usage or Render performance. If the 20-second engine deadline is exceeded, investigate before deployment rather than increasing deadlines blindly.
+These commands create an isolated image and ephemeral benchmark container. They do not recreate the API, change ports or access PostgreSQL. Build downloads dependencies/models; the benchmark has no network. The 4 GiB limit is a local test ceiling, not measured usage or a hosting recommendation. Synthetic results report load/analysis times, processed frames/audio windows and peak RSS; they do not measure accuracy, real-client concurrency, Docker's complete memory usage or Render performance. If the 40-second engine deadline is exceeded, investigate before deployment rather than increasing deadlines blindly.
 
 ## API connection after service validation
 
@@ -59,6 +59,15 @@ The Docker image built successfully on Docker Desktop Linux, including checksum 
 | 2 | 4 GiB | 1.558 | 7.425 | 777.7 |
 | 1 | 2 GiB | 2.160 | 15.041 | 836.8 |
 
-Both runs processed 14 frames and 12 audio windows representing 180 seconds. ONNX GPU-discovery warnings were nonfatal; CPU execution completed. The 1 CPU / 2 GiB size is a candidate for low-traffic closed testing, not an accepted production capacity. Its 15-second result leaves limited margin under the engine's 20-second analysis deadline. Render performance, full-container memory, repeated real inputs, concurrent requests and model accuracy remain unvalidated. The single-worker server serializes requests, so queuing delay can exceed the API's deadline under load. Do not claim a concurrent-user capacity from these results.
+Both runs processed 14 frames and 12 audio windows representing 180 seconds. ONNX GPU-discovery warnings were nonfatal; CPU execution completed. The 1 CPU / 2 GiB size is a candidate for low-traffic closed testing, not an accepted production capacity. Its 15-second result leaves limited margin under the engine's original 20-second analysis deadline. Render performance, full-container memory, repeated real inputs, concurrent requests and model accuracy remain unvalidated. The single-worker server serializes requests, so queuing delay can exceed the API's deadline under load. Do not claim a concurrent-user capacity from these results.
 
 Local validation for this delivery: 544 API tests passed and TypeScript built; 11 Python server/integrity tests and 7 speech-gate tests passed. No Render service was created or paid plan selected during preparation.
+
+
+## Render HTTP investigation and bounded deadline adjustment
+
+The operator confirmed health on the 1 CPU / 2 GiB Render service. A benchmark loading a second Engine exceeded the original 20-second limit. Subsequent HTTP tests against the already loaded server returned: one frame/no audio, 0.529 s; 14 frames/no audio, 9.449 s; one frame/one audio window, 2.020 s; one frame/12 audio windows, 14.264 s. The combined 14-frame/12-window request returned HTTP 503. This suggests the combined workload exceeded its budget, but that response did not distinguish the original failure reason.
+
+The forensic analysis budget is now 40 seconds, exposed as `forensicsTimeoutSeconds` on `/health`. Deadline failures retain HTTP 503 and add the fixed diagnostic `reason: deadline_exceeded`. Native ONNX/PyTorch calls cannot be interrupted mid-call; budget checks now run after each native inference too, preventing a late result from being reported as success. The 10-second request-reading and speech-gate deadlines remain unchanged. The API still has an 80-second forensic-call default and a 90-second operation deadline, and the mobile client has a 100-second request timeout. These are nested bounds, not additive allowances; decoding, extraction, transcription, translation and semantic inference also consume the outer budget. Full-pipeline success and concurrent capacity remain unvalidated.
+
+After deploying only the private service, confirm `/health` reports 40, then repeat the combined HTTP test with a client timeout of 55 seconds. Do not treat the adjustment as successful until that test passes; do not silently reduce the sampling coverage or change the paid compute plan. Native-process memory plus diagnostic-client memory and request queues must still be monitored.

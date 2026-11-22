@@ -92,6 +92,23 @@ class ForensicsTests(unittest.TestCase):
         with self.assertRaises(TimeoutError):
             engine.analyze({"frames": [{"timestampSeconds": 0, "dataBase64": ""}], "audioPcm16Base64": ""}, time.monotonic() - 1)
 
+    def test_native_result_after_budget_is_not_returned_as_success(self):
+        engine = Engine.__new__(Engine)
+        engine.image_input = SimpleNamespace(name="input")
+        engine.image_dtype = np.float32
+        engine.image = Mock()
+        output = io.BytesIO()
+        Image.new("RGB", (400, 400)).save(output, format="PNG")
+        request = {"frames": [{"timestampSeconds": 0, "dataBase64": base64.b64encode(output.getvalue()).decode()}], "audioPcm16Base64": ""}
+        for budget in [1, 40]:
+            with patch("server.time.monotonic", return_value=0) as clock:
+                def slow_native(*args):
+                    clock.return_value = budget + 1
+                    return [np.array([[2.0]], dtype=np.float32)]
+                engine.image.run.side_effect = slow_native
+                with self.assertRaises(TimeoutError):
+                    engine.analyze(request, deadline=budget)
+
     def test_frame_inference_returns_raw_logit_and_image_threshold_only(self):
         engine = Engine.__new__(Engine)
         engine.image_input = SimpleNamespace(name="input")

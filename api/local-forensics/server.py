@@ -21,6 +21,7 @@ MAX_BODY = 20 * 1024 * 1024
 MAX_PCM_BYTES = 180 * 16000 * 2
 AUDIO_SAMPLES = 64600
 MAX_AUDIO_WINDOWS = 12
+FORENSICS_TIMEOUT_SECONDS = 40
 
 
 class DeadlineReader(io.RawIOBase):
@@ -123,7 +124,7 @@ class Engine:
         return self.speech_detector.analyze(base64.b64decode(value, validate=True), deadline)
 
     def analyze(self, request, deadline=None):
-        deadline = min(deadline or float("inf"), time.monotonic() + 20)
+        deadline = min(deadline or float("inf"), time.monotonic() + FORENSICS_TIMEOUT_SECONDS)
         def check_deadline():
             if time.monotonic() >= deadline:
                 raise TimeoutError("Local forensic deadline exceeded")
@@ -145,6 +146,7 @@ class Engine:
                 raise ValueError("Invalid image length")
             tensor = preprocess_image(data).astype(self.image_dtype)
             logit = float(np.asarray(self.image.run(None, {self.image_input.name: tensor})[0]).reshape(-1)[0])
+            check_deadline()
             if not math.isfinite(logit):
                 raise ValueError("Non-finite image output")
             image_results.append({"timestampSeconds": timestamp, "imageLogit": logit,
@@ -156,6 +158,7 @@ class Engine:
             for timestamp, clip, rms in windows:
                 check_deadline()
                 _, logits = self.audio(self.torch.from_numpy(clip[None]))
+                check_deadline()
                 scores = logits[0].tolist()
                 if len(scores) != 2 or not all(math.isfinite(x) for x in scores):
                     raise ValueError("Invalid audio output")
@@ -190,6 +193,7 @@ def serve(engine, host="127.0.0.1", port=8081, translation=None):
                 return
             self.respond(200, {"ok": True, "provider": "local-experimental", "imageModel": "community-forensics-frontier",
                                "audioModel": "AASIST", "calibratedForVideo": False,
+                               "forensicsTimeoutSeconds": FORENSICS_TIMEOUT_SECONDS,
                                "contractVersion": 3, "speechAvailable": True, "speechProvider": "silero-vad",
                                "translationAvailable": translation is not None,
                                "translationProvider": "madlad400-3b-ct2-int8" if translation else None})
@@ -216,9 +220,10 @@ def serve(engine, host="127.0.0.1", port=8081, translation=None):
                 elif self.path == "/speech":
                     self.respond(200, engine.speech(json.loads(body), time.monotonic() + 10))
                 else:
-                    self.respond(200, engine.analyze(json.loads(body), time.monotonic() + 20))
+                    self.respond(200, engine.analyze(json.loads(body), time.monotonic() + FORENSICS_TIMEOUT_SECONDS))
             except TimeoutError:
-                self.respond(503, {"error": "translation_unavailable" if self.path == "/translate" else "forensics_unavailable"})
+                self.respond(503, {"error": "translation_unavailable" if self.path == "/translate" else "forensics_unavailable",
+                                   "reason": "deadline_exceeded"})
             except (ValueError, TypeError, KeyError, OSError):
                 self.respond(400, {"error": "invalid_translation" if self.path == "/translate" else "invalid_media"})
             except Exception:
