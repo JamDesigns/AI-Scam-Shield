@@ -26,6 +26,7 @@ import '../premium/premium_service.dart';
 import '../premium/subscription_page.dart';
 import '../premium/premium_offer_page.dart';
 import '../navigation/home_page.dart';
+import '../stats/stats_page.dart';
 import 'scan_models.dart';
 import 'scan_service.dart';
 import 'scan_action_advice.dart';
@@ -1056,7 +1057,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
   Future<void> _openAccountDevicePage({bool fromPurchase = false}) async {
     if (!_ready || _sessionInvalid || (_isBusy && !fromPurchase)) return;
     final t = AppLocalizations.of(context);
-    await Navigator.of(context).push(MaterialPageRoute<void>(
+    final deleted = await Navigator.of(context).push(MaterialPageRoute<bool>(
         builder: (_) => AccountDevicePage(
             service: PremiumAccountService(_api),
             labels: AccountDeviceLabels(
@@ -1073,8 +1074,32 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
               notLinked: t.t('account.notLinked'),
               failed: t.t('account.failed'),
               success: t.t('account.success'),
+              deleteAccount: t.t('account.delete'),
+              deleteMessage: t.t('account.deleteMessage'),
+              deleteAccepted: t.t('account.deleteAccepted'),
+              manageSubscriptions: t.t('account.manageSubscriptions'),
+              deletionHelp: t.t('account.deletionHelp'),
             ))));
     if (!mounted) return;
+    if (deleted == true) {
+      setState(() {
+        _ready = false;
+        _sessionInvalid = false;
+        _accountLinked = false;
+        _isPremium = false;
+        _unverifiedPurchase = false;
+        _lastScannedInput = null;
+        _lastScannedFingerprint = null;
+        _restoredLastResult = null;
+        _lastResult = null;
+        _mediaAnalysisResult = null;
+        _videoAnalysisResult = null;
+      });
+      _controller.clear();
+      await _bootstrap();
+      StatsPage.globalKey.currentState?.resetAfterAccountDeletion();
+      return;
+    }
     try {
       final account = await PremiumAccountService(_api).status();
       if (mounted) setState(() => _accountLinked = account.linked);

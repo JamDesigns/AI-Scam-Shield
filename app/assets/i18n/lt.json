@@ -223,5 +223,10 @@
   "account.success": "Paskyra atnaujinta",
   "account.cancel": "Atšaukti",
   "account.confirm": "Patvirtinti",
-  "errors.translationUnavailable": "Analizės nepavyko išversti į programėlės kalbą. Bandykite dar kartą."
+  "errors.translationUnavailable": "Analizės nepavyko išversti į programėlės kalbą. Bandykite dar kartą.",
+  "account.delete": "Ištrinti paskyrą",
+  "account.deleteMessage": "Ištrinti paskyrą ir duomenis visuose susietuose telefonuose? Šio veiksmo atšaukti negalima. Google Play prenumeratos neatšaukiamos: norėdami sustabdyti mokėjimus, tvarkykite jas atskirai. Būtinas Google patvirtinimas.",
+  "account.deleteAccepted": "Paprašyta ištrinti. Visi susieti seansai panaikinti. Apdorojimas tęsiamas serveryje ir uždarius programėlę.",
+  "account.manageSubscriptions": "Tvarkyti prenumeratas",
+  "account.deletionHelp": "Paskyros ištrynimo pagalba"
 }

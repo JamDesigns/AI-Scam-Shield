@@ -223,5 +223,10 @@
   "account.success": "Konts atjaunināts",
   "account.cancel": "Atcelt",
   "account.confirm": "Apstiprināt",
-  "errors.translationUnavailable": "Analīzi neizdevās iztulkot lietotnes valodā. Mēģiniet vēlreiz."
+  "errors.translationUnavailable": "Analīzi neizdevās iztulkot lietotnes valodā. Mēģiniet vēlreiz.",
+  "account.delete": "Dzēst kontu",
+  "account.deleteMessage": "Dzēst kontu un datus visos saistītajos tālruņos? Šo darbību nevar atsaukt. Google Play abonementi netiek atcelti: pārvaldiet tos atsevišķi, lai apturētu maksājumus. Nepieciešama Google verifikācija.",
+  "account.deleteAccepted": "Dzēšana pieprasīta. Visas saistītās sesijas ir atsauktas. Apstrāde turpinās serverī arī pēc lietotnes aizvēršanas.",
+  "account.manageSubscriptions": "Pārvaldīt abonementus",
+  "account.deletionHelp": "Palīdzība konta dzēšanai"
 }

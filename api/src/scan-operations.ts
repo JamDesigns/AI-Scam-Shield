@@ -209,7 +209,8 @@ export async function failScanOperation(pool: pg.Pool, operation: ScanReservatio
 async function lockScanOwner(db: pg.PoolClient, deviceId: string) {
   const account = await getDeviceAccount(db, deviceId);
   if (account) {
-    const row = (await db.query("SELECT active_device_id FROM premium_accounts WHERE id = $1 FOR UPDATE", [account.id])).rows[0];
+    const row = (await db.query("SELECT active_device_id, deletion_requested_at FROM premium_accounts WHERE id = $1 FOR UPDATE", [account.id])).rows[0];
+    if (row?.deletion_requested_at) throw new ScanPolicyError("account_deletion_pending", 409);
     if (!row) throw new ScanPolicyError("account_unavailable", 503);
     account.activeDeviceId = row.active_device_id;
   }

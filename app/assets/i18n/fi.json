@@ -223,5 +223,10 @@
   "account.success": "Tili päivitetty",
   "account.cancel": "Peruuta",
   "account.confirm": "Vahvista",
-  "errors.translationUnavailable": "Analyysia ei voitu kääntää sovelluksen kielelle. Yritä uudelleen."
+  "errors.translationUnavailable": "Analyysia ei voitu kääntää sovelluksen kielelle. Yritä uudelleen.",
+  "account.delete": "Poista tili",
+  "account.deleteMessage": "Poistetaanko tili ja tiedot kaikista liitetyistä puhelimista? Tätä ei voi perua. Google Play -tilauksia ei peruta: hallitse niitä erikseen maksujen lopettamiseksi. Google-vahvistus vaaditaan.",
+  "account.deleteAccepted": "Poistopyyntö lähetetty. Kaikki liitetyt istunnot on peruttu. Käsittely jatkuu palvelimella, vaikka suljet sovelluksen.",
+  "account.manageSubscriptions": "Hallinnoi tilauksia",
+  "account.deletionHelp": "Tilin poistamisen ohje"
 }

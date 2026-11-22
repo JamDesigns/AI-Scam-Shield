@@ -209,6 +209,22 @@ const migrations: Migration[] = [
   },
 ];
 
+// Deletion work survives API restarts; no provider credentials or ID tokens are stored.
+migrations.push({
+  id: "20261123_005_account_deletion",
+  up: async (client) => {
+    await client.query(`ALTER TABLE premium_accounts ADD COLUMN IF NOT EXISTS deletion_requested_at TIMESTAMPTZ`);
+    await client.query(`CREATE TABLE IF NOT EXISTS account_deletion_jobs (
+      account_id TEXT PRIMARY KEY REFERENCES premium_accounts(id) ON DELETE CASCADE,
+      revenuecat_ids TEXT[] NOT NULL, next_customer INT NOT NULL DEFAULT 0,
+      firebase_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+      available_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), attempts INT NOT NULL DEFAULT 0,
+      lease_token TEXT, lease_until TIMESTAMPTZ, last_error TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )`);
+  },
+});
+
 const MIGRATION_LOCK_ID = 741932817;
 
 export async function runMigrations(pool: pg.Pool): Promise<void> {

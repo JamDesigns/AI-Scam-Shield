@@ -223,5 +223,10 @@
   "account.success": "Konto uuendatud",
   "account.cancel": "Loobu",
   "account.confirm": "Kinnita",
-  "errors.translationUnavailable": "Analüüsi ei saanud rakenduse keelde tõlkida. Proovi uuesti."
+  "errors.translationUnavailable": "Analüüsi ei saanud rakenduse keelde tõlkida. Proovi uuesti.",
+  "account.delete": "Kustuta konto",
+  "account.deleteMessage": "Kas kustutada konto ja andmed kõigis seotud telefonides? Seda ei saa tagasi võtta. Google Play tellimusi ei tühistata: maksete peatamiseks halda neid eraldi. Vajalik on Google’i kinnitus.",
+  "account.deleteAccepted": "Kustutamist on taotletud. Kõik seotud seansid on tühistatud. Töötlemine jätkub serveris ka rakenduse sulgemisel.",
+  "account.manageSubscriptions": "Halda tellimusi",
+  "account.deletionHelp": "Konto kustutamise abi"
 }

@@ -8,12 +8,14 @@ import { readSubscriptionStatus } from "./subscription-state.js";
 import type { RevenueCatClient } from "./revenuecat-sync.js";
 import { consumeSharedRateLimit } from "./shared-rate-limit.js";
 import { ScanPolicyError } from "./scan-policy.js";
+import { requestAccountDeletion } from "./account-deletion.js";
 
 /** These routes also require the ordinary authenticated installation session in onRequest. */
 export function registerAccountRoutes(app: FastifyInstance, options: {
   pool: pg.Pool; verifier: AccountIdentityVerifier | null;
   revenueCatClient: Pick<RevenueCatClient, "getPremiumState">;
   requireDevice: (request: FastifyRequest) => string;
+  deletionAvailable?: boolean;
 }) {
   const identity = async (request: FastifyRequest, recent = false) => {
     if (!options.verifier) throw new ScanPolicyError("account_identity_unavailable", 503);
@@ -33,11 +35,19 @@ export function registerAccountRoutes(app: FastifyInstance, options: {
   const status = async (deviceId: string) => {
     const account = await getDeviceAccount(options.pool, deviceId);
     const subscription = await readSubscriptionStatus(options.pool, deviceId);
-    return { linked: account !== null, accountId: account?.id ?? null,
+    return { linked: account !== null, deletionAvailable: options.deletionAvailable === true, accountId: account?.id ?? null,
       revenueCatAppUserId: account?.id ?? null, activeOnThisDevice: account?.activeDeviceId === deviceId,
       activationRequired: Boolean(account && account.activeDeviceId !== deviceId), ...subscription };
   };
   app.get("/accounts/status", async (request) => status(options.requireDevice(request)));
+  app.post("/accounts/delete", async (request, reply) => {
+    const deviceId = options.requireDevice(request);
+    z.object({ confirm: z.literal(true) }).strict().parse(request.body);
+    if (!options.deletionAvailable) throw new ScanPolicyError("account_deletion_unavailable", 503);
+    const verified = await identity(request, true);
+    await limited("account_delete", `${verified.issuer}\0${verified.subject}`, 5);
+    return reply.code(202).send(await requestAccountDeletion(options.pool, deviceId, verified));
+  });
   app.post("/accounts/link", async (request) => {
     const deviceId = options.requireDevice(request);
     z.object({}).strict().parse(request.body ?? {});

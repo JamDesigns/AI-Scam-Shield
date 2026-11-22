@@ -223,5 +223,10 @@
   "account.success": "Račun je ažuriran",
   "account.cancel": "Odustani",
   "account.confirm": "Potvrdi",
-  "errors.translationUnavailable": "Analizu nije moguće prevesti na jezik aplikacije. Pokušajte ponovno."
+  "errors.translationUnavailable": "Analizu nije moguće prevesti na jezik aplikacije. Pokušajte ponovno.",
+  "account.delete": "Izbriši račun",
+  "account.deleteMessage": "Izbrisati račun i podatke na svim povezanim telefonima? To se ne može poništiti. Pretplate na Google Playu ne otkazuju se: upravljajte njima zasebno kako biste zaustavili naplatu. Potrebna je Googleova provjera.",
+  "account.deleteAccepted": "Brisanje je zatraženo. Sve povezane sesije su opozvane. Obrada se nastavlja na poslužitelju ako zatvorite aplikaciju.",
+  "account.manageSubscriptions": "Upravljaj pretplatama",
+  "account.deletionHelp": "Pomoć za brisanje računa"
 }

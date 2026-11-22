@@ -223,5 +223,10 @@
   "account.success": "Il-kont ġie aġġornat",
   "account.cancel": "Ikkanċella",
   "account.confirm": "Ikkonferma",
-  "errors.translationUnavailable": "L-analiżi ma setgħetx tiġi tradotta fil-lingwa tal-app. Erġa’ pprova."
+  "errors.translationUnavailable": "L-analiżi ma setgħetx tiġi tradotta fil-lingwa tal-app. Erġa’ pprova.",
+  "account.delete": "Ħassar il-kont",
+  "account.deleteMessage": "Tħassar il-kont u d-data fuq it-telefowns kollha marbuta? Dan ma jistax jitreġġa’ lura. L-abbonamenti ta’ Google Play ma jiġux ikkanċellati: immaniġġjahom separatament biex twaqqaf il-ħlasijiet. Hija meħtieġa verifika ma’ Google.",
+  "account.deleteAccepted": "Intalab it-tħassir. Is-sessjonijiet kollha marbuta ġew revokati. L-ipproċessar ikompli fuq is-server jekk tagħlaq l-app.",
+  "account.manageSubscriptions": "Immaniġġja l-abbonamenti",
+  "account.deletionHelp": "Għajnuna għat-tħassir tal-kont"
 }

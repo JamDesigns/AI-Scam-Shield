@@ -223,5 +223,10 @@
   "account.success": "Konto zaktualizowane",
   "account.cancel": "Anuluj",
   "account.confirm": "Potwierdź",
-  "errors.translationUnavailable": "Nie udało się przetłumaczyć analizy na język aplikacji. Spróbuj ponownie."
+  "errors.translationUnavailable": "Nie udało się przetłumaczyć analizy na język aplikacji. Spróbuj ponownie.",
+  "account.delete": "Usuń konto",
+  "account.deleteMessage": "Usunąć konto i dane ze wszystkich powiązanych telefonów? Tej operacji nie można cofnąć. Subskrypcje Google Play nie zostaną anulowane: zarządzaj nimi osobno, aby zatrzymać opłaty. Wymagana jest weryfikacja Google.",
+  "account.deleteAccepted": "Zlecono usunięcie. Wszystkie powiązane sesje zostały unieważnione. Przetwarzanie trwa na serwerze po zamknięciu aplikacji.",
+  "account.manageSubscriptions": "Zarządzaj subskrypcjami",
+  "account.deletionHelp": "Pomoc w usuwaniu konta"
 }

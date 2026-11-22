@@ -223,5 +223,10 @@
   "account.success": "Cont actualizat",
   "account.cancel": "Anulează",
   "account.confirm": "Confirmă",
-  "errors.translationUnavailable": "Analiza nu a putut fi tradusă în limba aplicației. Încearcă din nou."
+  "errors.translationUnavailable": "Analiza nu a putut fi tradusă în limba aplicației. Încearcă din nou.",
+  "account.delete": "Șterge contul",
+  "account.deleteMessage": "Ștergi contul și datele de pe toate telefoanele asociate? Acțiunea este ireversibilă. Abonamentele Google Play nu sunt anulate: gestionează-le separat pentru a opri plățile. Este necesară verificarea Google.",
+  "account.deleteAccepted": "Ștergere solicitată. Toate sesiunile asociate au fost revocate. Procesarea continuă pe server dacă închizi aplicația.",
+  "account.manageSubscriptions": "Gestionează abonamentele",
+  "account.deletionHelp": "Ajutor pentru ștergerea contului"
 }

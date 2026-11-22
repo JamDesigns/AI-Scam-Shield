@@ -223,5 +223,10 @@
   "account.success": "Cuntas nuashonraithe",
   "account.cancel": "Cealaigh",
   "account.confirm": "Deimhnigh",
-  "errors.translationUnavailable": "Níorbh fhéidir an anailís a aistriú go teanga na haipe. Bain triail eile as."
+  "errors.translationUnavailable": "Níorbh fhéidir an anailís a aistriú go teanga na haipe. Bain triail eile as.",
+  "account.delete": "Scrios an cuntas",
+  "account.deleteMessage": "An bhfuil tú ag iarraidh do chuntas agus do shonraí a scriosadh ar gach fón nasctha? Ní féidir é seo a chealú. Ní chuirtear síntiúis Google Play ar ceal: bainistigh iad ar leithligh chun stop a chur le táillí. Teastaíonn fíorú Google.",
+  "account.deleteAccepted": "Iarradh scriosadh. Cúlghaireadh gach seisiún nasctha. Leanann an phróiseáil ar an bhfreastalaí má dhúnann tú an aip.",
+  "account.manageSubscriptions": "Bainistigh síntiúis",
+  "account.deletionHelp": "Cabhair le scriosadh cuntais"
 }

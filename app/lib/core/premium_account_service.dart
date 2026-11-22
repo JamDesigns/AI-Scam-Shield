@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'app_session.dart';
 
 import 'api_client.dart';
 import 'revenuecat_service.dart';
@@ -82,10 +84,12 @@ class PremiumAccountStatus {
       required this.activeOnThisDevice,
       required this.isPremium,
       this.accountId,
+      this.deletionAvailable = false,
       this.revenueCatAppUserId});
   final bool linked;
   final bool activeOnThisDevice;
   final bool isPremium;
+  final bool deletionAvailable;
   final String? accountId;
   final String? revenueCatAppUserId;
   factory PremiumAccountStatus.fromJson(Map<String, dynamic> value) =>
@@ -93,6 +97,7 @@ class PremiumAccountStatus {
           linked: value['linked'] == true,
           activeOnThisDevice: value['activeOnThisDevice'] == true,
           isPremium: value['isPremium'] == true,
+          deletionAvailable: value['deletionAvailable'] == true,
           accountId: value['accountId'] as String?,
           revenueCatAppUserId: value['revenueCatAppUserId'] as String?);
 }
@@ -142,6 +147,26 @@ class PremiumAccountService {
 
   Future<PremiumAccountStatus> signInGoogle() async =>
       _link(await _authenticateGoogle());
+
+  Future<void> requestDeletion({required bool confirmed}) async {
+    if (!confirmed) throw StateError('deletion_confirmation_required');
+    final token = await _authenticateGoogle();
+    final result = await _accountStep(
+        'account_delete',
+        () => api.postJson('/accounts/delete', {'confirm': true},
+            includeOutputLanguage: false, accountIdentityToken: token));
+    if (result['accepted'] != true) throw StateError('deletion_not_accepted');
+    // The server owns the durable deletion job; closing the app cannot cancel it.
+    await (await SharedPreferences.getInstance()).clear();
+    await SessionRepository.instance.forget();
+    await FirebaseAuth.instance.signOut();
+    try {
+      await GoogleSignIn.instance.signOut();
+    } catch (_) {}
+    try {
+      await RevenueCatService.clearAccountIdentity();
+    } catch (_) {}
+  }
 
   Future<PremiumAccountStatus> restore() async {
     final linked = await signInGoogle();
