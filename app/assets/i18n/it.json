@@ -223,5 +223,10 @@
   "account.success": "Account aggiornato",
   "account.cancel": "Annulla",
   "account.confirm": "Conferma",
-  "errors.translationUnavailable": "Impossibile tradurre l’analisi nella lingua dell’app. Riprova."
+  "errors.translationUnavailable": "Impossibile tradurre l’analisi nella lingua dell’app. Riprova.",
+  "account.delete": "Elimina account",
+  "account.deleteMessage": "Eliminare account e dati su tutti i telefoni collegati? Non è possibile annullare. Gli abbonamenti Google Play non vengono annullati: gestiscili separatamente per interrompere gli addebiti. È richiesta la verifica con Google.",
+  "account.deleteAccepted": "Eliminazione richiesta. Tutte le sessioni collegate sono state revocate. Il processo continua sul server anche se chiudi l’app.",
+  "account.manageSubscriptions": "Gestisci abbonamenti",
+  "account.deletionHelp": "Aiuto per eliminare l’account"
 }

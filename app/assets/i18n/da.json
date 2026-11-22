@@ -223,5 +223,10 @@
   "account.success": "Konto opdateret",
   "account.cancel": "Annuller",
   "account.confirm": "Bekræft",
-  "errors.translationUnavailable": "Analysen kunne ikke oversættes til appens sprog. Prøv igen."
+  "errors.translationUnavailable": "Analysen kunne ikke oversættes til appens sprog. Prøv igen.",
+  "account.delete": "Slet konto",
+  "account.deleteMessage": "Slet konto og data på alle tilknyttede telefoner? Dette kan ikke fortrydes. Google Play-abonnementer opsiges ikke: administrer dem separat for at stoppe betalinger. Google-bekræftelse er påkrævet.",
+  "account.deleteAccepted": "Sletning anmodet. Alle tilknyttede sessioner er tilbagekaldt. Behandlingen fortsætter på serveren, hvis du lukker appen.",
+  "account.manageSubscriptions": "Administrer abonnementer",
+  "account.deletionHelp": "Hjælp til kontosletning"
 }

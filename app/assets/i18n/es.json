@@ -223,5 +223,10 @@
   "account.success": "Cuenta actualizada",
   "account.cancel": "Cancelar",
   "account.confirm": "Confirmar",
-  "errors.translationUnavailable": "No se ha podido traducir el análisis al idioma de la app. Inténtalo de nuevo."
+  "errors.translationUnavailable": "No se ha podido traducir el análisis al idioma de la app. Inténtalo de nuevo.",
+  "account.delete": "Eliminar cuenta",
+  "account.deleteMessage": "¿Eliminar tu cuenta y sus datos en todos los teléfonos vinculados? No se puede deshacer. Las suscripciones de Google Play no se cancelan: gestiónalas por separado para detener los cobros. Se verificará tu identidad con Google.",
+  "account.deleteAccepted": "Eliminación solicitada. Se han revocado todas las sesiones vinculadas. El proceso continúa en el servidor aunque cierres la app.",
+  "account.manageSubscriptions": "Gestionar suscripciones",
+  "account.deletionHelp": "Ayuda para eliminar la cuenta"
 }

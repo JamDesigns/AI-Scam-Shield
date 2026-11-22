@@ -25,9 +25,10 @@ export async function linkVerifiedAccount(pool: pg.Pool, deviceId: string, ident
     await db.query(`INSERT INTO premium_accounts(id, identity_issuer, identity_subject, time_zone)
       SELECT $1,$2,$3,time_zone FROM devices WHERE id = $4 ON CONFLICT(identity_issuer, identity_subject) DO NOTHING`,
       [randomUUID(), identity.issuer, identity.subject, deviceId]);
-    const account = (await db.query(`SELECT id, active_device_id, time_zone FROM premium_accounts
+    const account = (await db.query(`SELECT id, active_device_id, time_zone, deletion_requested_at FROM premium_accounts
       WHERE identity_issuer = $1 AND identity_subject = $2 FOR UPDATE`, [identity.issuer, identity.subject])).rows[0];
     if (!account) throw new ScanPolicyError("account_unavailable", 503);
+    if (account.deletion_requested_at) throw new ScanPolicyError("account_deletion_pending", 409);
     const device = (await db.query("SELECT id, account_id FROM devices WHERE id = $1 FOR UPDATE", [deviceId])).rows[0];
     if (!device || device.account_id && device.account_id !== account.id) throw new ScanPolicyError("device_account_conflict", 409);
     // Do not bind a running anonymous operation to a different accounting owner mid-flight.
@@ -88,7 +89,7 @@ export async function activatePremiumDevice(pool: pg.Pool, client: Pick<RevenueC
   const db = await pool.connect();
   try {
     await db.query("BEGIN");
-    const owner = (await db.query(`SELECT id FROM premium_accounts WHERE id = $1 AND identity_issuer = $2 AND identity_subject = $3 FOR UPDATE`, [account.id, identity.issuer, identity.subject])).rows[0];
+    const owner = (await db.query(`SELECT id FROM premium_accounts WHERE id = $1 AND identity_issuer = $2 AND identity_subject = $3 AND deletion_requested_at IS NULL FOR UPDATE`, [account.id, identity.issuer, identity.subject])).rows[0];
     if (!owner) throw new ScanPolicyError("account_identity_mismatch", 403);
     const device = (await db.query("SELECT account_id FROM devices WHERE id = $1 FOR UPDATE", [deviceId])).rows[0];
     if (device?.account_id !== account.id) throw new ScanPolicyError("account_identity_mismatch", 403);

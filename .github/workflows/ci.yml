@@ -27,6 +27,11 @@ jobs:
       - name: Check legal language coverage and routing
         run: node --test docs/legal-documents.test.mjs
 
+      - name: Check account deletion request resource
+        run: |
+          node docs/generate-deletion-page.mjs --check
+          node --test docs/account-deletion-page.test.mjs
+
   api:
     name: API build
     runs-on: ubuntu-latest

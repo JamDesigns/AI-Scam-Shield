@@ -44,6 +44,7 @@ class AppSession {
 abstract class SessionStorage {
   Future<String?> read();
   Future<void> write(String value);
+  Future<void> delete();
 }
 
 class SecureSessionStorage implements SessionStorage {
@@ -59,6 +60,8 @@ class SecureSessionStorage implements SessionStorage {
 
   @override
   Future<void> write(String value) => _storage.write(key: _key, value: value);
+  @override
+  Future<void> delete() => _storage.delete(key: _key);
 }
 
 class SessionException implements Exception {
@@ -98,6 +101,13 @@ class SessionRepository {
   Future<AppSession>? _loading;
   AppSession? _session;
   AppSession? _pendingPersistence;
+
+  Future<void> forget() async {
+    if (_loading != null) await _loading;
+    _session = null;
+    _pendingPersistence = null;
+    await _storage.delete();
+  }
 
   Future<AppSession> getOrCreate() async {
     if (_session != null) return _session!;

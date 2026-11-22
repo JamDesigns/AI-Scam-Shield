@@ -223,5 +223,10 @@
   "account.success": "Kontot har uppdaterats",
   "account.cancel": "Avbryt",
   "account.confirm": "Bekräfta",
-  "errors.translationUnavailable": "Analysen kunde inte översättas till appens språk. Försök igen."
+  "errors.translationUnavailable": "Analysen kunde inte översättas till appens språk. Försök igen.",
+  "account.delete": "Radera konto",
+  "account.deleteMessage": "Radera kontot och data på alla länkade telefoner? Detta kan inte ångras. Google Play-prenumerationer avslutas inte: hantera dem separat för att stoppa betalningar. Google-verifiering krävs.",
+  "account.deleteAccepted": "Radering begärd. Alla länkade sessioner har återkallats. Behandlingen fortsätter på servern om du stänger appen.",
+  "account.manageSubscriptions": "Hantera prenumerationer",
+  "account.deletionHelp": "Hjälp med kontoradering"
 }

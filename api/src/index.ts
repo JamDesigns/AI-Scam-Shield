@@ -43,6 +43,8 @@ import { buildMediaForensicsEvidence, type MediaForensicsEvidence } from "./fore
 import { createMediaTranscriptionProvider } from "./transcription/media-transcription-provider-factory.js";
 import { getVideoDurationSeconds, extractVideoFrames, MAX_VIDEO_DURATION_SECONDS } from "./video/video-frame-extractor.js";
 import { runMigrations } from "./migrations.js";
+import { createAccountDeletionWorker } from "./account-deletion.js";
+import { createDeletionProviders } from "./account-deletion-providers.js";
 import { ScanPolicyError, validateTimeZone, type ScanKind } from "./scan-policy.js";
 import { getTimeContext, getUsageSnapshot, reserveScanOperation, completeScanOperation, failScanOperation, type ScanReservation } from "./scan-operations.js";
 import { parseSupportedLocale } from "./locales.js";
@@ -84,6 +86,7 @@ const envSchema = z.object({
 
   ACCOUNT_IDENTITY_PROVIDER: z.enum(["disabled", "firebase"]).default("disabled"),
   FIREBASE_AUTH_PROJECT_ID: z.string().optional(),
+  ACCOUNT_DELETION_ENABLED: z.enum(["true", "false"]).default("false"),
   REVENUECAT_WEBHOOK_AUTH: z.string().default(""),
   REVENUECAT_API_KEY: z.string().default(""),
   REVENUECAT_ENVIRONMENT: z.enum(["PRODUCTION", "SANDBOX"]).default("PRODUCTION"),
@@ -132,6 +135,7 @@ const env = envSchema.parse({
 
   ACCOUNT_IDENTITY_PROVIDER: process.env.ACCOUNT_IDENTITY_PROVIDER,
   FIREBASE_AUTH_PROJECT_ID: process.env.FIREBASE_AUTH_PROJECT_ID,
+  ACCOUNT_DELETION_ENABLED: process.env.ACCOUNT_DELETION_ENABLED,
   REVENUECAT_WEBHOOK_AUTH: process.env.REVENUECAT_WEBHOOK_AUTH,
   REVENUECAT_API_KEY: process.env.REVENUECAT_API_KEY,
   REVENUECAT_ENVIRONMENT: process.env.REVENUECAT_ENVIRONMENT,
@@ -233,9 +237,22 @@ const revenueCatWorker = createRevenueCatWorker(pool, revenueCatClient, {
   onError: (code) => app.log.warn({ code }, "Subscription synchronization pending"),
 });
 let subscriptionTimer: ReturnType<typeof setInterval> | undefined;
+const deletionProviders = createDeletionProviders({ enabled: env.ACCOUNT_DELETION_ENABLED === "true",
+  projectId: env.FIREBASE_AUTH_PROJECT_ID, credentialPath: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+  revenueCatKey: env.REVENUECAT_API_KEY });
+if (env.ACCOUNT_DELETION_ENABLED === "true" && !deletionProviders) app.log.error("Account deletion disabled: administrative provider configuration unavailable");
+const deletionWorker = deletionProviders ? createAccountDeletionWorker(pool, deletionProviders,
+  () => app.log.warn("Account deletion step pending; retry scheduled")) : null;
+let deletionTimer: ReturnType<typeof setInterval> | undefined;
 let rateCleanupTimer: ReturnType<typeof setInterval> | undefined;
 app.addHook("onReady", async () => {
   if (env.NODE_ENV === "test") return;
+  if (deletionWorker) {
+    const tick = () => { void deletionWorker.tick().catch(() => app.log.warn("Account deletion worker unavailable")); };
+    deletionTimer = setInterval(tick, 3000);
+    deletionTimer.unref();
+    tick();
+  }
   if (revenueCatConfigured) {
     subscriptionTimer = setInterval(() => { void revenueCatWorker.tick(); }, 3000);
     subscriptionTimer.unref();
@@ -246,6 +263,8 @@ app.addHook("onReady", async () => {
   void pruneRateLimits(pool).catch(() => app.log.warn("Rate limit cleanup pending"));
 });
 app.addHook("onClose", async () => {
+  if (deletionTimer) clearInterval(deletionTimer);
+  await deletionWorker?.stop();
   if (subscriptionTimer) clearInterval(subscriptionTimer);
   if (rateCleanupTimer) clearInterval(rateCleanupTimer);
   await revenueCatWorker.stop();
@@ -291,6 +310,7 @@ app.addHook("onRequest", async (req) => {
 
 registerAccountRoutes(app, {
   pool,
+  deletionAvailable: deletionProviders !== null,
   verifier: createAccountIdentityVerifier({ provider: env.ACCOUNT_IDENTITY_PROVIDER, firebaseProjectId: env.FIREBASE_AUTH_PROJECT_ID }),
   revenueCatClient,
   requireDevice,

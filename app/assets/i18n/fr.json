@@ -223,5 +223,10 @@
   "account.success": "Compte mis à jour",
   "account.cancel": "Annuler",
   "account.confirm": "Confirmer",
-  "errors.translationUnavailable": "L’analyse n’a pas pu être traduite dans la langue de l’application. Réessayez."
+  "errors.translationUnavailable": "L’analyse n’a pas pu être traduite dans la langue de l’application. Réessayez.",
+  "account.delete": "Supprimer le compte",
+  "account.deleteMessage": "Supprimer votre compte et ses données sur tous les téléphones liés ? Cette action est irréversible. Les abonnements Google Play ne sont pas annulés : gérez-les séparément pour arrêter les prélèvements. Une vérification Google est requise.",
+  "account.deleteAccepted": "Suppression demandée. Toutes les sessions liées sont révoquées. Le traitement continue sur le serveur si vous fermez l’application.",
+  "account.manageSubscriptions": "Gérer les abonnements",
+  "account.deletionHelp": "Aide à la suppression du compte"
 }

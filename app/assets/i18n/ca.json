@@ -223,5 +223,10 @@
   "account.success": "Compte actualitzat",
   "account.cancel": "Cancel·la",
   "account.confirm": "Confirma",
-  "errors.translationUnavailable": "No s’ha pogut traduir l’anàlisi a l’idioma de l’app. Torna-ho a provar."
+  "errors.translationUnavailable": "No s’ha pogut traduir l’anàlisi a l’idioma de l’app. Torna-ho a provar.",
+  "account.delete": "Suprimeix el compte",
+  "account.deleteMessage": "Vols suprimir el compte i les dades de tots els telèfons vinculats? No es pot desfer. Les subscripcions de Google Play no es cancel·len: gestiona-les per separat per aturar els cobraments. Cal verificar la identitat amb Google.",
+  "account.deleteAccepted": "Supressió sol·licitada. S’han revocat totes les sessions vinculades. El procés continua al servidor encara que tanquis l’app.",
+  "account.manageSubscriptions": "Gestiona les subscripcions",
+  "account.deletionHelp": "Ajuda per suprimir el compte"
 }

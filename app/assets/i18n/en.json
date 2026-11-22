@@ -223,5 +223,10 @@
   "account.success": "Account updated",
   "account.cancel": "Cancel",
   "account.confirm": "Confirm",
-  "errors.translationUnavailable": "The analysis could not be translated into the app language. Please try again."
+  "errors.translationUnavailable": "The analysis could not be translated into the app language. Please try again.",
+  "account.delete": "Delete account",
+  "account.deleteMessage": "Delete your account and data on all linked phones? This cannot be undone. Google Play subscriptions are not cancelled: manage them separately to stop charges. Google verification is required.",
+  "account.deleteAccepted": "Deletion requested. All linked sessions are revoked. Processing continues on the server if you close the app.",
+  "account.manageSubscriptions": "Manage subscriptions",
+  "account.deletionHelp": "Account deletion help"
 }

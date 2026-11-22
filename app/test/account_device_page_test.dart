@@ -13,11 +13,19 @@ class FakeAccountService extends PremiumAccountService {
   int activations = 0;
   bool fail = false;
   bool linked = true;
+  int deletions = 0;
+  @override
+  Future<void> requestDeletion({required bool confirmed}) async {
+    expect(confirmed, isTrue);
+    deletions++;
+  }
+
   @override
   Future<PremiumAccountStatus> status() async => PremiumAccountStatus(
       linked: linked,
       activeOnThisDevice: false,
       isPremium: false,
+      deletionAvailable: true,
       accountId: 'owner',
       revenueCatAppUserId: 'owner');
   @override
@@ -51,10 +59,34 @@ const labels = AccountDeviceLabels(
     success: 'Updated');
 
 void main() {
+  testWidgets(
+      'deletion requires confirmation and cancellation preserves account',
+      (tester) async {
+    final service = FakeAccountService();
+    await tester.pumpWidget(
+        MaterialApp(home: AccountDevicePage(service: service, labels: labels)));
+    await tester.pumpAndSettle();
+    final button = find.byKey(const ValueKey('delete-account'));
+    await tester.ensureVisible(button);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(find.text(labels.deleteMessage), findsOneWidget);
+    expect(service.deletions, 0);
+    await tester.tap(find.text(labels.cancel));
+    await tester.pumpAndSettle();
+    expect(service.deletions, 0);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, labels.deleteAccount));
+    await tester.pumpAndSettle();
+    expect(service.deletions, 1);
+    expect(find.text(labels.deleteAccepted), findsOneWidget);
+  });
   testWidgets('linked accounts hide the Google sign-in action after reopening',
       (tester) async {
     await tester.pumpWidget(MaterialApp(
-        home: AccountDevicePage(service: FakeAccountService(), labels: labels)));
+        home:
+            AccountDevicePage(service: FakeAccountService(), labels: labels)));
     await tester.pumpAndSettle();
     expect(find.text(labels.signInGoogle), findsNothing);
     expect(find.text(labels.inactive), findsOneWidget);

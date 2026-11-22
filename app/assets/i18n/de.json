@@ -223,5 +223,10 @@
   "account.success": "Konto aktualisiert",
   "account.cancel": "Abbrechen",
   "account.confirm": "Bestätigen",
-  "errors.translationUnavailable": "Die Analyse konnte nicht in die App-Sprache übersetzt werden. Versuche es erneut."
+  "errors.translationUnavailable": "Die Analyse konnte nicht in die App-Sprache übersetzt werden. Versuche es erneut.",
+  "account.delete": "Konto löschen",
+  "account.deleteMessage": "Konto und Daten auf allen verknüpften Telefonen löschen? Dies kann nicht rückgängig gemacht werden. Google-Play-Abonnements werden nicht gekündigt. Verwalten Sie diese separat, um Zahlungen zu beenden. Eine Google-Bestätigung ist erforderlich.",
+  "account.deleteAccepted": "Löschung angefordert. Alle verknüpften Sitzungen wurden widerrufen. Die Verarbeitung läuft auf dem Server weiter, wenn Sie die App schließen.",
+  "account.manageSubscriptions": "Abonnements verwalten",
+  "account.deletionHelp": "Hilfe zur Kontolöschung"
 }

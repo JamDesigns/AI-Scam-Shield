@@ -13,6 +13,11 @@ const sessionJson = {
 };
 
 class MemorySessionStorage implements SessionStorage {
+  @override
+  Future<void> delete() async {
+    value = null;
+  }
+
   String? value;
   bool failRead = false;
   bool failWrite = false;
@@ -31,6 +36,25 @@ class MemorySessionStorage implements SessionStorage {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  test('forget removes persisted credentials and enrols a fresh identity', () async {
+    final storage = MemorySessionStorage()..value = jsonEncode(sessionJson);
+    var enrolments = 0;
+    final client = MockClient((_) async {
+      enrolments++;
+      return http.Response(jsonEncode({...sessionJson,
+        'deviceId': '78124de4-3cae-4772-a18a-d3e3c74d234e',
+      }), 201);
+    });
+    final repository = SessionRepository(storage: storage, client: client,
+        baseUrl: 'https://example.test', readTimeZone: () async => 'Europe/Madrid');
+    expect((await repository.getOrCreate()).deviceId, sessionJson['deviceId']);
+    await repository.forget();
+    expect(storage.value, isNull);
+    expect((await repository.getOrCreate()).deviceId, '78124de4-3cae-4772-a18a-d3e3c74d234e');
+    expect(enrolments, 1);
+    client.close();
+  });
 
   test('travelling does not change the registered quota calendar zone',
       () async {

@@ -33,6 +33,25 @@ class StatsPageState extends State<StatsPage> {
   late ScanService _service;
   ApiClient? _api;
 
+  void resetAfterAccountDeletion() {
+    if (!mounted) return;
+    _epoch++;
+    _api?.close();
+    _api = null;
+    setState(() {
+      _stats = null;
+      _activity = [];
+      _loading = true;
+      _refreshing = false;
+      _loadingMore = false;
+      _hasMore = false;
+      _serviceReady = false;
+      _page = 1;
+      _errorKey = null;
+    });
+    _init();
+  }
+
   @override
   void initState() {
     super.initState();

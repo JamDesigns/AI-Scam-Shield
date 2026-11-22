@@ -223,5 +223,10 @@
   "account.success": "Fiók frissítve",
   "account.cancel": "Mégse",
   "account.confirm": "Megerősítés",
-  "errors.translationUnavailable": "Az elemzést nem sikerült az alkalmazás nyelvére fordítani. Próbálja újra."
+  "errors.translationUnavailable": "Az elemzést nem sikerült az alkalmazás nyelvére fordítani. Próbálja újra.",
+  "account.delete": "Fiók törlése",
+  "account.deleteMessage": "Törli a fiókot és az adatokat az összes kapcsolt telefonon? Ez nem vonható vissza. A Google Play-előfizetések nem szűnnek meg: a terhelések leállításához külön kezelje őket. Google-ellenőrzés szükséges.",
+  "account.deleteAccepted": "Törlés kérve. Minden kapcsolt munkamenet visszavonva. A feldolgozás a szerveren folytatódik az alkalmazás bezárása után is.",
+  "account.manageSubscriptions": "Előfizetések kezelése",
+  "account.deletionHelp": "Segítség a fiók törléséhez"
 }

@@ -14,6 +14,14 @@ class RevenueCatService {
 
   static bool _isTestKey(String key) => key.startsWith('test_');
 
+  static Future<void> clearAccountIdentity() async {
+    try {
+      if (_configured) await Purchases.logOut();
+    } finally {
+      _configuredUserId = null;
+    }
+  }
+
   static Future<void> initialize({required String appUserId}) async {
     if (_configured) {
       if (_configuredUserId != appUserId) {

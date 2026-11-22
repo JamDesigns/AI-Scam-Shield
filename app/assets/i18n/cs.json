@@ -223,5 +223,10 @@
   "account.success": "Účet byl aktualizován",
   "account.cancel": "Zrušit",
   "account.confirm": "Potvrdit",
-  "errors.translationUnavailable": "Analýzu se nepodařilo přeložit do jazyka aplikace. Zkuste to znovu."
+  "errors.translationUnavailable": "Analýzu se nepodařilo přeložit do jazyka aplikace. Zkuste to znovu.",
+  "account.delete": "Smazat účet",
+  "account.deleteMessage": "Smazat účet a data na všech propojených telefonech? Tento krok nelze vrátit. Předplatná Google Play nebudou zrušena: spravujte je samostatně, chcete-li zastavit platby. Je nutné ověření Google.",
+  "account.deleteAccepted": "Smazání bylo vyžádáno. Všechny propojené relace byly odvolány. Zpracování pokračuje na serveru i po zavření aplikace.",
+  "account.manageSubscriptions": "Spravovat předplatná",
+  "account.deletionHelp": "Nápověda ke smazání účtu"
 }

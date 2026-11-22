@@ -223,5 +223,10 @@
   "account.success": "Account bijgewerkt",
   "account.cancel": "Annuleren",
   "account.confirm": "Bevestigen",
-  "errors.translationUnavailable": "De analyse kon niet worden vertaald naar de taal van de app. Probeer het opnieuw."
+  "errors.translationUnavailable": "De analyse kon niet worden vertaald naar de taal van de app. Probeer het opnieuw.",
+  "account.delete": "Account verwijderen",
+  "account.deleteMessage": "Account en gegevens op alle gekoppelde telefoons verwijderen? Dit kan niet ongedaan worden gemaakt. Google Play-abonnementen worden niet opgezegd: beheer ze apart om betalingen te stoppen. Google-verificatie is vereist.",
+  "account.deleteAccepted": "Verwijdering aangevraagd. Alle gekoppelde sessies zijn ingetrokken. De verwerking gaat door op de server als u de app sluit.",
+  "account.manageSubscriptions": "Abonnementen beheren",
+  "account.deletionHelp": "Hulp bij accountverwijdering"
 }

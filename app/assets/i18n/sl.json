@@ -223,5 +223,10 @@
   "account.success": "Račun je posodobljen",
   "account.cancel": "Prekliči",
   "account.confirm": "Potrdi",
-  "errors.translationUnavailable": "Analize ni bilo mogoče prevesti v jezik aplikacije. Poskusite znova."
+  "errors.translationUnavailable": "Analize ni bilo mogoče prevesti v jezik aplikacije. Poskusite znova.",
+  "account.delete": "Izbriši račun",
+  "account.deleteMessage": "Izbrišem račun in podatke na vseh povezanih telefonih? Tega ni mogoče razveljaviti. Naročnine Google Play se ne prekličejo: za ustavitev plačil jih upravljajte posebej. Potrebno je preverjanje Google.",
+  "account.deleteAccepted": "Izbris je zahtevan. Vse povezane seje so preklicane. Obdelava se nadaljuje na strežniku tudi po zaprtju aplikacije.",
+  "account.manageSubscriptions": "Upravljaj naročnine",
+  "account.deletionHelp": "Pomoč pri izbrisu računa"
 }
