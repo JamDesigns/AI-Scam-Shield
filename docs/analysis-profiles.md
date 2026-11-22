@@ -97,4 +97,3 @@ Translation accepts at most 16 strings, 6000 source characters and 48 sentence s
 Activity responses include the stored inputType. The app localizes media labels from that type, while literal user text such as [image] remains unchanged. No history rewrite or database migration is required.
 
 Sources: https://huggingface.co/google/madlad400-3b-mt ; https://huggingface.co/Nextcloud-AI/madlad400-3b-mt-ct2-int8 ; https://opennmt.net/CTranslate2/performance.html .
-
