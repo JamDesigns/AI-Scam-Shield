@@ -28,7 +28,7 @@ export function createDeletionProviders(options: {
         });
         await response.body?.cancel();
         if (response.status === 404) return;
-        if (!response.ok) throw new Error("customer_deletion_unavailable");
+        if (!response.ok) throw new Error(`customer_deletion_http_${response.status}`);
       }
       throw new Error("customer_deletion_not_confirmed");
     },

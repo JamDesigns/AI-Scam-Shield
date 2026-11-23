@@ -30,7 +30,13 @@ describe('administrative erasure adapters', () => {
   });
   it('does not treat permission failure as deletion success', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 403 })));
-    await expect(configured().deleteCustomer('owner')).rejects.toThrow('customer_deletion_unavailable');
+    await expect(configured().deleteCustomer('owner')).rejects.toThrow('customer_deletion_http_403');
+  });
+  it('retains asynchronous deletion until absence is confirmed', async () => {
+    const fetcher = vi.fn().mockImplementation(async () => new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetcher);
+    await expect(configured().deleteCustomer('owner')).rejects.toThrow('customer_deletion_not_confirmed');
+    expect(fetcher).toHaveBeenCalledTimes(3);
   });
   it('retries idempotently when Firebase already deleted the user', async () => {
     mocks.authDelete.mockRejectedValue({ code: 'auth/user-not-found' });
