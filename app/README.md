@@ -6,7 +6,7 @@ The Flutter app is installed on the phone from Google Play or Apple App Store an
 
 | Platform | Publication artefact | Channel | Status |
 |---|---|---|---|
-| Android | `.aab` | Google Play Console → Google Play | Implementation undergoing validation; debug APK available for testing, release publication pending |
+| Android | `.aab` | Google Play Console → Google Play | Signed `3.3.0+11` AAB prepared; local 16 KB checks passed, Play acceptance and publication pending |
 | iOS | `.ipa` | App Store Connect/TestFlight → App Store | Native implementation and validation pending |
 
 The platforms share Dart code, but each needs its own native project, identifier, service configuration, signing and testing. A debug APK does not replace the signed AAB for Google Play; it cannot be installed on iOS either. The `ios/` folder does not yet represent an app ready for App Store.
@@ -25,7 +25,7 @@ Once iOS has been implemented and configured, run this on macOS with Xcode:
 flutter build ipa --release --dart-define=API_BASE_URL=https://api.example.com
 ```
 
-Replace the example domain with the actual API server. Android produces the AAB under `build/app/outputs/bundle/release/`; iOS produces the archive and IPA under `build/ios/archive/` and `build/ios/ipa/`. Signing, the build number and store accounts are configured separately for each platform. These two publication artefacts have not been generated as part of this delivery.
+Replace the example domain with the actual API server. Android produces the AAB under `build/app/outputs/bundle/release/`; iOS produces the archive and IPA under `build/ios/archive/` and `build/ios/ipa/`. Signing, the build number and store accounts are configured separately for each platform. The signed Android `3.3.0+11` AAB was generated using the existing production configuration; see [the release verification](../docs/android-release-11.md). The iOS publication artefact remains pending.
 
 The code retains a historical release URL in `AppConfig` and an Android emulator debug value. Do not assume these values correspond to the final deployment: use the explicit parameter for every build. An API URL is public configuration; PostgreSQL credentials, private AI keys and server secrets must never be passed through `--dart-define` or included in the mobile package.
 

@@ -59,7 +59,7 @@ privacy-policy.md    English policy generated from the shared legal source
 
 Both builds must explicitly include the remote API's HTTPS URL through `API_BASE_URL`. `https://api.example.com` is an example: replace it with server A's actual domain. Do not include `DATABASE_URL` or private provider keys in mobile builds.
 
-Before packaging, review the version/build number and configure signing for each platform. The repository version is currently `3.3.0+8`; each new upload must use a version code/build number accepted by its store.
+Before packaging, review the version/build number and configure signing for each platform. The repository version is currently `3.3.0+11`; each new upload must use a version code/build number accepted by its store. The Android version 11 AAB has been prepared and checked locally for 16 KB alignment; see [the release verification](docs/android-release-11.md).
 
 ### Android → Google Play
 
