@@ -51,7 +51,8 @@ describe('durable provider cleanup', () => {
     }, onRetry);
     await worker.tick();
     expect(firebase).not.toHaveBeenCalled();
-    expect(query.mock.calls.map(([sql]) => sql).join('\n')).toContain("last_error='deletion_step_unavailable'");
+    expect(query.mock.calls.map(([sql]) => sql).join('\n')).toContain('last_error=$3');
+    expect(query).toHaveBeenLastCalledWith(expect.any(String), ['owner', expect.any(String), 'deletion_step_unavailable']);
     expect(query.mock.calls.map(([sql]) => sql).join('\n')).not.toContain('confidential');
     expect(onRetry).toHaveBeenCalledOnce();
     await worker.stop();

@@ -83,10 +83,14 @@ export function createAccountDeletionWorker(pool: pg.Pool, providers: DeletionPr
         } catch (error) { await db.query("ROLLBACK").catch(() => {}); throw error; }
         finally { db.release(); }
       }
-    } catch {
+    } catch (error) {
+      // Persist only our fixed diagnostic codes, never provider bodies or identifiers.
+      const message = error instanceof Error ? error.message : '';
+      const diagnostic = /^(customer_deletion_http_[1-5][0-9]{2}|customer_deletion_not_confirmed|identity_deletion_unavailable)$/.test(message)
+        ? message : 'deletion_step_unavailable';
       await pool.query(`UPDATE account_deletion_jobs SET lease_token=NULL,lease_until=NULL,
-        available_at=NOW()+INTERVAL '5 minutes',last_error='deletion_step_unavailable'
-        WHERE account_id=$1 AND lease_token=$2`, [job.account_id, token]);
+        available_at=NOW()+INTERVAL '5 minutes',last_error=$3
+        WHERE account_id=$1 AND lease_token=$2`, [job.account_id, token, diagnostic]);
       onRetry?.();
     }
   }
